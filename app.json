@@ -4,7 +4,10 @@
     "slug": "arsenal-clone",
     "version": "1.0.0",
     "scheme": "arsenal-clone",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -29,14 +32,24 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.afifistudio.arsenalclone"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.afifistudio.arsenalclone"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f28948eb-c6cf-459e-bb8a-1d329fb88916"
       }
     }
   }
