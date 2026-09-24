@@ -1,10 +1,42 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, type ImageSourcePropType } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
 import { DisplayText } from '@/components/ui/DisplayText';
-import type { PlayerPhoto } from '@/lib/data/playerPhotos';
+import { resolveImage } from '@/lib/media/resolveImage';
+import type { Player } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
+
+export interface PlayerPhoto {
+  source: ImageSourcePropType;
+  /**
+   * cutout - transparent PNG placed on the card's own pattern
+   * panel  - full-height slice cut from the ref card, faded into the card on its left edge
+   */
+  kind: 'cutout' | 'panel';
+  /** width / height, only needed for panels */
+  aspect?: number;
+}
+
+const PANEL_ASPECT = 228 / 253;
+
+export function playerCardPhoto(player: Pick<Player, 'photo_url' | 'card_panel_url'>): PlayerPhoto {
+  const panel = resolveImage(player.card_panel_url);
+  if (panel) return { source: panel, kind: 'panel', aspect: PANEL_ASPECT };
+  return { source: resolveImage(player.photo_url) ?? { uri: player.photo_url }, kind: 'cutout' };
+}
+
+/** Card props straight from a players row. */
+export function playerCardData(player: Player): PlayerCardData {
+  return {
+    shirtNumber: player.shirt_number,
+    firstName: player.first_name,
+    lastName: player.last_name,
+    nationality: player.nationality,
+    flag: player.country_flag,
+    photo: playerCardPhoto(player),
+  };
+}
 
 export interface PlayerCardData {
   shirtNumber: number | string;

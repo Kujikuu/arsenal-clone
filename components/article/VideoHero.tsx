@@ -10,28 +10,50 @@ import {
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
+import { YouTubePlayer } from '@/components/media/YouTubePlayer';
 import { ARSENAL } from '@/theme/arsenal';
 
 interface Props {
   title: string;
-  poster: ImageSourcePropType;
+  poster?: ImageSourcePropType;
   /** Without a duration the hero is a plain image with a back button. */
-  duration?: string;
+  duration?: string | null;
+  /** Plays inline when set; otherwise play opens `watchUrl`. */
+  youtubeId?: string | null;
+  watchUrl?: string;
+  /** Start playing as soon as the screen opens. */
+  autoplay?: boolean;
+  rightAction?: React.ReactNode;
 }
 
 /** Inline player chrome over the poster frame (ref/post detail.jpeg). */
-export function VideoHero({ title, poster, duration }: Props) {
+export function VideoHero({
+  title,
+  poster,
+  duration,
+  youtubeId,
+  watchUrl,
+  autoplay,
+  rightAction,
+}: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(Boolean(autoplay && youtubeId));
   const height = (width * 9) / 16;
 
   return (
     <View style={{ paddingTop: insets.top + 43, backgroundColor: '#000' }}>
       <View style={{ width, height }}>
-        <Image source={poster} style={{ width, height }} resizeMode="cover" />
-        <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.28)' }} />
+        {playing && youtubeId ? (
+          <YouTubePlayer youtubeId={youtubeId} width={width} height={height} />
+        ) : (
+          <>
+            <Image source={poster} style={{ width, height }} resizeMode="cover" />
+            <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.28)' }} />
+          </>
+        )}
 
         <Pressable
           onPress={() => router.back()}
@@ -41,12 +63,19 @@ export function VideoHero({ title, poster, duration }: Props) {
           <Feather name="chevron-left" size={30} color="#FFF" />
         </Pressable>
 
-        {duration ? (
+        {rightAction ? (
+          <View style={{ position: 'absolute', right: 22, top: 2 }}>{rightAction}</View>
+        ) : null}
+
+        {duration && !playing ? (
           <VideoChrome
             title={title}
             duration={duration}
             playing={playing}
-            onToggle={() => setPlaying((p) => !p)}
+            onToggle={() => {
+              if (youtubeId) setPlaying(true);
+              else if (watchUrl) WebBrowser.openBrowserAsync(watchUrl);
+            }}
           />
         ) : null}
       </View>

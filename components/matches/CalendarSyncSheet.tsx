@@ -1,28 +1,73 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, Modal, Switch } from 'react-native';
+import { View, Text, Pressable, Modal, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { PillButton } from '@/components/ui/PillButton';
+import { SwitchRow } from '@/components/ui/SwitchRow';
+import { syncFixturesToCalendar } from '@/lib/calendar';
+import { useSettings } from '@/lib/settings/SettingsProvider';
+import type { TeamType } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onConfirm: () => void;
 }
 
 const OPTIONS = [
-  { key: 'men', title: "Men's First Team", detail: 'Premier League, Champions League, FA Cup' },
-  { key: 'women', title: "Women's Team", detail: "Women's Super League & Cup matches" },
-  { key: 'academy', title: 'Academy (U21 & U18)', detail: 'Premier League 2 fixtures' },
+  {
+    key: 'calendar_men',
+    team: 'men',
+    title: "Men's First Team",
+    detail: 'Premier League, Champions League and cups',
+  },
+  {
+    key: 'calendar_women',
+    team: 'women',
+    title: "Women's Team",
+    detail: "Women's Super League and Champions League",
+  },
+  {
+    key: 'calendar_academy',
+    team: 'academy',
+    title: 'Academy (U21, U19 & U18)',
+    detail: 'Premier League 2, UEFA Youth League, U18 PL',
+  },
 ] as const;
 
-type OptionKey = (typeof OPTIONS)[number]['key'];
+/** Picks which teams to sync, remembers the choice and writes the device calendar. */
+export function CalendarSyncSheet({ visible, onClose }: Props) {
+  const { settings, update } = useSettings();
+  const [syncing, setSyncing] = useState(false);
 
-export function CalendarSyncSheet({ visible, onClose, onConfirm }: Props) {
-  const [enabled, setEnabled] = useState<Record<OptionKey, boolean>>({
-    men: true,
-    women: true,
-    academy: false,
-  });
+  const selectedTeams = OPTIONS.filter((o) => settings[o.key]).map((o) => o.team as TeamType);
+
+  const onToggle = (key: (typeof OPTIONS)[number]['key'], value: boolean) =>
+    update({ [key]: value }).catch(() =>
+      Alert.alert('Could not save', 'Your calendar choices were not saved. Please try again.')
+    );
+
+  const onConfirm = async () => {
+    setSyncing(true);
+    try {
+      const { added, updated, removed } = await syncFixturesToCalendar(selectedTeams);
+      onClose();
+      const parts = [
+        added && `${added} added`,
+        updated && `${updated} updated`,
+        removed && `${removed} removed`,
+      ].filter(Boolean);
+      Alert.alert(
+        'Calendar synced',
+        parts.length
+          ? `Arsenal Fixtures calendar: ${parts.join(', ')}.`
+          : 'There are no upcoming fixtures for the selected teams.'
+      );
+    } catch (error: any) {
+      Alert.alert('Could not sync', error?.message ?? 'Please try again.');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -36,34 +81,29 @@ export function CalendarSyncSheet({ visible, onClose, onConfirm }: Props) {
             <MaterialCommunityIcons name="calendar-sync-outline" size={24} color={ARSENAL.red} />
             <Text className="ml-2.5 font-body-bold text-lg text-white">Sync Fixtures</Text>
           </View>
-          <Text className="mb-5 font-body text-sm text-neutral-400">
-            Add match schedules to your calendar. Kick-off times stay updated automatically.
+          <Text className="mb-3 font-body text-sm text-neutral-400">
+            Add upcoming matches to an Arsenal Fixtures calendar on this device. Sync again any time
+            to pick up changed kick-off times.
           </Text>
 
-          {OPTIONS.map((option) => (
-            <View
+          {OPTIONS.map((option, i) => (
+            <SwitchRow
               key={option.key}
-              style={{ borderBottomWidth: 1, borderBottomColor: ARSENAL.divider }}
-              className="flex-row items-center justify-between py-3">
-              <View className="flex-1 pr-3">
-                <Text className="font-body-semibold text-[15px] text-white">{option.title}</Text>
-                <Text className="font-body text-xs text-neutral-400">{option.detail}</Text>
-              </View>
-              <Switch
-                value={enabled[option.key]}
-                onValueChange={(value) => setEnabled((prev) => ({ ...prev, [option.key]: value }))}
-                trackColor={{ false: '#3A3A3C', true: ARSENAL.red }}
-                thumbColor="#FFFFFF"
-              />
-            </View>
+              title={option.title}
+              detail={option.detail}
+              value={settings[option.key]}
+              onValueChange={(v) => onToggle(option.key, v)}
+              last={i === OPTIONS.length - 1}
+            />
           ))}
 
-          <Pressable
+          <PillButton
+            label={selectedTeams.length ? 'SYNC TO CALENDAR' : 'REMOVE SYNCED FIXTURES'}
             onPress={onConfirm}
-            style={{ backgroundColor: ARSENAL.red, height: 44, borderRadius: 22 }}
-            className="mt-6 items-center justify-center active:opacity-85">
-            <Text className="font-body-semibold text-sm text-white">ADD TO CALENDAR</Text>
-          </Pressable>
+            loading={syncing}
+            height={44}
+            style={{ marginTop: 24 }}
+          />
         </Pressable>
       </Pressable>
     </Modal>

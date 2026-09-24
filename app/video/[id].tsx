@@ -1,200 +1,208 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-  Share,
-  Platform,
-  Linking,
-  Image,
-} from 'react-native';
+import { View, Text, ScrollView, Pressable, Share, Image, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
-import { useVideo, useVideos } from '@/lib/api/videos';
+import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { MediaRowCard } from '@/components/media/MediaRowCard';
+import { ReactionIcon } from '@/components/media/ReactionBadge';
+import { YouTubePlayer } from '@/components/media/YouTubePlayer';
+import { DisplayText } from '@/components/ui/DisplayText';
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
+import { useBookmark } from '@/lib/api/bookmarks';
+import { useReactions } from '@/lib/api/reactions';
+import { useVideo, videoWatchUrl } from '@/lib/api/videos';
+import { formatPublished } from '@/lib/format';
+import { resolveImage } from '@/lib/media/resolveImage';
+import { useSettings } from '@/lib/settings/SettingsProvider';
+import { ARSENAL } from '@/theme/arsenal';
 
 export default function VideoPlayerModal() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { video, loading } = useVideo(id as string);
-  const { videos: relatedVideos } = useVideos();
+  const { width } = useWindowDimensions();
+  const { settings } = useSettings();
+  const { data, loading, error, refetch } = useVideo(id);
+  const reactions = useReactions('video', id ? [id] : []);
+  const bookmark = useBookmark({ videoId: id ?? '' });
+  const [playing, setPlaying] = React.useState(false);
 
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-black">
-        <ActivityIndicator size="large" color="#DB0007" />
-      </View>
-    );
-  }
+  const video = data?.video;
+  const header = (
+    <TheArsenalHeader
+      left="close"
+      title={<DisplayText size={14}>ARSENAL TV</DisplayText>}
+      rightAction={
+        video ? (
+          <Pressable
+            onPress={() =>
+              Share.share({ message: `${video.title} - ${videoWatchUrl(video)}` }).catch(() => {})
+            }
+            hitSlop={10}
+            accessibilityLabel="Share">
+            <Ionicons name="arrow-redo-outline" size={26} color="#FFF" />
+          </Pressable>
+        ) : undefined
+      }
+    />
+  );
 
   if (!video) {
     return (
-      <View className="flex-1 items-center justify-center bg-black p-6">
-        <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
-        <Text className="mt-4 text-lg font-bold text-white">Video Not Found</Text>
-        <Pressable
-          onPress={() => router.back()}
-          className="mt-6 rounded-lg bg-arsenal-red px-4 py-2">
-          <Text className="font-bold text-white">Go Back</Text>
-        </Pressable>
+      <View className="flex-1 bg-black">
+        {header}
+        {error ? (
+          <ErrorState error={error} onRetry={refetch} />
+        ) : loading ? (
+          <LoadingState />
+        ) : (
+          <EmptyState icon="videocam-off-outline" title="Video not found" />
+        )}
       </View>
     );
   }
 
-  const embedUrl = `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1&playsinline=1&modestbranding=1&rel=0`;
-  const watchUrl = `https://www.youtube.com/watch?v=${video.youtube_id}`;
+  const height = (width * 9) / 16;
+  const reaction = reactions.get(video.id, video.reactions_base);
+  const showPlayer = Boolean(video.youtube_id) && (playing || settings.autoplay_video);
 
-  const onShare = async () => {
-    try {
-      await Share.share({
-        title: video.title,
-        message: `${video.title} - Watch on Arsenal TV: ${watchUrl}`,
-      });
-    } catch {}
-  };
-
-  const playVideo = async () => {
-    if (Platform.OS !== 'web') {
-      await WebBrowser.openBrowserAsync(watchUrl, {
-        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-        toolbarColor: '#060814',
-      });
-    } else {
-      Linking.openURL(watchUrl);
-    }
+  const play = () => {
+    if (video.youtube_id) setPlaying(true);
+    else WebBrowser.openBrowserAsync(videoWatchUrl(video));
   };
 
   return (
     <View className="flex-1 bg-black">
-      {/* Top Modal Bar */}
-      <View
-        style={{ paddingTop: Math.max(insets.top, 12) + 4 }}
-        className="z-20 flex-row items-center justify-between bg-black/90 px-4 pb-2.5">
-        <Pressable
-          onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-slate-800 active:opacity-70">
-          <Ionicons name="close" size={22} color="#FFFFFF" />
-        </Pressable>
+      {header}
 
-        <View className="flex-row items-center">
-          <View className="mr-2 h-2 w-2 rounded-full bg-arsenal-red" />
-          <Text className="text-xs font-black uppercase tracking-widest text-white">
-            ARSENAL TV
-          </Text>
-        </View>
-
-        <Pressable
-          onPress={onShare}
-          className="h-9 w-9 items-center justify-center rounded-full bg-slate-800 active:opacity-70">
-          <Ionicons name="share-outline" size={18} color="#FFFFFF" />
-        </Pressable>
-      </View>
-
-      {/* VIDEO PLAYER PREVIEW CONTAINER */}
-      <View className="relative h-64 w-full bg-slate-950">
-        {Platform.OS === 'web' ? (
-          <iframe
-            src={embedUrl}
-            style={{ width: '100%', height: '100%', border: 'none' }}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
+      {showPlayer && video.youtube_id ? (
+        <YouTubePlayer youtubeId={video.youtube_id} width={width} height={height} />
+      ) : (
+        <Pressable onPress={play} accessibilityLabel="Play video" style={{ width, height }}>
+          <Image
+            source={resolveImage(video.thumbnail_url)}
+            style={{ width, height }}
+            resizeMode="cover"
           />
-        ) : (
-          <Pressable onPress={playVideo} className="relative h-full w-full active:opacity-90">
-            <Image
-              source={{ uri: video.thumbnail_url }}
-              className="h-full w-full"
-              resizeMode="cover"
-            />
-            <View className="absolute inset-0 items-center justify-center bg-black/40">
-              <View className="h-16 w-16 items-center justify-center rounded-full bg-arsenal-red shadow-2xl">
-                <Ionicons name="play" size={32} color="#FFFFFF" style={{ marginLeft: 4 }} />
-              </View>
-              <Text className="mt-2 text-xs font-extrabold tracking-wider text-white">
-                TAP TO PLAY
+          <View
+            className="absolute inset-0 items-center justify-center"
+            style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+            <View
+              style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: ARSENAL.red }}
+              className="items-center justify-center">
+              <Ionicons name="play" size={30} color="#FFF" style={{ marginLeft: 4 }} />
+            </View>
+            {!video.youtube_id && (
+              <Text
+                className="font-body-semibold text-white"
+                style={{ fontSize: 12, marginTop: 10, letterSpacing: 0.5 }}>
+                WATCH ON YOUTUBE
               </Text>
-            </View>
-            <View className="absolute bottom-3 right-3 rounded bg-black/80 px-2 py-0.5">
-              <Text className="text-xs font-bold text-white">{video.duration}</Text>
-            </View>
-          </Pressable>
-        )}
-      </View>
-
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 50 }}>
-        {/* VIDEO DETAILS */}
-        <View className="border-b border-arsenal-cardBorder bg-arsenal-card p-4">
-          <View className="mb-1.5 flex-row items-center">
-            <View className="mr-2 rounded bg-arsenal-red px-2.5 py-0.5">
-              <Text className="text-[10px] font-black uppercase text-white">{video.category}</Text>
-            </View>
-            <Text className="text-xs font-medium text-slate-400">
-              {video.duration} • {video.views_count}
+            )}
+          </View>
+          <View
+            style={{
+              position: 'absolute',
+              right: 12,
+              bottom: 12,
+              borderRadius: 11,
+              paddingHorizontal: 8,
+              height: 22,
+              backgroundColor: 'rgba(255,255,255,0.88)',
+            }}
+            className="flex-row items-center">
+            <Ionicons name="play" size={11} color="#000" />
+            <Text
+              className="font-body-semibold"
+              style={{ fontSize: 13, color: '#000', marginLeft: 4 }}>
+              {video.duration}
             </Text>
           </View>
+        </Pressable>
+      )}
 
-          <Text className="mt-1 text-lg font-black leading-snug text-white">{video.title}</Text>
-
-          <Text className="mt-2 text-xs text-slate-400">
-            Published{' '}
-            {new Date(video.published_at).toLocaleDateString('en-GB', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })}
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }}>
+        <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: ARSENAL.divider }}>
+          <DisplayText size={11} color="#C8C6C7" heavy={false}>
+            {`${video.category.toUpperCase()} · ${formatPublished(video.published_at)}`}
+          </DisplayText>
+          <Text
+            className="font-body-semibold text-white"
+            style={{ fontSize: 22, lineHeight: 26, marginTop: 10 }}>
+            {video.title}
           </Text>
-
-          {/* Action Button */}
-          <Pressable
-            onPress={playVideo}
-            className="mt-4 flex-row items-center justify-center rounded-xl bg-arsenal-red px-4 py-3 shadow-lg active:opacity-85">
-            <Ionicons name="play" size={18} color="#FFFFFF" />
-            <Text className="ml-2 text-xs font-black uppercase tracking-wider text-white">
-              Watch Highlight ({video.duration})
-            </Text>
-          </Pressable>
-
-          {/* External YouTube App link */}
-          <Pressable
-            onPress={() => Linking.openURL(watchUrl)}
-            className="mt-2.5 flex-row items-center justify-center rounded-xl border border-slate-700 bg-slate-900 px-4 py-2.5 active:opacity-80">
-            <Ionicons name="logo-youtube" size={16} color="#EF4444" />
-            <Text className="ml-2 text-xs font-bold text-slate-200">Open in YouTube App</Text>
-          </Pressable>
-        </View>
-
-        {/* RELATED VIDEOS */}
-        <View className="p-4">
-          <Text className="mb-3 text-sm font-black uppercase tracking-wider text-white">
-            More From Arsenal TV
+          <Text
+            className="font-body"
+            style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 6 }}>
+            {video.duration}
+            {video.views_count ? ` · ${video.views_count}` : ''}
           </Text>
-
-          {relatedVideos
-            .filter((v) => v.id !== video.id)
-            .slice(0, 4)
-            .map((v) => (
+          <View className="flex-row items-center" style={{ marginTop: 18 }}>
+            <Pressable
+              onPress={() => reactions.toggle(video.id)}
+              accessibilityLabel={reaction.reacted ? 'Remove reaction' : 'React'}
+              className="flex-row items-center">
+              <ReactionIcon
+                kind="happy"
+                size={24}
+                color={reaction.reacted ? ARSENAL.red : '#FFF'}
+              />
+              <Text className="font-body text-white" style={{ fontSize: 15, marginLeft: 8 }}>
+                {reaction.total}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={bookmark.toggle}
+              accessibilityLabel={bookmark.saved ? 'Remove bookmark' : 'Bookmark'}
+              style={{ marginLeft: 26 }}
+              className="flex-row items-center">
+              <Ionicons
+                name={bookmark.saved ? 'bookmark' : 'bookmark-outline'}
+                size={22}
+                color="#FFF"
+              />
+              <Text className="font-body text-white" style={{ fontSize: 15, marginLeft: 6 }}>
+                {bookmark.saved ? 'Saved' : 'Save'}
+              </Text>
+            </Pressable>
+            {video.match_id ? (
               <Pressable
-                key={v.id}
-                onPress={() => router.replace(`/video/${v.id}`)}
-                className="mb-2.5 flex-row items-center rounded-xl border border-arsenal-cardBorder bg-arsenal-card p-3 active:opacity-85">
-                <View className="mr-3 h-7 w-7 items-center justify-center rounded-full bg-arsenal-red/80">
-                  <Ionicons name="play" size={14} color="#FFFFFF" style={{ marginLeft: 2 }} />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-xs font-bold text-white" numberOfLines={2}>
-                    {v.title}
-                  </Text>
-                  <Text className="mt-1 text-[10px] text-slate-400">
-                    {v.category} • {v.duration}
-                  </Text>
-                </View>
+                onPress={() => router.push(`/match/${video.match_id}`)}
+                accessibilityRole="button"
+                style={{
+                  marginLeft: 'auto',
+                  height: 32,
+                  borderRadius: 16,
+                  paddingHorizontal: 14,
+                  backgroundColor: ARSENAL.button,
+                }}
+                className="items-center justify-center">
+                <Text className="font-body-semibold text-white" style={{ fontSize: 12 }}>
+                  MATCH CENTRE
+                </Text>
               </Pressable>
-            ))}
+            ) : null}
+          </View>
         </View>
+
+        {data.related.length > 0 && (
+          <View style={{ padding: 16 }}>
+            <Text
+              className="font-body-semibold text-white"
+              style={{ fontSize: 20, marginBottom: 16 }}>
+              Up next
+            </Text>
+            {data.related.map((v) => (
+              <MediaRowCard
+                key={v.id}
+                title={v.title}
+                image={resolveImage(v.thumbnail_url) ?? { uri: v.thumbnail_url }}
+                height={96}
+                onPress={() => router.replace(`/video/${v.id}`)}
+              />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );

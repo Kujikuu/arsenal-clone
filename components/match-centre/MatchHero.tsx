@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, Pressable, useWindowDimensions } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DisplayText } from '@/components/ui/DisplayText';
-import type { GoalEvent } from '@/lib/data/matchCentre';
+import { TeamLogo } from '@/components/ui/TeamLogo';
 import { ARSENAL } from '@/theme/arsenal';
 
 const BANNER = require('@/assets/extracted/mc_live_banner.png');
@@ -11,6 +11,11 @@ const BANNER_ASPECT = 296 / 540;
 interface TeamSide {
   name: string;
   logo: string;
+}
+
+export interface GoalEvent {
+  minute: string;
+  player: string;
 }
 
 interface Props {
@@ -22,7 +27,8 @@ interface Props {
   score: string;
   homeGoals: GoalEvent[];
   awayGoals: GoalEvent[];
-  onListen: () => void;
+  /** Hidden when the match has no audio stream. */
+  onListen?: () => void;
 }
 
 function GoalList({ goals, align }: { goals: GoalEvent[]; align: 'left' | 'right' }) {
@@ -54,7 +60,7 @@ function GoalList({ goals, align }: { goals: GoalEvent[]; align: 'left' | 'right
 function Team({ team }: { team: TeamSide }) {
   return (
     <View style={{ width: 150 }} className="items-center">
-      <Image source={{ uri: team.logo }} style={{ width: 44, height: 44 }} resizeMode="contain" />
+      <TeamLogo uri={team.logo} name={team.name} size={44} />
       <Text className="font-body-semibold text-white" style={{ fontSize: 16, marginTop: 16 }}>
         {team.name}
       </Text>
@@ -120,22 +126,24 @@ export function MatchHero(props: Props) {
         <GoalList goals={props.awayGoals} align="left" />
       </View>
 
-      <Pressable
-        onPress={props.onListen}
-        accessibilityRole="button"
-        style={{
-          marginHorizontal: 16,
-          height: 34,
-          borderRadius: 17,
-          borderWidth: 1.2,
-          borderColor: ARSENAL.red,
-        }}
-        className="flex-row items-center justify-center active:opacity-75">
-        <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
-          LISTEN TO AUDIO ONLY
-        </Text>
-        <Ionicons name="play" size={8} color="#FFF" style={{ marginLeft: 16 }} />
-      </Pressable>
+      {props.onListen ? (
+        <Pressable
+          onPress={props.onListen}
+          accessibilityRole="button"
+          style={{
+            marginHorizontal: 16,
+            height: 34,
+            borderRadius: 17,
+            borderWidth: 1.2,
+            borderColor: ARSENAL.red,
+          }}
+          className="flex-row items-center justify-center active:opacity-75">
+          <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
+            LISTEN TO AUDIO ONLY
+          </Text>
+          <Ionicons name="play" size={8} color="#FFF" style={{ marginLeft: 16 }} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }

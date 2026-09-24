@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { DisplayText } from '@/components/ui/DisplayText';
-import type { MatchStat } from '@/lib/data/matchCentre';
+import type { MatchStat } from '@/types/database';
 import { ARSENAL, FONT } from '@/theme/arsenal';
 
 /** Michroma's % glyph reads as "o/o", so the sign is set in the body face. */
@@ -22,15 +22,15 @@ function StatValue({ value }: { value: string }) {
 }
 
 function StatRow({ stat }: { stat: MatchStat }) {
-  const homePct = `${Math.round(stat.homeShare * 1000) / 10}%` as const;
+  const homePct = `${Math.round(stat.home_share * 1000) / 10}%` as const;
   return (
     <View style={{ marginBottom: 20 }}>
       <View className="flex-row items-center justify-between">
-        <StatValue value={stat.home} />
+        <StatValue value={stat.home_value} />
         <Text className="font-body text-white" style={{ fontSize: 15 }}>
           {stat.label}
         </Text>
-        <StatValue value={stat.away} />
+        <StatValue value={stat.away_value} />
       </View>
       <View
         style={{ height: 8, borderRadius: 4, marginTop: 9, backgroundColor: ARSENAL.statRed }}
@@ -61,7 +61,7 @@ export function StatsPanel({ stats }: { stats: MatchStat[] }) {
       </Text>
       <View style={{ height: 1, backgroundColor: '#424041', marginTop: 14, marginBottom: 14 }} />
       {stats.map((stat) => (
-        <StatRow key={stat.label} stat={stat} />
+        <StatRow key={stat.id} stat={stat} />
       ))}
     </View>
   );

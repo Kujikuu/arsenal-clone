@@ -5,7 +5,9 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TheArsenalHeader } from '@/components/TheArsenalHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
-import { useAuth } from '@/lib/api/auth';
+import { PillButton } from '@/components/ui/PillButton';
+import { useAuth } from '@/lib/auth/AuthProvider';
+import { formatLongDate } from '@/lib/format';
 import { ARSENAL } from '@/theme/arsenal';
 
 const TILE_SIZE = 107;
@@ -13,7 +15,7 @@ const ICON_SIZE = 42;
 
 const MENU = [
   {
-    id: 'personal',
+    id: 'personal-details',
     title: 'PERSONAL DETAILS',
     icon: <Feather name="monitor" size={ICON_SIZE} color="#FFF" />,
   },
@@ -40,17 +42,11 @@ const MENU = [
     icon: <Ionicons name="chatbox-ellipses-outline" size={ICON_SIZE} color="#FFF" />,
   },
   {
-    id: 'tours',
+    id: 'stadium-tours',
     title: 'STADIUM TOURS',
     icon: <MaterialCommunityIcons name="flag-variant-outline" size={ICON_SIZE} color="#FFF" />,
   },
 ] as const;
-
-function formatMemberSince(iso?: string | null): string {
-  const date = iso ? new Date(iso) : null;
-  if (!date || Number.isNaN(date.getTime())) return '22 September 2026';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-}
 
 function PatternTile({ children }: { children: React.ReactNode }) {
   return (
@@ -78,7 +74,7 @@ export default function ProfileScreen() {
   const { user, profile } = useAuth();
   const [pressed, setPressed] = useState<string | null>(null);
 
-  const memberName = profile?.full_name || user?.email?.split('@')[0] || 'Ahmed Afifi';
+  const memberName = profile?.full_name || user?.email?.split('@')[0] || '';
 
   return (
     <View className="flex-1 bg-black">
@@ -95,14 +91,34 @@ export default function ProfileScreen() {
       />
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 24 }}>
-        <View className="items-center" style={{ paddingTop: 10, paddingBottom: 14 }}>
-          <Text className="font-body-semibold text-white" style={{ fontSize: 16.5 }}>
-            {memberName}
-          </Text>
-          <Text className="font-body text-white" style={{ fontSize: 16, marginTop: 8 }}>
-            Member since {formatMemberSince(user?.created_at)}
-          </Text>
-        </View>
+        {user ? (
+          <View className="items-center" style={{ paddingTop: 10, paddingBottom: 14 }}>
+            <Text className="font-body-semibold text-white" style={{ fontSize: 16.5 }}>
+              {memberName}
+            </Text>
+            <Text className="font-body text-white" style={{ fontSize: 16, marginTop: 8 }}>
+              Member since {formatLongDate(profile?.created_at ?? user.created_at)}
+            </Text>
+          </View>
+        ) : (
+          <View className="items-center px-6" style={{ paddingTop: 10, paddingBottom: 18 }}>
+            <Text
+              className="text-center font-body text-white"
+              style={{ fontSize: 16, lineHeight: 22 }}>
+              Sign in to manage your details, tickets and notifications.
+            </Text>
+            <View className="flex-row" style={{ marginTop: 16 }}>
+              <PillButton label="SIGN IN" height={38} onPress={() => router.push('/auth/login')} />
+              <PillButton
+                label="JOIN"
+                height={38}
+                variant="outline"
+                onPress={() => router.push('/auth/signup')}
+                style={{ marginLeft: 10 }}
+              />
+            </View>
+          </View>
+        )}
         <View
           style={{ height: 1, backgroundColor: '#4D4D4D', marginHorizontal: 14, marginBottom: 6 }}
         />
@@ -110,6 +126,7 @@ export default function ProfileScreen() {
         {MENU.map((item) => (
           <Pressable
             key={item.id}
+            onPress={() => router.push(`/account/${item.id}`)}
             onPressIn={() => setPressed(item.id)}
             onPressOut={() => setPressed(null)}
             accessibilityRole="button"

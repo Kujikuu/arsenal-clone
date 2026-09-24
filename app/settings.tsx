@@ -3,7 +3,7 @@ import { View, Text, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { TheArsenalHeader } from '@/components/TheArsenalHeader';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/lib/auth/AuthProvider';
 import { ARSENAL } from '@/theme/arsenal';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -17,32 +17,57 @@ interface Row {
 /** Settings list (ref/settings.jpeg). */
 export default function SettingsScreen() {
   const router = useRouter();
+  const { user, signOut, deleteAccount } = useAuth();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      await signOut();
+      router.replace('/(tabs)/profile');
+    } catch {
       Alert.alert('Could not log out', 'Please try again.');
-      return;
     }
-    router.replace('/(tabs)');
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteAccount();
+      Alert.alert('Account deleted', 'Your account and all of its data have been removed.');
+      router.replace('/(tabs)/profile');
+    } catch (error: any) {
+      Alert.alert('Could not delete account', error?.message ?? 'Please try again.');
+    }
   };
 
   const confirmDelete = () =>
-    Alert.alert('Delete account', 'This permanently removes your account. Continue?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: handleLogout },
-    ]);
+    Alert.alert(
+      'Delete account',
+      'This permanently removes your account, tickets, bookings, votes and saved items. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: handleDelete },
+      ]
+    );
 
   const rows: Row[] = [
+    { title: 'Contact Us', icon: 'people-outline', onPress: () => router.push('/contact') },
     {
-      title: 'Contact Us',
-      icon: 'people-outline',
-      onPress: () => Alert.alert('Contact Us', 'Reach out at support@arsenal.co.uk'),
+      title: 'Terms Of Use',
+      icon: 'document-text-outline',
+      onPress: () => router.push('/legal/terms'),
     },
-    { title: 'Terms Of Use', icon: 'document-text-outline', onPress: () => {} },
-    { title: 'Privacy Policy', icon: 'information-circle-outline', onPress: () => {} },
-    { title: 'Logout', icon: 'log-out-outline', onPress: handleLogout },
-    { title: 'Delete Account', icon: 'trash-outline', onPress: confirmDelete },
+    {
+      title: 'Privacy Policy',
+      icon: 'information-circle-outline',
+      onPress: () => router.push('/legal/privacy'),
+    },
+    ...(user
+      ? ([
+          { title: 'Logout', icon: 'log-out-outline', onPress: handleLogout },
+          { title: 'Delete Account', icon: 'trash-outline', onPress: confirmDelete },
+        ] as Row[])
+      : ([
+          { title: 'Sign In', icon: 'log-in-outline', onPress: () => router.push('/auth/login') },
+        ] as Row[])),
   ];
 
   return (

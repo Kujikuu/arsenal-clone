@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop, Path, Circle } from 'react-native-svg';
-import { tablePoints, type TableForm, type TableRow } from '@/lib/data/fixtures';
+import { TeamLogo } from '@/components/ui/TeamLogo';
+import type { Standing } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
 
 const ROW_HEIGHT = 48;
@@ -9,13 +10,18 @@ const HEADER_HEIGHT = 40;
 const STAT_WIDTH = 52;
 const LEFT_WIDTH = 190;
 
-const STAT_COLUMNS: { key: string; value: (row: TableRow) => number }[] = [
-  { key: 'P', value: (r) => r.p },
-  { key: 'W', value: (r) => r.w },
-  { key: 'D', value: (r) => r.d },
-  { key: 'L', value: (r) => r.l },
-  { key: 'Pts', value: tablePoints },
+const STAT_COLUMNS: { key: string; value: (row: Standing) => number | string }[] = [
+  { key: 'P', value: (r) => r.played },
+  { key: 'W', value: (r) => r.won },
+  { key: 'D', value: (r) => r.drawn },
+  { key: 'L', value: (r) => r.lost },
+  { key: 'GD', value: (r) => (r.goal_diff > 0 ? `+${r.goal_diff}` : r.goal_diff) },
+  { key: 'Pts', value: (r) => r.points },
 ];
+
+type TableForm = Standing['trend'];
+
+const codeFor = (row: Standing) => row.team_code ?? row.team_name.slice(0, 3).toUpperCase();
 
 function FormMarker({ form }: { form: TableForm }) {
   if (form === 'same') {
@@ -67,7 +73,7 @@ const headerStyle = {
 } as const;
 
 /** Standings with a fixed club column and horizontally scrolling stats (ref/match-table.jpeg). */
-export function LeagueTable({ rows }: { rows: TableRow[] }) {
+export function LeagueTable({ rows }: { rows: Standing[] }) {
   return (
     <View style={{ marginLeft: 10 }} className="flex-row">
       <View style={{ width: LEFT_WIDTH }}>
@@ -82,24 +88,20 @@ export function LeagueTable({ rows }: { rows: TableRow[] }) {
           </Text>
         </View>
         {rows.map((row) => (
-          <View key={row.code} style={rowStyle} className="flex-row items-center">
+          <View key={row.id} style={rowStyle} className="flex-row items-center">
             <Text
               className="font-body-semibold"
               style={{ fontSize: 15, color: '#C8C6C7', width: 38, paddingLeft: 10 }}>
               {row.rank}
             </Text>
             <View style={{ width: 24 }}>
-              <FormMarker form={row.form} />
+              <FormMarker form={row.trend} />
             </View>
-            <Image
-              source={{ uri: row.logo }}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
+            <TeamLogo uri={row.team_logo} name={row.team_name} size={20} />
             <Text
               className="font-body-semibold text-white"
               style={{ fontSize: 15, marginLeft: 10 }}>
-              {row.code}
+              {codeFor(row)}
             </Text>
           </View>
         ))}
@@ -119,7 +121,7 @@ export function LeagueTable({ rows }: { rows: TableRow[] }) {
               ))}
             </View>
             {rows.map((row) => (
-              <View key={row.code} style={rowStyle} className="flex-row items-center">
+              <View key={row.id} style={rowStyle} className="flex-row items-center">
                 {STAT_COLUMNS.map((col) => (
                   <Text
                     key={col.key}

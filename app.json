@@ -20,7 +20,13 @@
         }
       ],
       "expo-localization",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "The Arsenal adds upcoming fixtures to your calendar when you choose to sync them."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

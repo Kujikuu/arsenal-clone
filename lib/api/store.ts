@@ -1,76 +1,40 @@
-import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { StoreProduct } from '@/types/database';
+import { unwrap, useQuery } from '@/lib/api/useQuery';
+import type { StoreProduct } from '@/types/database';
 
-export async function fetchStoreProducts(
-  category?: string
-): Promise<{ data: StoreProduct[]; error: any }> {
-  try {
-    let query = supabase.from('store_products').select('*');
+export const STORE_CATEGORIES = ['ALL', 'KITS', 'TRAINING', 'RETRO', 'ACCESSORIES'] as const;
+export type StoreCategory = (typeof STORE_CATEGORIES)[number];
 
-    if (category && category !== 'All') {
-      query = query.eq('category', category);
-    }
+const toDb = (c: StoreCategory) =>
+  (c.charAt(0) + c.slice(1).toLowerCase()) as StoreProduct['category'];
 
-    const { data, error } = await query;
-    if (error) throw error;
-    return { data: (data as StoreProduct[]) || [], error: null };
-  } catch (error) {
-    console.warn('[fetchStoreProducts] Supabase query error:', error);
-    return { data: [], error };
-  }
+const normalise = (p: StoreProduct): StoreProduct => ({
+  ...p,
+  price_gbp: Number(p.price_gbp),
+  price_usd: Number(p.price_usd),
+});
+
+export function useStoreProducts(category: StoreCategory = 'ALL') {
+  return useQuery(
+    ['store-products', category],
+    async () => {
+      let query = supabase.from('store_products').select('*').order('created_at');
+      if (category !== 'ALL') query = query.eq('category', toDb(category));
+      return (unwrap(await query) as StoreProduct[]).map(normalise);
+    },
+    { initialData: [] }
+  );
 }
 
-export async function fetchProductById(
-  id: string
-): Promise<{ data: StoreProduct | null; error: any }> {
-  try {
-    const { data, error } = await supabase.from('store_products').select('*').eq('id', id).single();
-
-    if (error) throw error;
-    return { data: (data as StoreProduct) || null, error: null };
-  } catch (error) {
-    console.warn('[fetchProductById] Supabase query error:', error);
-    return { data: null, error };
-  }
-}
-
-export function useStoreProducts(category?: string) {
-  const [products, setProducts] = useState<StoreProduct[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    const { data, error: err } = await fetchStoreProducts(category);
-    setProducts(data);
-    setError(err);
-    setLoading(false);
-  }, [category]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  return { products, loading, error, refetch: load };
-}
-
-export function useStoreProduct(id: string) {
-  const [product, setProduct] = useState<StoreProduct | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
-
-  useEffect(() => {
-    async function load() {
-      if (!id) return;
-      setLoading(true);
-      const { data, error: err } = await fetchProductById(id);
-      setProduct(data);
-      setError(err);
-      setLoading(false);
-    }
-    load();
-  }, [id]);
-
-  return { product, loading, error };
+export function useStoreProduct(id: string | undefined) {
+  return useQuery(
+    ['store-product', id],
+    async () => {
+      const row = unwrap(
+        await supabase.from('store_products').select('*').eq('id', id).maybeSingle()
+      ) as StoreProduct | null;
+      return row ? normalise(row) : null;
+    },
+    { enabled: Boolean(id) }
+  );
 }

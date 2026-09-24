@@ -1,140 +1,70 @@
-import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { FanPoll, PollOption } from '@/types/database';
+import { unwrap, useQuery } from '@/lib/api/useQuery';
+import type { FanPoll, PollOption } from '@/types/database';
 
-export async function fetchActivePolls(): Promise<{ data: FanPoll[]; error: any }> {
-  try {
-    const { data: pollsData, error: pollsError } = await supabase
-      .from('fan_polls')
-      .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: false });
+/** Active polls, optionally for one match, with the signed-in user's vote. */
+export async function fetchPolls({ matchId }: { matchId?: string } = {}): Promise<FanPoll[]> {
+  let query = supabase
+    .from('fan_polls')
+    .select('*, options:poll_options(*)')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+  if (matchId) query = query.eq('match_id', matchId);
+  const polls = unwrap(await query) as (Omit<FanPoll, 'total_votes'> & { options: PollOption[] })[];
+  if (!polls.length) return [];
 
-    if (pollsError) throw pollsError;
-
-    if (!pollsData || pollsData.length === 0) {
-      return { data: [], error: null };
-    }
-
-    const pollIds = pollsData.map((p) => p.id);
-    const { data: optionsData, error: optionsError } = await supabase
-      .from('poll_options')
-      .select('*')
-      .in('poll_id', pollIds);
-
-    if (optionsError) throw optionsError;
-
-    // Check user vote if user is logged in
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    let userVotesMap: Record<string, string> = {};
-    if (user) {
-      const { data: userVotes } = await supabase
+  const { data: auth } = await supabase.auth.getSession();
+  const userId = auth.session?.user.id;
+  const votes: Record<string, string> = {};
+  if (userId) {
+    const rows = unwrap(
+      await supabase
         .from('poll_votes')
         .select('poll_id, option_id')
-        .eq('user_id', user.id);
-
-      if (userVotes) {
-        userVotes.forEach((uv) => {
-          userVotesMap[uv.poll_id] = uv.option_id;
-        });
-      }
-    }
-
-    const pollsWithNestedOptions: FanPoll[] = pollsData.map((poll) => {
-      const options = (optionsData as PollOption[])?.filter((opt) => opt.poll_id === poll.id) || [];
-      const total_votes = options.reduce((sum, opt) => sum + (opt.votes_count || 0), 0);
-      return {
-        ...poll,
-        options,
-        total_votes,
-        user_voted_option_id: userVotesMap[poll.id] || null,
-      };
-    });
-
-    return { data: pollsWithNestedOptions, error: null };
-  } catch (error) {
-    console.warn('[fetchActivePolls] Supabase query error:', error);
-    return { data: [], error };
+        .eq('user_id', userId)
+        .in(
+          'poll_id',
+          polls.map((p) => p.id)
+        )
+    ) as { poll_id: string; option_id: string }[];
+    rows.forEach((r) => (votes[r.poll_id] = r.option_id));
   }
+
+  return polls.map((poll) => {
+    const options = [...poll.options].sort((a, b) => a.id.localeCompare(b.id));
+    return {
+      ...poll,
+      options,
+      total_votes: options.reduce((sum, o) => sum + (o.votes_count || 0), 0),
+      user_voted_option_id: votes[poll.id] ?? null,
+    };
+  });
 }
 
-export async function castVote(
-  pollId: string,
-  optionId: string
-): Promise<{ success: boolean; error: any }> {
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: new Error('You must be signed in to vote.') };
-    }
-
-    // Insert vote
-    const { error: voteError } = await supabase.from('poll_votes').insert({
-      poll_id: pollId,
-      option_id: optionId,
-      user_id: user.id,
-    });
-
-    if (voteError) throw voteError;
-
-    // Increment vote count on option (or fetch updated)
-    try {
-      await supabase.rpc('increment_poll_option_vote', { target_option_id: optionId });
-    } catch {
-      // fallback if RPC is not created
-    }
-
-    return { success: true, error: null };
-  } catch (error) {
-    console.warn('[castVote] error:', error);
-    return { success: false, error };
-  }
+/** The vote count is incremented by a database trigger. */
+export async function castVote(pollId: string, optionId: string, userId: string) {
+  const { error } = await supabase
+    .from('poll_votes')
+    .insert({ poll_id: pollId, option_id: optionId, user_id: userId });
+  if (error) throw error;
 }
 
-export function usePolls() {
-  const [polls, setPolls] = useState<FanPoll[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+export function usePolls(matchId?: string) {
+  return useQuery(['polls', matchId], () => fetchPolls({ matchId }), { initialData: [] });
+}
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    const { data, error: err } = await fetchActivePolls();
-    setPolls(data);
-    setError(err);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const vote = async (pollId: string, optionId: string) => {
-    // optimistic update
-    setPolls((prev) =>
-      prev.map((poll) => {
-        if (poll.id !== pollId) return poll;
-        return {
+/** Optimistically apply a vote to a list of polls. */
+export function applyVote(polls: FanPoll[], pollId: string, optionId: string): FanPoll[] {
+  return polls.map((poll) =>
+    poll.id !== pollId
+      ? poll
+      : {
           ...poll,
           total_votes: poll.total_votes + 1,
           user_voted_option_id: optionId,
-          options: poll.options.map((opt) =>
-            opt.id === optionId ? { ...opt, votes_count: opt.votes_count + 1 } : opt
+          options: poll.options.map((o) =>
+            o.id === optionId ? { ...o, votes_count: o.votes_count + 1 } : o
           ),
-        };
-      })
-    );
-    const res = await castVote(pollId, optionId);
-    if (!res.success) {
-      load(); // roll back if failed
-    }
-    return res;
-  };
-
-  return { polls, loading, error, refetch: load, vote };
+        }
+  );
 }

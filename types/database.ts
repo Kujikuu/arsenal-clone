@@ -1,10 +1,24 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
+export type TeamType = 'men' | 'women' | 'academy';
+/** Media content can also belong to the club as a whole. */
+export type ContentTeamType = TeamType | 'club';
+export type ReactionKind = 'sad' | 'fire' | 'clap' | 'happy';
+
 export interface Article {
   id: string;
   title: string;
   subtitle?: string | null;
-  category: 'Match Report' | 'Interview' | 'News' | 'Transfer' | 'Academy' | 'Women';
+  category:
+    | 'Match Report'
+    | 'Interview'
+    | 'News'
+    | 'Transfer'
+    | 'Academy'
+    | 'Women'
+    | 'Feature'
+    | 'Video'
+    | 'Gallery';
   content: string;
   image_url: string;
   author: string;
@@ -12,41 +26,33 @@ export interface Article {
   published_at: string;
   is_featured: boolean;
   tag?: string | null;
+  team_type: ContentTeamType;
+  youtube_id?: string | null;
+  video_duration?: string | null;
+  reaction_kind: ReactionKind;
+  reactions_base: number;
+  match_id?: string | null;
 }
 
-export interface MatchTimelineEvent {
-  minute: number;
-  type: 'goal' | 'sub' | 'yellow_card' | 'red_card' | 'var' | 'penalty';
-  team: 'home' | 'away';
-  player: string;
-  detail?: string;
-}
-
-export interface MatchPlayerLineup {
-  shirt_number: number;
-  name: string;
-  position: string;
-  is_captain?: boolean;
-}
-
-export interface MatchLineup {
-  formation: string;
-  starting: MatchPlayerLineup[];
-  bench: MatchPlayerLineup[];
-}
-
-export interface MatchStats {
-  possession: [number, number]; // [home, away]
-  shots: [number, number];
-  shots_on_target: [number, number];
-  corners: [number, number];
-  fouls: [number, number];
-  yellow_cards: [number, number];
-}
+export type Competition =
+  | 'Premier League'
+  | 'UEFA Champions League'
+  | 'FA Cup'
+  | 'Carabao Cup'
+  | 'UEFA Europa League'
+  | 'Emirates Cup'
+  | 'Friendly'
+  | "Women's Super League"
+  | "UEFA Women's Champions League"
+  | "Women's League Cup"
+  | 'Premier League 2'
+  | 'U18 Premier League'
+  | 'UEFA Youth League';
 
 export interface Match {
   id: string;
-  competition: 'Premier League' | 'Champions League' | 'FA Cup' | 'Carabao Cup' | 'Friendly';
+  team_type: TeamType;
+  competition: Competition;
   competition_logo?: string | null;
   season: string;
   round: string;
@@ -61,18 +67,65 @@ export interface Match {
   minute?: number | null;
   stadium: string;
   referee?: string | null;
-  lineups_json?: {
-    home: MatchLineup;
-    away: MatchLineup;
-  } | null;
-  timeline_events_json?: MatchTimelineEvent[] | null;
-  match_stats_json?: MatchStats | null;
+  audio_url?: string | null;
+}
+
+export type MatchEventType =
+  | 'goal'
+  | 'own_goal'
+  | 'penalty_goal'
+  | 'yellow_card'
+  | 'red_card'
+  | 'sub'
+  | 'var'
+  | 'whistle'
+  | 'chance'
+  | 'corner'
+  | 'info';
+
+export interface MatchEvent {
+  id: string;
+  match_id: string;
+  sort: number;
+  minute_label: string;
+  type: MatchEventType;
+  team?: 'home' | 'away' | null;
+  player?: string | null;
+  title: string;
+  body: string;
+}
+
+export interface MatchLineupPlayer {
+  id: string;
+  match_id: string;
+  side: 'home' | 'away';
+  shirt_number: number;
+  name: string;
+  position: string;
+  photo_url?: string | null;
+  is_starter: boolean;
+  sort: number;
+}
+
+export interface MatchStat {
+  id: string;
+  match_id: string;
+  sort: number;
+  label: string;
+  home_value: string;
+  away_value: string;
+  /** Share of the bar owned by the home side, 0..1. */
+  home_share: number;
 }
 
 export interface Standing {
   id: string;
+  team_type: TeamType;
+  season: string;
+  competition: string;
   rank: number;
   team_name: string;
+  team_code?: string | null;
   team_logo: string;
   played: number;
   won: number;
@@ -82,12 +135,13 @@ export interface Standing {
   goals_against: number;
   goal_diff: number;
   points: number;
+  trend: 'up' | 'down' | 'same';
   form?: string | null; // e.g. "W,W,D,W,W"
 }
 
 export interface Player {
   id: string;
-  team_type: 'men' | 'women' | 'academy';
+  team_type: TeamType;
   first_name: string;
   last_name: string;
   known_as?: string | null;
@@ -97,22 +151,110 @@ export interface Player {
   country_flag: string;
   date_of_birth: string;
   photo_url: string;
+  /** Full-height card art; replaces the cutout on the player card when set. */
+  card_panel_url?: string | null;
   bio: string;
   appearances: number;
   goals: number;
   assists: number;
-  clean_sheets?: number;
+  clean_sheets?: number | null;
+  place_of_birth?: string | null;
+  signed_on?: string | null;
 }
 
 export interface Video {
   id: string;
   title: string;
-  category: 'Highlights' | 'Interviews' | 'Features' | 'Classic';
-  youtube_id: string;
+  category:
+    | 'Highlights'
+    | 'Interviews'
+    | 'Features'
+    | 'Classic'
+    | 'Full Match'
+    | 'Reaction'
+    | 'Behind The Scenes';
+  youtube_id?: string | null;
   duration: string;
   thumbnail_url: string;
   published_at: string;
   views_count?: string | null;
+  team_type: ContentTeamType;
+  collection_id?: string | null;
+  match_id?: string | null;
+  sort: number;
+  reactions_base: number;
+}
+
+export interface VideoCollection {
+  id: string;
+  title: string;
+  team_type: ContentTeamType;
+  match_id?: string | null;
+  sort: number;
+}
+
+export interface Reel {
+  id: string;
+  tag: string;
+  title: string;
+  subtitle: string;
+  image_url: string;
+  article_id?: string | null;
+  team_type: ContentTeamType;
+  is_featured: boolean;
+  reactions_base: number;
+  published_at: string;
+}
+
+export interface PhotoGallery {
+  id: string;
+  title: string;
+  team_type: ContentTeamType;
+  cover_url: string;
+  match_id?: string | null;
+  published_at: string;
+}
+
+export interface PhotoGalleryImage {
+  id: string;
+  gallery_id: string;
+  image_url: string;
+  caption?: string | null;
+  sort: number;
+}
+
+export interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  team_type: ContentTeamType;
+  cover_url: string;
+  published_at: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  quiz_id: string;
+  sort: number;
+  prompt: string;
+  options: string[];
+  correct_index: number;
+  explanation?: string | null;
+}
+
+export interface Experience {
+  id: string;
+  category: 'tour' | 'museum' | 'matchday' | 'legends';
+  title: string;
+  subtitle: string;
+  description: string;
+  image_url: string;
+  price_gbp: number;
+  duration_minutes: number;
+  schedule: string;
+  book_url: string;
+  team_type: ContentTeamType;
+  sort: number;
 }
 
 export interface FanPoll {
@@ -122,6 +264,7 @@ export interface FanPoll {
   category: string;
   ends_at: string;
   is_active: boolean;
+  match_id?: string | null;
   total_votes: number;
   options: PollOption[];
   user_voted_option_id?: string | null;
@@ -165,10 +308,84 @@ export interface StoreProduct {
 export interface UserProfile {
   id: string;
   full_name: string;
-  email?: string;
   avatar_url?: string | null;
   favorite_player_id?: string | null;
   gunner_id_number: string;
   membership_tier: 'Red Member' | 'Silver Member' | 'Junior Gunner' | 'Digital Fan';
+  phone?: string | null;
+  date_of_birth?: string | null;
+  country?: string | null;
+  postcode?: string | null;
+  marketing_opt_in: boolean;
   created_at: string;
+}
+
+export interface UserSettings {
+  user_id: string;
+  notify_kickoff: boolean;
+  notify_lineups: boolean;
+  notify_goals: boolean;
+  notify_full_time: boolean;
+  notify_news: boolean;
+  notify_tickets: boolean;
+  notify_women: boolean;
+  notify_academy: boolean;
+  favourite_team_type: TeamType;
+  currency: 'GBP' | 'USD';
+  autoplay_video: boolean;
+  language: 'en' | 'es' | 'fr' | 'ar';
+  calendar_men: boolean;
+  calendar_women: boolean;
+  calendar_academy: boolean;
+}
+
+export interface TicketSale {
+  id: string;
+  match_id: string;
+  phase: string;
+  opens_at: string;
+  closes_at?: string | null;
+  price_from_gbp: number;
+  status: 'upcoming' | 'open' | 'sold_out';
+  buy_url: string;
+  match?: Match | null;
+}
+
+export interface UserTicket {
+  id: string;
+  user_id: string;
+  match_id: string;
+  sale_id?: string | null;
+  block: string;
+  row_label: string;
+  seat: string;
+  barcode: string;
+  created_at: string;
+  match?: Match | null;
+}
+
+export interface TourBooking {
+  id: string;
+  user_id: string;
+  experience_id: string;
+  tour_date: string;
+  guests: number;
+  created_at: string;
+  experience?: Experience | null;
+}
+
+export interface LegalDocument {
+  slug: string;
+  title: string;
+  body: string;
+  updated_at: string;
+}
+
+export interface SearchResult {
+  kind: 'article' | 'video';
+  id: string;
+  title: string;
+  image_url: string;
+  published_at: string;
+  total: number;
 }

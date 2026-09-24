@@ -82,12 +82,6 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => <ProfileTabIcon focused={focused} />,
         }}
       />
-
-      {/* Legacy routes kept reachable by URL but hidden from the bar */}
-      <Tabs.Screen name="matches" options={{ href: null }} />
-      <Tabs.Screen name="video" options={{ href: null }} />
-      <Tabs.Screen name="teams" options={{ href: null }} />
-      <Tabs.Screen name="fanzone" options={{ href: null }} />
     </Tabs>
   );
 }
