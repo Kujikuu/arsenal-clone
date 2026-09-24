@@ -11,7 +11,7 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
-import { YouTubePlayer } from '@/components/media/YouTubePlayer';
+import { canPlayInline, YouTubePlayer } from '@/components/media/YouTubePlayer';
 import { ARSENAL } from '@/theme/arsenal';
 
 interface Props {
@@ -40,13 +40,14 @@ export function VideoHero({
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const [playing, setPlaying] = useState(Boolean(autoplay && youtubeId));
+  const inline = Boolean(youtubeId) && canPlayInline();
+  const [playing, setPlaying] = useState(Boolean(autoplay && inline));
   const height = (width * 9) / 16;
 
   return (
     <View style={{ paddingTop: insets.top + 43, backgroundColor: '#000' }}>
       <View style={{ width, height }}>
-        {playing && youtubeId ? (
+        {playing && inline && youtubeId ? (
           <YouTubePlayer youtubeId={youtubeId} width={width} height={height} />
         ) : (
           <>
@@ -73,7 +74,7 @@ export function VideoHero({
             duration={duration}
             playing={playing}
             onToggle={() => {
-              if (youtubeId) setPlaying(true);
+              if (inline) setPlaying(true);
               else if (watchUrl) WebBrowser.openBrowserAsync(watchUrl);
             }}
           />

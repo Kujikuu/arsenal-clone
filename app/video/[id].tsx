@@ -6,7 +6,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { TheArsenalHeader } from '@/components/TheArsenalHeader';
 import { MediaRowCard } from '@/components/media/MediaRowCard';
 import { ReactionIcon } from '@/components/media/ReactionBadge';
-import { YouTubePlayer } from '@/components/media/YouTubePlayer';
+import { canPlayInline, YouTubePlayer } from '@/components/media/YouTubePlayer';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useBookmark } from '@/lib/api/bookmarks';
@@ -64,10 +64,11 @@ export default function VideoPlayerModal() {
 
   const height = (width * 9) / 16;
   const reaction = reactions.get(video.id, video.reactions_base);
-  const showPlayer = Boolean(video.youtube_id) && (playing || settings.autoplay_video);
+  const inline = Boolean(video.youtube_id) && canPlayInline();
+  const showPlayer = inline && (playing || settings.autoplay_video);
 
   const play = () => {
-    if (video.youtube_id) setPlaying(true);
+    if (inline) setPlaying(true);
     else WebBrowser.openBrowserAsync(videoWatchUrl(video));
   };
 
@@ -92,7 +93,7 @@ export default function VideoPlayerModal() {
               className="items-center justify-center">
               <Ionicons name="play" size={30} color="#FFF" style={{ marginLeft: 4 }} />
             </View>
-            {!video.youtube_id && (
+            {!inline && (
               <Text
                 className="font-body-semibold text-white"
                 style={{ fontSize: 12, marginTop: 10, letterSpacing: 0.5 }}>

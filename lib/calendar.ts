@@ -1,13 +1,23 @@
 import { Platform } from 'react-native';
-import * as Calendar from 'expo-calendar/legacy';
+import type * as CalendarModule from 'expo-calendar/legacy';
 import { fetchUpcomingMatches } from '@/lib/api/matches';
+import { hasCalendarModule, MISSING_NATIVE_MODULE_MESSAGE } from '@/lib/nativeModules';
 import type { TeamType } from '@/types/database';
 
 const CALENDAR_TITLE = 'Arsenal Fixtures';
 const MATCH_MARKER = 'arsenal-match:';
 const MATCH_LENGTH_MS = 2 * 60 * 60 * 1000;
 
-async function findOrCreateCalendar(): Promise<string> {
+type CalendarApi = typeof CalendarModule;
+
+/** Loaded on demand so builds without the native module don't crash at startup. */
+function loadCalendar(): CalendarApi {
+  if (!hasCalendarModule()) throw new Error(MISSING_NATIVE_MODULE_MESSAGE);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- deliberate lazy native import
+  return require('expo-calendar/legacy') as CalendarApi;
+}
+
+async function findOrCreateCalendar(Calendar: CalendarApi): Promise<string> {
   const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
   const existing = calendars.find((c) => c.title === CALENDAR_TITLE && c.allowsModifications);
   if (existing) return existing.id;
@@ -41,12 +51,13 @@ export interface SyncResult {
  * teams that were switched off.
  */
 export async function syncFixturesToCalendar(teamTypes: TeamType[]): Promise<SyncResult> {
+  const Calendar = loadCalendar();
   const { status } = await Calendar.requestCalendarPermissionsAsync();
   if (status !== 'granted') {
     throw new Error('Allow calendar access in Settings to sync fixtures.');
   }
 
-  const calendarId = await findOrCreateCalendar();
+  const calendarId = await findOrCreateCalendar(Calendar);
   const matches = await fetchUpcomingMatches(teamTypes);
 
   const now = new Date();
@@ -55,7 +66,7 @@ export async function syncFixturesToCalendar(teamTypes: TeamType[]): Promise<Syn
   const byMatch = new Map(
     existing
       .map((e) => [e.notes?.split(MATCH_MARKER)[1]?.trim(), e] as const)
-      .filter(([id]) => Boolean(id)) as [string, Calendar.Event][]
+      .filter(([id]) => Boolean(id)) as [string, CalendarModule.Event][]
   );
 
   const result: SyncResult = { added: 0, updated: 0, removed: 0 };
