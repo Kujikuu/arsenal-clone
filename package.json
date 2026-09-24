@@ -12,7 +12,9 @@
     "prebuild": "expo prebuild",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "db:fetch-squad": "node scripts/fetch_pl_squad.mjs",
+    "db:seed": "node scripts/gen_seed.mjs > supabase/seed.sql"
   },
   "dependencies": {
     "@expo-google-fonts/kumbh-sans": "^0.4.2",

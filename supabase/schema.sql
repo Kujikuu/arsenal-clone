@@ -878,3 +878,6 @@ revoke all on function public.toggle_reaction(text, text, text) from public, ano
 grant execute on function public.toggle_reaction(text, text, text) to authenticated;
 grant execute on function public.get_reactions(text, text[]) to anon, authenticated;
 grant execute on function public.search_content(text, text, text, integer, integer) to anon, authenticated;
+
+-- Some youth players have no official Premier League photo yet.
+alter table public.players alter column photo_url drop not null;

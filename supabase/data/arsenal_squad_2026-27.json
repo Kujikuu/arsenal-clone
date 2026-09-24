@@ -1,0 +1,1998 @@
+{
+  "source": "footballapi.pulselive.com",
+  "season": "2026/27",
+  "comp_season_id": 841,
+  "fetched_at": "2026-09-24T13:42:08.478Z",
+  "players": [
+    {
+      "pl_id": 7975,
+      "opta": "p154561",
+      "name": "David Raya",
+      "first_name": "David",
+      "last_name": "Raya",
+      "shirt_number": 1,
+      "position": "Goalkeeper",
+      "nationality": "Spain",
+      "nationality_iso": "ES",
+      "date_of_birth": "1995-09-15",
+      "place_of_birth": "Barcelona, Spain",
+      "joined": "2024-07-04",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/154561.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 3
+      }
+    },
+    {
+      "pl_id": 11373,
+      "opta": "p109745",
+      "name": "Kepa Arrizabalaga",
+      "first_name": "Kepa",
+      "last_name": "Arrizabalaga",
+      "shirt_number": 13,
+      "position": "Goalkeeper",
+      "nationality": "Spain",
+      "nationality_iso": "ES",
+      "date_of_birth": "1994-10-03",
+      "place_of_birth": "Ondarroa, Spain",
+      "joined": "2025-07-01",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/109745.png",
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 66204,
+      "opta": "p462424",
+      "name": "William Saliba",
+      "first_name": "William",
+      "last_name": "Saliba",
+      "shirt_number": 2,
+      "position": "Defender",
+      "nationality": "France",
+      "nationality_iso": "FR",
+      "date_of_birth": "2001-03-24",
+      "place_of_birth": "Bondy, France",
+      "joined": "2019-07-25",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/462424.png",
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 14548,
+      "opta": "p198869",
+      "name": "Ben White",
+      "first_name": "Ben",
+      "last_name": "White",
+      "shirt_number": 4,
+      "position": "Defender",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "1997-10-08",
+      "place_of_birth": "Poole, England",
+      "joined": "2021-07-30",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/198869.png",
+      "stats": {
+        "appearances": 4,
+        "goals": 0,
+        "assists": 1,
+        "clean_sheets": 2
+      }
+    },
+    {
+      "pl_id": 50234,
+      "opta": "p226597",
+      "name": "Gabriel Magalhães",
+      "first_name": "Gabriel",
+      "last_name": "dos Santos Magalhães",
+      "shirt_number": 6,
+      "position": "Defender",
+      "nationality": "Brazil",
+      "nationality_iso": "BR",
+      "date_of_birth": "1997-12-19",
+      "place_of_birth": "São Paulo, Brazil",
+      "joined": "2020-09-01",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/226597.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 3
+      }
+    },
+    {
+      "pl_id": 67776,
+      "opta": "p445122",
+      "name": "Jurriën Timber",
+      "first_name": "Jurriën",
+      "last_name": "Timber",
+      "shirt_number": 12,
+      "position": "Defender",
+      "nationality": "Netherlands",
+      "nationality_iso": "NL",
+      "date_of_birth": "2001-06-17",
+      "place_of_birth": "Utrecht, Netherlands",
+      "joined": "2023-07-14",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/445122.png",
+      "stats": {
+        "appearances": 2,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 69914,
+      "opta": "p466075",
+      "name": "Riccardo Calafiori",
+      "first_name": "Riccardo",
+      "last_name": "Calafiori",
+      "shirt_number": 33,
+      "position": "Defender",
+      "nationality": "Italy",
+      "nationality_iso": "IT",
+      "date_of_birth": "2002-05-19",
+      "place_of_birth": "Roma, Italy",
+      "joined": "2024-07-29",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/466075.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 2,
+        "clean_sheets": 2
+      }
+    },
+    {
+      "pl_id": 114564,
+      "opta": "p499169",
+      "name": "Myles Lewis-Skelly",
+      "first_name": "Myles",
+      "last_name": "Lewis-Skelly",
+      "shirt_number": 49,
+      "position": "Defender",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2006-09-26",
+      "place_of_birth": "London, England",
+      "joined": "2022-12-04",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/499169.png",
+      "stats": {
+        "appearances": 4,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 1
+      }
+    },
+    {
+      "pl_id": 147908,
+      "opta": "p616065",
+      "name": "Marli Salmon",
+      "first_name": "Marli",
+      "last_name": "Salmon",
+      "shirt_number": 89,
+      "position": "Defender",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2009-08-29",
+      "place_of_birth": "London, England",
+      "joined": "2025-07-22",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616065.png",
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 11419,
+      "opta": "p184029",
+      "name": "Martin Ødegaard",
+      "first_name": "Martin",
+      "last_name": "Ødegaard",
+      "shirt_number": 8,
+      "position": "Midfielder",
+      "nationality": "Norway",
+      "nationality_iso": "NO",
+      "date_of_birth": "1998-12-17",
+      "place_of_birth": "Drammen, Norway",
+      "joined": "2021-08-20",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/184029.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 2,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 21584,
+      "opta": "p232413",
+      "name": "Eberechi Eze",
+      "first_name": "Eberechi",
+      "last_name": "Eze",
+      "shirt_number": 10,
+      "position": "Midfielder",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "1998-06-29",
+      "place_of_birth": "London, England",
+      "joined": "2025-08-23",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/232413.png",
+      "stats": {
+        "appearances": 4,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 19778,
+      "opta": "p195384",
+      "name": "Mikel Merino",
+      "first_name": "Mikel",
+      "last_name": "Merino",
+      "shirt_number": 23,
+      "position": "Midfielder",
+      "nationality": "Spain",
+      "nationality_iso": "ES",
+      "date_of_birth": "1996-06-22",
+      "place_of_birth": "Pamplona, Spain",
+      "joined": "2024-08-27",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/195384.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 64523,
+      "opta": "p481655",
+      "name": "Martín Zubimendi",
+      "first_name": "Martín",
+      "last_name": "Zubimendi",
+      "shirt_number": 36,
+      "position": "Midfielder",
+      "nationality": "Spain",
+      "nationality_iso": "ES",
+      "date_of_birth": "1999-02-02",
+      "place_of_birth": "San Sebastián, Spain",
+      "joined": "2025-07-06",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/481655.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 15202,
+      "opta": "p204480",
+      "name": "Declan Rice",
+      "first_name": "Declan",
+      "last_name": "Rice",
+      "shirt_number": 41,
+      "position": "Midfielder",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "1999-01-14",
+      "place_of_birth": "London, England",
+      "joined": "2023-07-15",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/204480.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 2,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 141181,
+      "opta": "p616077",
+      "name": "Max Dowman",
+      "first_name": "Max",
+      "last_name": "Dowman",
+      "shirt_number": 56,
+      "position": "Midfielder",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2009-12-31",
+      "place_of_birth": "Chelmsford, England",
+      "joined": "2025-07-22",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616077.png",
+      "stats": {
+        "appearances": 1,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 49481,
+      "opta": "p223340",
+      "name": "Bukayo Saka",
+      "first_name": "Bukayo",
+      "last_name": "Saka",
+      "shirt_number": 7,
+      "position": "Forward",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2001-09-05",
+      "place_of_birth": "London, England",
+      "joined": "2018-11-28",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/223340.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 3,
+        "assists": 0,
+        "clean_sheets": 2
+      }
+    },
+    {
+      "pl_id": 32728,
+      "opta": "p224117",
+      "name": "Viktor Gyökeres",
+      "first_name": "Viktor",
+      "last_name": "Gyökeres",
+      "shirt_number": 14,
+      "position": "Forward",
+      "nationality": "Sweden",
+      "nationality_iso": "SE",
+      "date_of_birth": "1998-06-04",
+      "place_of_birth": "Stockholm, Sweden",
+      "joined": "2025-07-26",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/224117.png",
+      "stats": {
+        "appearances": 2,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 67407,
+      "opta": "p248857",
+      "name": "Noni Madueke",
+      "first_name": "Noni",
+      "last_name": "Madueke",
+      "shirt_number": 20,
+      "position": "Forward",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2002-03-10",
+      "place_of_birth": "London, England",
+      "joined": "2025-07-18",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/248857.png",
+      "stats": {
+        "appearances": 2,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 20810,
+      "opta": "p219847",
+      "name": "Kai Havertz",
+      "first_name": "Kai",
+      "last_name": "Havertz",
+      "shirt_number": 29,
+      "position": "Forward",
+      "nationality": "Germany",
+      "nationality_iso": "DE",
+      "date_of_birth": "1999-06-11",
+      "place_of_birth": "Aachen, Germany",
+      "joined": "2023-06-28",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/219847.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 2,
+        "assists": 0,
+        "clean_sheets": 3
+      }
+    },
+    {
+      "pl_id": 118077,
+      "opta": "p448104",
+      "name": "Piero Hincapié",
+      "first_name": "Piero",
+      "last_name": "Hincapié",
+      "shirt_number": 5,
+      "position": "Defender",
+      "nationality": "Ecuador",
+      "nationality_iso": "EC",
+      "date_of_birth": "2002-01-09",
+      "place_of_birth": "Esmeraldas, Ecuador",
+      "joined": "2026-07-01",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/448104.png",
+      "stats": {
+        "appearances": 2,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 66378,
+      "opta": "p437495",
+      "name": "Illan Meslier",
+      "first_name": "Illan",
+      "last_name": "Meslier",
+      "shirt_number": 30,
+      "position": "Goalkeeper",
+      "nationality": "France",
+      "nationality_iso": "FR",
+      "date_of_birth": "2000-03-02",
+      "place_of_birth": "Lorient, France",
+      "joined": "2026-07-09",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/437495.png",
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 119476,
+      "opta": "p500040",
+      "name": "Cristhian Mosquera",
+      "first_name": "Cristhian",
+      "last_name": "Mosquera",
+      "shirt_number": 3,
+      "position": "Defender",
+      "nationality": "Spain",
+      "nationality_iso": "ES",
+      "date_of_birth": "2004-06-27",
+      "place_of_birth": "Alicante, Spain",
+      "joined": "2025-07-24",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/500040.png",
+      "stats": {
+        "appearances": 2,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 1
+      }
+    },
+    {
+      "pl_id": 67704,
+      "opta": "p439509",
+      "name": "Christos Tzolis",
+      "first_name": "Christos",
+      "last_name": "Tzolis",
+      "shirt_number": 17,
+      "position": "Forward",
+      "nationality": "Greece",
+      "nationality_iso": "GR",
+      "date_of_birth": "2002-01-30",
+      "place_of_birth": "Thessaloniki, Greece",
+      "joined": "2026-07-23",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/439509.png",
+      "stats": {
+        "appearances": 5,
+        "goals": 0,
+        "assists": 1,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 74761,
+      "opta": "p208706",
+      "name": "Bruno Guimarães",
+      "first_name": "Bruno",
+      "last_name": "Guimarães Rodriguez Moura",
+      "shirt_number": 39,
+      "position": "Midfielder",
+      "nationality": "Brazil",
+      "nationality_iso": "BR",
+      "date_of_birth": "1997-11-16",
+      "place_of_birth": "Rio de Janeiro, Brazil",
+      "joined": "2026-08-08",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/208706.png",
+      "stats": {
+        "appearances": 3,
+        "goals": 1,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 13274,
+      "opta": "p199798",
+      "name": "Ezri Konsa",
+      "first_name": "Ezri",
+      "last_name": "Konsa",
+      "shirt_number": 15,
+      "position": "Defender",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "1997-10-23",
+      "place_of_birth": "London, England",
+      "joined": "2026-08-21",
+      "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/500x500/199798.png",
+      "stats": {
+        "appearances": 4,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 1
+      }
+    },
+    {
+      "pl_id": 145413,
+      "opta": "p616068",
+      "name": "Ife Ibrahim",
+      "first_name": "Ife",
+      "last_name": "Ibrahim",
+      "shirt_number": 44,
+      "position": "Midfielder",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2008-01-20",
+      "place_of_birth": "England",
+      "joined": "2026-01-27",
+      "photo_url": null,
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    },
+    {
+      "pl_id": 141180,
+      "opta": "p616071",
+      "name": "Theo Julienne",
+      "first_name": "Theo",
+      "last_name": "Julienne",
+      "shirt_number": 45,
+      "position": "Midfielder",
+      "nationality": "England",
+      "nationality_iso": "GB-ENG",
+      "date_of_birth": "2008-01-11",
+      "place_of_birth": "England",
+      "joined": "2026-07-30",
+      "photo_url": null,
+      "stats": {
+        "appearances": 0,
+        "goals": 0,
+        "assists": 0,
+        "clean_sheets": 0
+      }
+    }
+  ],
+  "academy": [],
+  "lineup_squads": {
+    "arsenal": [
+      {
+        "name": "David Raya",
+        "first_name": "David",
+        "last_name": "Raya",
+        "opta": "p154561",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/154561.png"
+      },
+      {
+        "name": "Kepa Arrizabalaga",
+        "first_name": "Kepa",
+        "last_name": "Arrizabalaga",
+        "opta": "p109745",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/109745.png"
+      },
+      {
+        "name": "William Saliba",
+        "first_name": "William",
+        "last_name": "Saliba",
+        "opta": "p462424",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/462424.png"
+      },
+      {
+        "name": "Ben White",
+        "first_name": "Ben",
+        "last_name": "White",
+        "opta": "p198869",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/198869.png"
+      },
+      {
+        "name": "Gabriel Magalhães",
+        "first_name": "Gabriel",
+        "last_name": "dos Santos Magalhães",
+        "opta": "p226597",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/226597.png"
+      },
+      {
+        "name": "Jurriën Timber",
+        "first_name": "Jurriën",
+        "last_name": "Timber",
+        "opta": "p445122",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/445122.png"
+      },
+      {
+        "name": "Riccardo Calafiori",
+        "first_name": "Riccardo",
+        "last_name": "Calafiori",
+        "opta": "p466075",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/466075.png"
+      },
+      {
+        "name": "Myles Lewis-Skelly",
+        "first_name": "Myles",
+        "last_name": "Lewis-Skelly",
+        "opta": "p499169",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/499169.png"
+      },
+      {
+        "name": "Marli Salmon",
+        "first_name": "Marli",
+        "last_name": "Salmon",
+        "opta": "p616065",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616065.png"
+      },
+      {
+        "name": "Martin Ødegaard",
+        "first_name": "Martin",
+        "last_name": "Ødegaard",
+        "opta": "p184029",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/184029.png"
+      },
+      {
+        "name": "Eberechi Eze",
+        "first_name": "Eberechi",
+        "last_name": "Eze",
+        "opta": "p232413",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/232413.png"
+      },
+      {
+        "name": "Mikel Merino",
+        "first_name": "Mikel",
+        "last_name": "Merino",
+        "opta": "p195384",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/195384.png"
+      },
+      {
+        "name": "Martín Zubimendi",
+        "first_name": "Martín",
+        "last_name": "Zubimendi",
+        "opta": "p481655",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/481655.png"
+      },
+      {
+        "name": "Declan Rice",
+        "first_name": "Declan",
+        "last_name": "Rice",
+        "opta": "p204480",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/204480.png"
+      },
+      {
+        "name": "Max Dowman",
+        "first_name": "Max",
+        "last_name": "Dowman",
+        "opta": "p616077",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616077.png"
+      },
+      {
+        "name": "Bukayo Saka",
+        "first_name": "Bukayo",
+        "last_name": "Saka",
+        "opta": "p223340",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/223340.png"
+      },
+      {
+        "name": "Viktor Gyökeres",
+        "first_name": "Viktor",
+        "last_name": "Gyökeres",
+        "opta": "p224117",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/224117.png"
+      },
+      {
+        "name": "Noni Madueke",
+        "first_name": "Noni",
+        "last_name": "Madueke",
+        "opta": "p248857",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/248857.png"
+      },
+      {
+        "name": "Kai Havertz",
+        "first_name": "Kai",
+        "last_name": "Havertz",
+        "opta": "p219847",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/219847.png"
+      },
+      {
+        "name": "Piero Hincapié",
+        "first_name": "Piero",
+        "last_name": "Hincapié",
+        "opta": "p448104",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/448104.png"
+      },
+      {
+        "name": "Illan Meslier",
+        "first_name": "Illan",
+        "last_name": "Meslier",
+        "opta": "p437495",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/437495.png"
+      },
+      {
+        "name": "Cristhian Mosquera",
+        "first_name": "Cristhian",
+        "last_name": "Mosquera",
+        "opta": "p500040",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/500040.png"
+      },
+      {
+        "name": "Christos Tzolis",
+        "first_name": "Christos",
+        "last_name": "Tzolis",
+        "opta": "p439509",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/439509.png"
+      },
+      {
+        "name": "Bruno Guimarães",
+        "first_name": "Bruno",
+        "last_name": "Guimarães Rodriguez Moura",
+        "opta": "p208706",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/208706.png"
+      },
+      {
+        "name": "Ezri Konsa",
+        "first_name": "Ezri",
+        "last_name": "Konsa",
+        "opta": "p199798",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/500x500/199798.png"
+      },
+      {
+        "name": "Ife Ibrahim",
+        "first_name": "Ife",
+        "last_name": "Ibrahim",
+        "opta": "p616068",
+        "photo_url": null
+      },
+      {
+        "name": "Theo Julienne",
+        "first_name": "Theo",
+        "last_name": "Julienne",
+        "opta": "p616071",
+        "photo_url": null
+      },
+      {
+        "name": "Neto",
+        "first_name": "Norberto",
+        "last_name": "Murara Neto",
+        "opta": "p69752",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/500x500/69752.png"
+      },
+      {
+        "name": "Tommy Setford",
+        "first_name": "Tommy",
+        "last_name": "Setford",
+        "opta": "p551221",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/551221.png"
+      },
+      {
+        "name": "Alexei Rojas",
+        "first_name": "Alexei",
+        "last_name": "Rojas",
+        "opta": "p553747",
+        "photo_url": null
+      },
+      {
+        "name": "Jack Porter",
+        "first_name": "Jack",
+        "last_name": "Porter",
+        "opta": "p616059",
+        "photo_url": null
+      },
+      {
+        "name": "Kieran Tierney",
+        "first_name": "Kieran",
+        "last_name": "Tierney",
+        "opta": "p192895",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/192895.png"
+      },
+      {
+        "name": "Jakub Kiwior",
+        "first_name": "Jakub",
+        "last_name": "Kiwior",
+        "opta": "p440854",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/440854.png"
+      },
+      {
+        "name": "Oleksandr Zinchenko",
+        "first_name": "Oleksandr",
+        "last_name": "Zinchenko",
+        "opta": "p206325",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/206325.png"
+      },
+      {
+        "name": "Takehiro Tomiyasu",
+        "first_name": "Takehiro",
+        "last_name": "Tomiyasu",
+        "opta": "p223723",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/223723.png"
+      },
+      {
+        "name": "Josh Nichols",
+        "first_name": "Josh",
+        "last_name": "Nichols",
+        "opta": "p499167",
+        "photo_url": null
+      },
+      {
+        "name": "Michal Rosiak",
+        "first_name": "Michal",
+        "last_name": "Rosiak",
+        "opta": "p554192",
+        "photo_url": null
+      },
+      {
+        "name": "Brayden Clarke",
+        "first_name": "Brayden",
+        "last_name": "Clarke",
+        "opta": "p563324",
+        "photo_url": null
+      },
+      {
+        "name": "Thomas Partey",
+        "first_name": "Thomas",
+        "last_name": "Partey",
+        "opta": "p167199",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/167199.png"
+      },
+      {
+        "name": "Jorginho",
+        "first_name": "Jorge Luiz",
+        "last_name": "Frello Filho",
+        "opta": "p85955",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/85955.png"
+      },
+      {
+        "name": "Jimi Gower",
+        "first_name": "Jimi",
+        "last_name": "Gower",
+        "opta": "p538182",
+        "photo_url": null
+      },
+      {
+        "name": "Jack Henry-Francis",
+        "first_name": "Jack",
+        "last_name": "Henry-Francis",
+        "opta": "p514307",
+        "photo_url": null
+      },
+      {
+        "name": "Ethan Nwaneri",
+        "first_name": "Ethan",
+        "last_name": "Nwaneri",
+        "opta": "p499175",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/499175.png"
+      },
+      {
+        "name": "Salah-Eddine Oulad",
+        "first_name": "Salah-Eddine",
+        "last_name": "Oulad",
+        "opta": "p498046",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/498046.png"
+      },
+      {
+        "name": "Gabriel Jesus",
+        "first_name": "Gabriel Fernando",
+        "last_name": "de Jesus",
+        "opta": "p205651",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/205651.png"
+      },
+      {
+        "name": "Gabriel Martinelli",
+        "first_name": "Gabriel",
+        "last_name": "Teodoro Martinelli Silva",
+        "opta": "p444145",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/444145.png"
+      },
+      {
+        "name": "Leandro Trossard",
+        "first_name": "Leandro",
+        "last_name": "Trossard",
+        "opta": "p116216",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/116216.png"
+      },
+      {
+        "name": "Raheem Sterling",
+        "first_name": "Raheem",
+        "last_name": "Sterling",
+        "opta": "p103955",
+        "photo_url": null
+      },
+      {
+        "name": "Nathan Butler-Oyedeji",
+        "first_name": "Nathan",
+        "last_name": "Butler-Oyedeji",
+        "opta": "p461025",
+        "photo_url": null
+      },
+      {
+        "name": "Ismeal Kabia",
+        "first_name": "Ismeal",
+        "last_name": "Kabia",
+        "opta": "p588796",
+        "photo_url": null
+      },
+      {
+        "name": "Nuno Tavares",
+        "first_name": "Nuno Albertino",
+        "last_name": "Varela Tavares",
+        "opta": "p437626",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/437626.png"
+      },
+      {
+        "name": "Karl Hein",
+        "first_name": "Karl",
+        "last_name": "Hein",
+        "opta": "p463748",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/463748.png"
+      },
+      {
+        "name": "Maldini Kacurri",
+        "first_name": "Maldini",
+        "last_name": "Kacurri",
+        "opta": "p588793",
+        "photo_url": null
+      },
+      {
+        "name": "Fábio Vieira",
+        "first_name": "Fábio Daniel",
+        "last_name": "Ferreira Vieira",
+        "opta": "p438098",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/438098.png"
+      },
+      {
+        "name": "Albert Sambi Lokonga",
+        "first_name": "Albert",
+        "last_name": "Sambi Lokonga",
+        "opta": "p437742",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/437742.png"
+      },
+      {
+        "name": "Reiss Nelson",
+        "first_name": "Reiss",
+        "last_name": "Nelson",
+        "opta": "p200641",
+        "photo_url": null
+      },
+      {
+        "name": "Christian Nørgaard",
+        "first_name": "Christian",
+        "last_name": "Nørgaard",
+        "opta": "p128295",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/128295.png"
+      },
+      {
+        "name": "Louie Copley",
+        "first_name": "Louie",
+        "last_name": "Copley",
+        "opta": "p499179",
+        "photo_url": null
+      },
+      {
+        "name": "Andre Harriman-Annous",
+        "first_name": "Andre",
+        "last_name": "Harriman-Annous",
+        "opta": "p646243",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/646243.png"
+      },
+      {
+        "name": "Charles Sagoe",
+        "first_name": "Charles",
+        "last_name": "Sagoe",
+        "opta": "p516874",
+        "photo_url": null
+      },
+      {
+        "name": "Brando Bailey-Joseph",
+        "first_name": "Brando",
+        "last_name": "Bailey-Joseph",
+        "opta": "p616074",
+        "photo_url": null
+      },
+      {
+        "name": "Ceadach O’Neill",
+        "first_name": "Ceadach",
+        "last_name": "O’Neill",
+        "opta": "p645551",
+        "photo_url": null
+      },
+      {
+        "name": "Jaden Dixon",
+        "first_name": "Jaden",
+        "last_name": "Dixon",
+        "opta": "p499731",
+        "photo_url": null
+      },
+      {
+        "name": "Khari Ranson",
+        "first_name": "Khari",
+        "last_name": "Ranson",
+        "opta": "p608028",
+        "photo_url": null
+      },
+      {
+        "name": "Harrison Dudziak",
+        "first_name": "Harrison",
+        "last_name": "Dudziak",
+        "opta": "p499173",
+        "photo_url": null
+      }
+    ],
+    "brighton": [
+      {
+        "name": "Bart Verbruggen",
+        "first_name": "Bart",
+        "last_name": "Verbruggen",
+        "opta": "p489639",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/489639.png"
+      },
+      {
+        "name": "Jason Steele",
+        "first_name": "Jason",
+        "last_name": "Steele",
+        "opta": "p49262",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/49262.png"
+      },
+      {
+        "name": "Tom McGill",
+        "first_name": "Tom",
+        "last_name": "McGill",
+        "opta": "p209288",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/209288.png"
+      },
+      {
+        "name": "Lewis Dunk",
+        "first_name": "Lewis",
+        "last_name": "Dunk",
+        "opta": "p83299",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/83299.png"
+      },
+      {
+        "name": "Olivier Boscagli",
+        "first_name": "Olivier",
+        "last_name": "Boscagli",
+        "opta": "p204120",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/204120.png"
+      },
+      {
+        "name": "Ferdi Kadioglu",
+        "first_name": "Ferdi",
+        "last_name": "Kadioglu",
+        "opta": "p231416",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/231416.png"
+      },
+      {
+        "name": "Maxim De Cuyper",
+        "first_name": "Maxim",
+        "last_name": "De Cuyper",
+        "opta": "p465730",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/465730.png"
+      },
+      {
+        "name": "Jack Hinshelwood",
+        "first_name": "Jack",
+        "last_name": "Hinshelwood",
+        "opta": "p532529",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/532529.png"
+      },
+      {
+        "name": "Kaoru Mitoma",
+        "first_name": "Kaoru",
+        "last_name": "Mitoma",
+        "opta": "p451340",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/451340.png"
+      },
+      {
+        "name": "Diego Gómez",
+        "first_name": "Diego",
+        "last_name": "Gómez",
+        "opta": "p514254",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/514254.png"
+      },
+      {
+        "name": "Yasin Ayari",
+        "first_name": "Yasin",
+        "last_name": "Ayari",
+        "opta": "p509416",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/509416.png"
+      },
+      {
+        "name": "Mats Wieffer",
+        "first_name": "Mats",
+        "last_name": "Wieffer",
+        "opta": "p467779",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/467779.png"
+      },
+      {
+        "name": "Pascal Groß",
+        "first_name": "Pascal",
+        "last_name": "Groß",
+        "opta": "p60307",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/60307.png"
+      },
+      {
+        "name": "Matt O'Riley",
+        "first_name": "Matt",
+        "last_name": "O'Riley",
+        "opta": "p219249",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/219249.png"
+      },
+      {
+        "name": "Georginio Rutter",
+        "first_name": "Georginio",
+        "last_name": "Rutter",
+        "opta": "p463067",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/463067.png"
+      },
+      {
+        "name": "Yankuba Minteh",
+        "first_name": "Yankuba",
+        "last_name": "Minteh",
+        "opta": "p592031",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/592031.png"
+      },
+      {
+        "name": "Charalampos Kostoulas",
+        "first_name": "Charalampos",
+        "last_name": "Kostoulas",
+        "opta": "p647850",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/647850.png"
+      },
+      {
+        "name": "Nehemiah Oriola",
+        "first_name": "Nehemiah",
+        "last_name": "Oriola",
+        "opta": "p556637",
+        "photo_url": null
+      },
+      {
+        "name": "Costinha",
+        "first_name": "João Pedro",
+        "last_name": "Loureiro da Costa",
+        "opta": "p451490",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/451490.png"
+      },
+      {
+        "name": "Zadok Yohanna",
+        "first_name": "Zadok",
+        "last_name": "Yohanna",
+        "opta": "p700308",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/700308.png"
+      },
+      {
+        "name": "George Munday",
+        "first_name": "George",
+        "last_name": "Munday",
+        "opta": "p667902",
+        "photo_url": null
+      },
+      {
+        "name": "Pascal Struijk",
+        "first_name": "Pascal",
+        "last_name": "Struijk",
+        "opta": "p222694",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/222694.png"
+      },
+      {
+        "name": "Brajan Gruda",
+        "first_name": "Brajan",
+        "last_name": "Gruda",
+        "opta": "p513433",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/513433.png"
+      },
+      {
+        "name": "Malick Yalcouyé",
+        "first_name": "Malick",
+        "last_name": "Yalcouyé",
+        "opta": "p611695",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/611695.png"
+      },
+      {
+        "name": "Evan Ferguson",
+        "first_name": "Evan",
+        "last_name": "Ferguson",
+        "opta": "p487117",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/487117.png"
+      },
+      {
+        "name": "Ibrahim Osman",
+        "first_name": "Ibrahim",
+        "last_name": "Osman",
+        "opta": "p612855",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/612855.png"
+      },
+      {
+        "name": "Michael Svoboda",
+        "first_name": "Michael",
+        "last_name": "Svoboda",
+        "opta": "p454490",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/454490.png"
+      },
+      {
+        "name": "Luka Vuskovic",
+        "first_name": "Luka",
+        "last_name": "Vuskovic",
+        "opta": "p610799",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/610799.png"
+      },
+      {
+        "name": "Promise David",
+        "first_name": "Promise",
+        "last_name": "David",
+        "opta": "p538007",
+        "photo_url": null
+      },
+      {
+        "name": "Jaouen Hadjam",
+        "first_name": "Jaouen",
+        "last_name": "Hadjam",
+        "opta": "p512123",
+        "photo_url": null
+      },
+      {
+        "name": "Shane Nti",
+        "first_name": "Shane",
+        "last_name": "Nti",
+        "opta": "p596049",
+        "photo_url": null
+      },
+      {
+        "name": "Chema Andrés",
+        "first_name": "José María",
+        "last_name": "Andrés Baixauli",
+        "opta": "p592984",
+        "photo_url": null
+      },
+      {
+        "name": "Femi Azeez",
+        "first_name": "Femi",
+        "last_name": "Azeez",
+        "opta": "p471551",
+        "photo_url": null
+      },
+      {
+        "name": "Younes Ibrahim",
+        "first_name": "Younes",
+        "last_name": "Ibrahim",
+        "opta": "p661016",
+        "photo_url": null
+      },
+      {
+        "name": "Killian Cahill",
+        "first_name": "Killian",
+        "last_name": "Cahill",
+        "opta": "p565858",
+        "photo_url": null
+      },
+      {
+        "name": "Carl Rushworth",
+        "first_name": "Carl",
+        "last_name": "Rushworth",
+        "opta": "p472739",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/472739.png"
+      },
+      {
+        "name": "Tariq Lamptey",
+        "first_name": "Tariq",
+        "last_name": "Lamptey",
+        "opta": "p232792",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/232792.png"
+      },
+      {
+        "name": "Igor Julio",
+        "first_name": "Igor Julio",
+        "last_name": "dos Santos de Paulo",
+        "opta": "p223434",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/223434.png"
+      },
+      {
+        "name": "Adam Webster",
+        "first_name": "Adam",
+        "last_name": "Webster",
+        "opta": "p110735",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/110735.png"
+      },
+      {
+        "name": "Eiran Cashin",
+        "first_name": "Eiran",
+        "last_name": "Cashin",
+        "opta": "p439135",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/439135.png"
+      },
+      {
+        "name": "Jan Paul van Hecke",
+        "first_name": "Jan Paul",
+        "last_name": "van Hecke",
+        "opta": "p469142",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/469142.png"
+      },
+      {
+        "name": "Pervis Estupiñán",
+        "first_name": "Pervis",
+        "last_name": "Estupiñán",
+        "opta": "p204214",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/204214.png"
+      },
+      {
+        "name": "Joël Veltman",
+        "first_name": "Joël",
+        "last_name": "Veltman",
+        "opta": "p111478",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/111478.png"
+      },
+      {
+        "name": "Jacob Slater",
+        "first_name": "Jacob",
+        "last_name": "Slater",
+        "opta": "p589100",
+        "photo_url": null
+      },
+      {
+        "name": "Charlie Tasker",
+        "first_name": "Charlie",
+        "last_name": "Tasker",
+        "opta": "p547720",
+        "photo_url": null
+      },
+      {
+        "name": "Freddie Simmonds",
+        "first_name": "Freddie",
+        "last_name": "Simmonds",
+        "opta": "p604988",
+        "photo_url": null
+      },
+      {
+        "name": "James Milner",
+        "first_name": "James",
+        "last_name": "Milner",
+        "opta": "p15157",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/15157.png"
+      },
+      {
+        "name": "Solly March",
+        "first_name": "Solly",
+        "last_name": "March",
+        "opta": "p109345",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/109345.png"
+      },
+      {
+        "name": "Carlos Baleba",
+        "first_name": "Carlos",
+        "last_name": "Baleba",
+        "opta": "p535301",
+        "photo_url": null
+      },
+      {
+        "name": "Joe Knight",
+        "first_name": "Joe",
+        "last_name": "Knight",
+        "opta": "p567121",
+        "photo_url": null
+      },
+      {
+        "name": "João Pedro",
+        "first_name": "João Pedro",
+        "last_name": "Junqueira de Jesus",
+        "opta": "p475168",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/475168.png"
+      },
+      {
+        "name": "Simon Adingra",
+        "first_name": "Simon",
+        "last_name": "Adingra",
+        "opta": "p535818",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/535818.png"
+      },
+      {
+        "name": "Danny Welbeck",
+        "first_name": "Danny",
+        "last_name": "Welbeck",
+        "opta": "p50175",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/50175.png"
+      },
+      {
+        "name": "Harry Howell",
+        "first_name": "Harry",
+        "last_name": "Howell",
+        "opta": "p597320",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/597320.png"
+      },
+      {
+        "name": "Jeremy Sarmiento",
+        "first_name": "Jeremy",
+        "last_name": "Sarmiento",
+        "opta": "p441192",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/441192.png"
+      },
+      {
+        "name": "Andrew Moran",
+        "first_name": "Andrew",
+        "last_name": "Moran",
+        "opta": "p513834",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/513834.png"
+      },
+      {
+        "name": "Tom Watson",
+        "first_name": "Tom",
+        "last_name": "Watson",
+        "opta": "p549074",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/549074.png"
+      },
+      {
+        "name": "Mark O'Mahony",
+        "first_name": "Mark",
+        "last_name": "O'Mahony",
+        "opta": "p574402",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/574402.png"
+      },
+      {
+        "name": "Diego Coppola",
+        "first_name": "Diego",
+        "last_name": "Coppola",
+        "opta": "p550090",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/550090.png"
+      },
+      {
+        "name": "Kjell Scherpen",
+        "first_name": "Kjell",
+        "last_name": "Scherpen",
+        "opta": "p240514",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/240514.png"
+      },
+      {
+        "name": "Valentín Barco",
+        "first_name": "Valentín",
+        "last_name": "Barco",
+        "opta": "p543158",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/543158.png"
+      },
+      {
+        "name": "Odeluga Offiah",
+        "first_name": "Odeluga",
+        "last_name": "Offiah",
+        "opta": "p445548",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/445548.png"
+      },
+      {
+        "name": "Julio Enciso",
+        "first_name": "Julio",
+        "last_name": "Enciso",
+        "opta": "p474120",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/474120.png"
+      },
+      {
+        "name": "Facundo Buonanotte",
+        "first_name": "Facundo",
+        "last_name": "Buonanotte",
+        "opta": "p536916",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/536916.png"
+      },
+      {
+        "name": "Stefanos Tzimas",
+        "first_name": "Stefanos",
+        "last_name": "Tzimas",
+        "opta": "p608181",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/608181.png"
+      },
+      {
+        "name": "Abdallah Sima",
+        "first_name": "Abdallah",
+        "last_name": "Sima",
+        "opta": "p516211",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/516211.png"
+      },
+      {
+        "name": "Yoon Do-Young",
+        "first_name": "Do-Young",
+        "last_name": "Yoon",
+        "opta": "p623080",
+        "photo_url": null
+      },
+      {
+        "name": "Nils Ramming",
+        "first_name": "Nils",
+        "last_name": "Ramming",
+        "opta": "p627550",
+        "photo_url": null
+      }
+    ],
+    "man-city": [
+      {
+        "name": "Marcus Bettinelli",
+        "first_name": "Marcus",
+        "last_name": "Bettinelli",
+        "opta": "p122074",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/122074.png"
+      },
+      {
+        "name": "Gianluigi Donnarumma",
+        "first_name": "Gianluigi",
+        "last_name": "Donnarumma",
+        "opta": "p204936",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/204936.png"
+      },
+      {
+        "name": "Rúben Dias",
+        "first_name": "Rúben",
+        "last_name": "dos Santos Gato Alves Dias",
+        "opta": "p171314",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/171314.png"
+      },
+      {
+        "name": "Marc Guéhi",
+        "first_name": "Marc",
+        "last_name": "Guéhi",
+        "opta": "p209036",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/209036.png"
+      },
+      {
+        "name": "Rayan Aït-Nouri",
+        "first_name": "Rayan",
+        "last_name": "Aït-Nouri",
+        "opta": "p448514",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/448514.png"
+      },
+      {
+        "name": "Josko Gvardiol",
+        "first_name": "Josko",
+        "last_name": "Gvardiol",
+        "opta": "p477424",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/477424.png"
+      },
+      {
+        "name": "Abdukodir Khusanov",
+        "first_name": "Abdukodir",
+        "last_name": "Khusanov",
+        "opta": "p578153",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/578153.png"
+      },
+      {
+        "name": "Rico Lewis",
+        "first_name": "Rico",
+        "last_name": "Lewis",
+        "opta": "p477064",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/477064.png"
+      },
+      {
+        "name": "Mateo Kovacic",
+        "first_name": "Mateo",
+        "last_name": "Kovacic",
+        "opta": "p91651",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/91651.png"
+      },
+      {
+        "name": "Rayan Cherki",
+        "first_name": "Rayan",
+        "last_name": "Cherki",
+        "opta": "p466052",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/466052.png"
+      },
+      {
+        "name": "Matheus Nunes",
+        "first_name": "Matheus Luiz",
+        "last_name": "Nunes",
+        "opta": "p465351",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/465351.png"
+      },
+      {
+        "name": "Nico O'Reilly",
+        "first_name": "Nico",
+        "last_name": "O'Reilly",
+        "opta": "p472769",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/472769.png"
+      },
+      {
+        "name": "Phil Foden",
+        "first_name": "Phil",
+        "last_name": "Foden",
+        "opta": "p209244",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/209244.png"
+      },
+      {
+        "name": "Floyd Samba",
+        "first_name": "Floyd",
+        "last_name": "Samba",
+        "opta": "p595480",
+        "photo_url": null
+      },
+      {
+        "name": "Erling Haaland",
+        "first_name": "Erling",
+        "last_name": "Haaland",
+        "opta": "p223094",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/223094.png"
+      },
+      {
+        "name": "Jérémy Doku",
+        "first_name": "Jérémy",
+        "last_name": "Doku",
+        "opta": "p248875",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/248875.png"
+      },
+      {
+        "name": "Antoine Semenyo",
+        "first_name": "Antoine",
+        "last_name": "Semenyo",
+        "opta": "p437730",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/437730.png"
+      },
+      {
+        "name": "Ryan McAidoo",
+        "first_name": "Ryan",
+        "last_name": "McAidoo",
+        "opta": "p616288",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616288.png"
+      },
+      {
+        "name": "Vitor Reis",
+        "first_name": "Vitor",
+        "last_name": "de Oliveira Nunes dos Reis",
+        "opta": "p616222",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/616222.png"
+      },
+      {
+        "name": "Finley Burns",
+        "first_name": "Finley",
+        "last_name": "Burns",
+        "opta": "p432710",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/432710.png"
+      },
+      {
+        "name": "Elliot Anderson",
+        "first_name": "Elliot",
+        "last_name": "Anderson",
+        "opta": "p215379",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/215379.png"
+      },
+      {
+        "name": "Max-Edgar Chabot",
+        "first_name": "Max-Edgar",
+        "last_name": "Chabot",
+        "opta": "p713410",
+        "photo_url": null
+      },
+      {
+        "name": "Gerónimo Rulli",
+        "first_name": "Gerónimo",
+        "last_name": "Rulli",
+        "opta": "p106921",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/106921.png"
+      },
+      {
+        "name": "Ayyoub Bouaddi",
+        "first_name": "Ayyoub",
+        "last_name": "Bouaddi",
+        "opta": "p637238",
+        "photo_url": null
+      },
+      {
+        "name": "Kaden Braithwaite",
+        "first_name": "Kaden",
+        "last_name": "Braithwaite",
+        "opta": "p554054",
+        "photo_url": null
+      },
+      {
+        "name": "Allan",
+        "first_name": "Allan",
+        "last_name": "Andrade Elias",
+        "opta": "p624777",
+        "photo_url": null
+      },
+      {
+        "name": "Enzo Fernández",
+        "first_name": "Enzo",
+        "last_name": "Fernández",
+        "opta": "p448047",
+        "photo_url": null
+      },
+      {
+        "name": "Iliman Ndiaye",
+        "first_name": "Iliman",
+        "last_name": "Ndiaye",
+        "opta": "p440993",
+        "photo_url": null
+      },
+      {
+        "name": "Stefan Ortega",
+        "first_name": "Stefan",
+        "last_name": "Ortega",
+        "opta": "p88248",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/88248.png"
+      },
+      {
+        "name": "Ederson",
+        "first_name": "Ederson",
+        "last_name": "Santana de Moraes",
+        "opta": "p121160",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/121160.png"
+      },
+      {
+        "name": "Scott Carson",
+        "first_name": "Scott",
+        "last_name": "Carson",
+        "opta": "p17601",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/17601.png"
+      },
+      {
+        "name": "Spike Brits",
+        "first_name": "Spike",
+        "last_name": "Brits",
+        "opta": "p613120",
+        "photo_url": null
+      },
+      {
+        "name": "John Stones",
+        "first_name": "John",
+        "last_name": "Stones",
+        "opta": "p97299",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/97299.png"
+      },
+      {
+        "name": "Nathan Aké",
+        "first_name": "Nathan",
+        "last_name": "Aké",
+        "opta": "p126184",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/126184.png"
+      },
+      {
+        "name": "Manuel Akanji",
+        "first_name": "Manuel",
+        "last_name": "Akanji",
+        "opta": "p211975",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/211975.png"
+      },
+      {
+        "name": "Jahmai Simpson-Pusey",
+        "first_name": "Jahmai",
+        "last_name": "Simpson-Pusey",
+        "opta": "p554194",
+        "photo_url": null
+      },
+      {
+        "name": "Max Alleyne",
+        "first_name": "Max",
+        "last_name": "Alleyne",
+        "opta": "p494307",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/494307.png"
+      },
+      {
+        "name": "Jack Grealish",
+        "first_name": "Jack",
+        "last_name": "Grealish",
+        "opta": "p114283",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/114283.png"
+      },
+      {
+        "name": "Nico González",
+        "first_name": "Nico",
+        "last_name": "González",
+        "opta": "p465694",
+        "photo_url": null
+      },
+      {
+        "name": "Rodri",
+        "first_name": "Rodrigo",
+        "last_name": "Hernández Cascante",
+        "opta": "p220566",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/220566.png"
+      },
+      {
+        "name": "Kevin De Bruyne",
+        "first_name": "Kevin",
+        "last_name": "De Bruyne",
+        "opta": "p61366",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/61366.png"
+      },
+      {
+        "name": "Ilkay Gündogan",
+        "first_name": "Ilkay",
+        "last_name": "Gündogan",
+        "opta": "p59859",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/59859.png"
+      },
+      {
+        "name": "Bernardo Silva",
+        "first_name": "Bernardo",
+        "last_name": "Mota Veiga de Carvalho e Silva",
+        "opta": "p165809",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/165809.png"
+      },
+      {
+        "name": "Claudio Echeverri",
+        "first_name": "Claudio",
+        "last_name": "Echeverri",
+        "opta": "p575204",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/575204.png"
+      },
+      {
+        "name": "Oscar Bobb",
+        "first_name": "Oscar",
+        "last_name": "Bobb",
+        "opta": "p477555",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/477555.png"
+      },
+      {
+        "name": "James McAtee",
+        "first_name": "James",
+        "last_name": "McAtee",
+        "opta": "p432714",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/432714.png"
+      },
+      {
+        "name": "Omar Marmoush",
+        "first_name": "Omar Khaled Mohamed Abdelsalam",
+        "last_name": "Marmoush",
+        "opta": "p438234",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/438234.png"
+      },
+      {
+        "name": "Sávio",
+        "first_name": "Sávio",
+        "last_name": "Moreira de Oliveira",
+        "opta": "p510281",
+        "photo_url": null
+      },
+      {
+        "name": "Divin Mubama",
+        "first_name": "Divin",
+        "last_name": "Mubama",
+        "opta": "p487837",
+        "photo_url": null
+      },
+      {
+        "name": "Yan Couto",
+        "first_name": "Yan",
+        "last_name": "Bueno Couto",
+        "opta": "p468236",
+        "photo_url": null
+      },
+      {
+        "name": "Tijjani Reijnders",
+        "first_name": "Tijjani",
+        "last_name": "Reijnders",
+        "opta": "p433036",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/433036.png"
+      },
+      {
+        "name": "Callum Doyle",
+        "first_name": "Callum",
+        "last_name": "Doyle",
+        "opta": "p472767",
+        "photo_url": null
+      },
+      {
+        "name": "Tomas Galvez",
+        "first_name": "Tomas",
+        "last_name": "Galvez",
+        "opta": "p533713",
+        "photo_url": null
+      },
+      {
+        "name": "Kyle Walker",
+        "first_name": "Kyle",
+        "last_name": "Walker",
+        "opta": "p58621",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/58621.png"
+      },
+      {
+        "name": "Issa Kaboré",
+        "first_name": "Issa",
+        "last_name": "Kaboré",
+        "opta": "p476369",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/476369.png"
+      },
+      {
+        "name": "Kalvin Phillips",
+        "first_name": "Kalvin",
+        "last_name": "Phillips",
+        "opta": "p155405",
+        "photo_url": null
+      },
+      {
+        "name": "Máximo Perrone",
+        "first_name": "Máximo",
+        "last_name": "Perrone",
+        "opta": "p482769",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/482769.png"
+      },
+      {
+        "name": "Mahamadou Susoho",
+        "first_name": "Mahamadou",
+        "last_name": "Susoho",
+        "opta": "p496283",
+        "photo_url": null
+      },
+      {
+        "name": "Josh Wilson-Esbrand",
+        "first_name": "Josh",
+        "last_name": "Wilson-Esbrand",
+        "opta": "p447880",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/447880.png"
+      },
+      {
+        "name": "Sverre Nypan",
+        "first_name": "Sverre",
+        "last_name": "Nypan",
+        "opta": "p566164",
+        "photo_url": null
+      },
+      {
+        "name": "James Trafford",
+        "first_name": "James",
+        "last_name": "Trafford",
+        "opta": "p432720",
+        "photo_url": "https://resources.premierleague.com/premierleague25/photos/players/110x140/432720.png"
+      },
+      {
+        "name": "Divine Mukasa",
+        "first_name": "Divine",
+        "last_name": "Mukasa",
+        "opta": "p590039",
+        "photo_url": null
+      },
+      {
+        "name": "Stephen Mfuni",
+        "first_name": "Stephen",
+        "last_name": "Mfuni",
+        "opta": "p566213",
+        "photo_url": null
+      },
+      {
+        "name": "Reigan Heskey",
+        "first_name": "Reigan",
+        "last_name": "Heskey",
+        "opta": "p580921",
+        "photo_url": null
+      },
+      {
+        "name": "Jaden Heskey",
+        "first_name": "Jaden",
+        "last_name": "Heskey",
+        "opta": "p516236",
+        "photo_url": null
+      },
+      {
+        "name": "Charlie Gray",
+        "first_name": "Charlie",
+        "last_name": "Gray",
+        "opta": "p516234",
+        "photo_url": null
+      },
+      {
+        "name": "Sam Coffey",
+        "first_name": "Sam",
+        "last_name": "Coffey",
+        "opta": "p229881",
+        "photo_url": null
+      },
+      {
+        "name": "Kian Noble",
+        "first_name": "Kian",
+        "last_name": "Noble",
+        "opta": "p519909",
+        "photo_url": null
+      },
+      {
+        "name": "Tyrone Samba",
+        "first_name": "Tyrone",
+        "last_name": "Samba",
+        "opta": "p580919",
+        "photo_url": null
+      }
+    ]
+  }
+}

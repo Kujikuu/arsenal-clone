@@ -150,7 +150,8 @@ export interface Player {
   nationality: string;
   country_flag: string;
   date_of_birth: string;
-  photo_url: string;
+  /** Official Premier League cutout; null when the player has none yet. */
+  photo_url?: string | null;
   /** Full-height card art; replaces the cutout on the player card when set. */
   card_panel_url?: string | null;
   bio: string;

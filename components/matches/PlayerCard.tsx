@@ -8,12 +8,13 @@ import type { Player } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
 
 export interface PlayerPhoto {
-  source: ImageSourcePropType;
+  source?: ImageSourcePropType;
   /**
    * cutout - transparent PNG placed on the card's own pattern
    * panel  - full-height slice cut from the ref card, faded into the card on its left edge
+   * none   - no photo yet; the card shows only its pattern
    */
-  kind: 'cutout' | 'panel';
+  kind: 'cutout' | 'panel' | 'none';
   /** width / height, only needed for panels */
   aspect?: number;
 }
@@ -23,7 +24,8 @@ const PANEL_ASPECT = 228 / 253;
 export function playerCardPhoto(player: Pick<Player, 'photo_url' | 'card_panel_url'>): PlayerPhoto {
   const panel = resolveImage(player.card_panel_url);
   if (panel) return { source: panel, kind: 'panel', aspect: PANEL_ASPECT };
-  return { source: resolveImage(player.photo_url) ?? { uri: player.photo_url }, kind: 'cutout' };
+  const cutout = resolveImage(player.photo_url);
+  return cutout ? { source: cutout, kind: 'cutout' } : { kind: 'none' };
 }
 
 /** Card props straight from a players row. */
@@ -101,7 +103,7 @@ export function PlayerCard({ player, height = 190, onPress }: Props) {
 
       {photo.kind === 'panel' ? (
         <PanelPhoto photo={photo} height={height} />
-      ) : photoFailed ? null : (
+      ) : photo.kind === 'none' || photoFailed ? null : (
         <Image
           onError={() => setPhotoFailed(true)}
           source={photo.source}
