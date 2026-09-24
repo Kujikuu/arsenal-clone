@@ -9,6 +9,7 @@ module.exports = defineConfig([
   {
     rules: {
       'react/display-name': 'off',
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ]);

@@ -3,15 +3,21 @@ import '@/global.css';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import { ThemeProvider as NavThemeProvider } from 'expo-router/react-navigation';
-import * as Device from 'expo-device';
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+import { useFonts } from 'expo-font';
+import {
+  KumbhSans_400Regular,
+  KumbhSans_500Medium,
+  KumbhSans_600SemiBold,
+  KumbhSans_700Bold,
+} from '@expo-google-fonts/kumbh-sans';
+import { Michroma_400Regular } from '@expo-google-fonts/michroma';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Pressable } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { Icon } from '@/components/nativewindui/Icon';
 import { ThemeToggle } from '@/components/nativewindui/ThemeToggle';
-import { cn } from '@/lib/cn';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { NAV_THEME } from '@/theme';
 
@@ -20,24 +26,76 @@ export {
   ErrorBoundary,
 } from 'expo-router';
 
-const isIos26 = Platform.select({ default: false, ios: Device.osVersion?.startsWith('26.') });
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const { colorScheme, isDarkColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
+  const [fontsLoaded, fontError] = useFonts({
+    KumbhSans_400Regular,
+    KumbhSans_500Medium,
+    KumbhSans_600SemiBold,
+    KumbhSans_700Bold,
+    Michroma_400Regular,
+  });
+
+  useEffect(() => {
+    if (fontError) console.warn('[RootLayout] Font loading failed:', fontError);
+    if (fontsLoaded || fontError) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) return null;
 
   return (
     <>
-      <StatusBar
-        key={`root-status-bar-${isDarkColorScheme ? 'light' : 'dark'}`}
-        style={isDarkColorScheme ? 'light' : 'dark'}
-      />
+      {/* The whole app is dark (see ref/), so the status bar is always light. */}
+      <StatusBar style="light" />
       {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
       {/* <ExampleProvider> */}
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ActionSheetProvider>
           <NavThemeProvider value={NAV_THEME[colorScheme]}>
-            <Stack>
-              <Stack.Screen name="index" options={INDEX_OPTIONS} />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="article/[id]"
+                options={{ presentation: 'card', headerShown: false }}
+              />
+              <Stack.Screen
+                name="match/[id]"
+                options={{ presentation: 'card', headerShown: false }}
+              />
+              <Stack.Screen
+                name="player/[id]"
+                options={{ presentation: 'card', headerShown: false }}
+              />
+              <Stack.Screen
+                name="video/[id]"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="store/[id]"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/login"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="auth/signup"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="search"
+                options={{ presentation: 'fullScreenModal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="filter-fixtures"
+                options={{ presentation: 'modal', headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings"
+                options={{ presentation: 'card', headerShown: false }}
+              />
               <Stack.Screen name="modal" options={MODAL_OPTIONS} />
             </Stack>
           </NavThemeProvider>
@@ -45,23 +103,6 @@ export default function RootLayout() {
       </GestureHandlerRootView>
       {/* </ExampleProvider> */}
     </>
-  );
-}
-
-const INDEX_OPTIONS = {
-  headerLargeTitle: true,
-  headerTransparent: isIos26,
-  title: 'NativewindUI',
-  headerRight: () => <SettingsIcon />,
-} as const;
-
-function SettingsIcon() {
-  return (
-    <Link href="/modal" asChild>
-      <Pressable className={cn('opacity-80 active:opacity-50', isIos26 && 'px-1.5')}>
-        <Icon name="gearshape" className="text-foreground" />
-      </Pressable>
-    </Link>
   );
 }
 
