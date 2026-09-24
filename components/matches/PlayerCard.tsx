@@ -78,6 +78,8 @@ function PanelPhoto({ photo, height }: { photo: PlayerPhoto; height: number }) {
 export function PlayerCard({ player, height = 190, onPress }: Props) {
   const [width, setWidth] = useState(0);
   const { photo } = player;
+  // A missing remote photo leaves the pattern card instead of a broken image.
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const body = (
     <View
@@ -99,8 +101,9 @@ export function PlayerCard({ player, height = 190, onPress }: Props) {
 
       {photo.kind === 'panel' ? (
         <PanelPhoto photo={photo} height={height} />
-      ) : (
+      ) : photoFailed ? null : (
         <Image
+          onError={() => setPhotoFailed(true)}
           source={photo.source}
           style={{
             position: 'absolute',
