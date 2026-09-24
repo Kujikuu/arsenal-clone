@@ -1,10 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, type ImageSourcePropType } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
 import { DisplayText } from '@/components/ui/DisplayText';
-import type { PlayerPhoto } from '@/lib/data/playerPhotos';
+import { resolveImage } from '@/lib/media/resolveImage';
+import type { Player } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
+
+export interface PlayerPhoto {
+  source?: ImageSourcePropType;
+  /**
+   * cutout - transparent PNG placed on the card's own pattern
+   * panel  - full-height slice cut from the ref card, faded into the card on its left edge
+   * none   - no photo yet; the card shows only its pattern
+   */
+  kind: 'cutout' | 'panel' | 'none';
+  /** width / height, only needed for panels */
+  aspect?: number;
+}
+
+const PANEL_ASPECT = 228 / 253;
+
+export function playerCardPhoto(player: Pick<Player, 'photo_url' | 'card_panel_url'>): PlayerPhoto {
+  const panel = resolveImage(player.card_panel_url);
+  if (panel) return { source: panel, kind: 'panel', aspect: PANEL_ASPECT };
+  const cutout = resolveImage(player.photo_url);
+  return cutout ? { source: cutout, kind: 'cutout' } : { kind: 'none' };
+}
+
+/** Card props straight from a players row. */
+export function playerCardData(player: Player): PlayerCardData {
+  return {
+    shirtNumber: player.shirt_number,
+    firstName: player.first_name,
+    lastName: player.last_name,
+    nationality: player.nationality,
+    flag: player.country_flag,
+    photo: playerCardPhoto(player),
+  };
+}
 
 export interface PlayerCardData {
   shirtNumber: number | string;
@@ -46,6 +80,8 @@ function PanelPhoto({ photo, height }: { photo: PlayerPhoto; height: number }) {
 export function PlayerCard({ player, height = 190, onPress }: Props) {
   const [width, setWidth] = useState(0);
   const { photo } = player;
+  // A missing remote photo leaves the pattern card instead of a broken image.
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   const body = (
     <View
@@ -67,8 +103,9 @@ export function PlayerCard({ player, height = 190, onPress }: Props) {
 
       {photo.kind === 'panel' ? (
         <PanelPhoto photo={photo} height={height} />
-      ) : (
+      ) : photo.kind === 'none' || photoFailed ? null : (
         <Image
+          onError={() => setPhotoFailed(true)}
           source={photo.source}
           style={{
             position: 'absolute',

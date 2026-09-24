@@ -6,155 +6,138 @@ import {
   Image,
   Pressable,
   RefreshControl,
-  ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { ArsenalHeader } from '@/components/ArsenalHeader';
-import { DatabaseStatusBanner } from '@/components/DatabaseStatusBanner';
-import { useStoreProducts } from '@/lib/api/store';
+import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
+import { DisplayText } from '@/components/ui/DisplayText';
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
+import { STORE_CATEGORIES, useStoreProducts, type StoreCategory } from '@/lib/api/store';
+import { formatPrice } from '@/lib/format';
+import { resolveImage } from '@/lib/media/resolveImage';
+import { useSettings } from '@/lib/settings/SettingsProvider';
+import { ARSENAL } from '@/theme/arsenal';
 
-const CATEGORIES = ['All', 'Kits', 'Training', 'Retro', 'Accessories'];
-
+/** Arsenal Direct shop in the app's black & red style. */
 export default function StoreScreen() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [currency, setCurrency] = useState<'GBP' | 'USD'>('GBP');
+  const { width } = useWindowDimensions();
+  const { settings, update } = useSettings();
+  const [category, setCategory] = useState<StoreCategory>('ALL');
   const [refreshing, setRefreshing] = useState(false);
-
-  const { products, loading, error, refetch } = useStoreProducts(
-    selectedCategory === 'All' ? undefined : selectedCategory
-  );
+  const products = useStoreProducts(category);
+  const currency = settings.currency;
+  const cardWidth = (width - 16 * 2 - 12) / 2;
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await refetch();
+    await products.refetch();
     setRefreshing(false);
   };
 
-  const currencySymbol = currency === 'GBP' ? '£' : '$';
+  const toggleCurrency = () =>
+    update({ currency: currency === 'GBP' ? 'USD' : 'GBP' }).catch(() => {});
+
+  const items = products.data ?? [];
 
   return (
-    <View className="flex-1 bg-arsenal-dark">
-      <ArsenalHeader
-        title="ARSENAL DIRECT"
-        subtitle="Official Merchandise"
+    <View className="flex-1 bg-black">
+      <TheArsenalHeader
         rightAction={
           <Pressable
-            onPress={() => setCurrency(currency === 'GBP' ? 'USD' : 'GBP')}
-            className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 active:opacity-70">
-            <Text className="text-xs font-black text-arsenal-gold">
+            onPress={toggleCurrency}
+            hitSlop={8}
+            accessibilityLabel={`Prices in ${currency}. Switch currency`}
+            style={{
+              height: 30,
+              borderRadius: 15,
+              paddingHorizontal: 10,
+              backgroundColor: ARSENAL.pill,
+            }}
+            className="items-center justify-center active:opacity-70">
+            <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
               {currency === 'GBP' ? '£ GBP' : '$ USD'}
             </Text>
           </Pressable>
         }
       />
 
-      {/* Category selector chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="my-3 px-4"
-        contentContainerStyle={{ paddingRight: 24 }}>
-        {CATEGORIES.map((cat) => {
-          const isSelected = selectedCategory === cat;
-          return (
-            <Pressable
-              key={cat}
-              onPress={() => setSelectedCategory(cat)}
-              className={`mr-2 rounded-full border px-3.5 py-1.5 ${
-                isSelected
-                  ? 'border-arsenal-red bg-arsenal-red'
-                  : 'border-arsenal-cardBorder bg-arsenal-card'
-              }`}>
-              <Text className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-slate-400'}`}>
-                {cat}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <UnderlineTabs
+        tabs={STORE_CATEGORIES}
+        value={category}
+        onChange={setCategory}
+        variant="inline"
+        scrollable
+        gap={27}
+        fontSize={15}
+        height={56}
+      />
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#DB0007"
-            colors={['#DB0007']}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ARSENAL.red} />
         }>
-        {error && <DatabaseStatusBanner tableName="store_products" onRetry={onRefresh} />}
-
-        {loading && products.length === 0 ? (
-          <ActivityIndicator color="#DB0007" className="my-10" />
+        {products.error ? (
+          <ErrorState error={products.error} onRetry={products.refetch} />
+        ) : products.loading && !items.length ? (
+          <LoadingState />
+        ) : !items.length ? (
+          <EmptyState icon="bag-outline" title="Nothing in this category yet" />
         ) : (
-          <View className="px-4">
-            <View className="-mx-2 flex-row flex-wrap">
-              {products.map((product) => {
-                const price = currency === 'GBP' ? product.price_gbp : product.price_usd;
-
-                return (
-                  <View key={product.id} className="mb-4 w-1/2 px-2">
-                    <Pressable
-                      onPress={() => router.push(`/store/${product.id}`)}
-                      className="h-72 flex-col justify-between overflow-hidden rounded-2xl border border-arsenal-cardBorder bg-arsenal-card shadow-md active:opacity-85">
-                      {/* Image & Badges */}
-                      <View className="relative h-40 bg-slate-900">
-                        <Image
-                          source={{ uri: product.main_image_url }}
-                          className="h-full w-full"
-                          resizeMode="cover"
-                        />
-
-                        {product.badge && (
-                          <View className="absolute left-2 top-2 rounded bg-arsenal-red px-2 py-0.5">
-                            <Text className="text-[9px] font-black uppercase tracking-wider text-white">
-                              {product.badge}
-                            </Text>
-                          </View>
-                        )}
-
-                        {product.is_customizable && (
-                          <View className="absolute bottom-2 right-2 flex-row items-center rounded border border-slate-700 bg-black/80 px-2 py-0.5">
-                            <Ionicons name="sparkles" size={10} color="#D4AF37" />
-                            <Text className="ml-1 text-[9px] font-bold text-amber-300">
-                              Customizable
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-
-                      {/* Product Info */}
-                      <View className="flex-1 justify-between p-3">
-                        <View>
-                          <Text className="text-[10px] font-bold uppercase text-slate-400">
-                            {product.category}
-                          </Text>
-                          <Text
-                            className="mt-0.5 line-clamp-2 text-xs font-bold text-white"
-                            numberOfLines={2}>
-                            {product.title}
-                          </Text>
-                        </View>
-
-                        <View className="mt-2 flex-row items-center justify-between border-t border-slate-800 pt-2">
-                          <Text className="text-sm font-black text-arsenal-gold">
-                            {currencySymbol}
-                            {price.toFixed(2)}
-                          </Text>
-                          <View className="h-6 w-6 items-center justify-center rounded-full bg-arsenal-red/90">
-                            <Ionicons name="arrow-forward" size={12} color="#FFFFFF" />
-                          </View>
-                        </View>
-                      </View>
-                    </Pressable>
+          <View className="flex-row flex-wrap" style={{ paddingLeft: 16, paddingTop: 18 }}>
+            {items.map((product) => (
+              <Pressable
+                key={product.id}
+                onPress={() => router.push(`/store/${product.id}`)}
+                accessibilityRole="button"
+                style={{
+                  width: cardWidth,
+                  marginRight: 12,
+                  marginBottom: 14,
+                  borderRadius: 6,
+                  backgroundColor: ARSENAL.surfaceRaised,
+                }}
+                className="overflow-hidden active:opacity-85">
+                <Image
+                  source={resolveImage(product.main_image_url)}
+                  style={{ width: cardWidth, height: cardWidth * 1.1 }}
+                  resizeMode="cover"
+                />
+                {product.badge ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      left: 8,
+                      top: 8,
+                      backgroundColor: ARSENAL.red,
+                      borderRadius: 3,
+                      paddingHorizontal: 6,
+                      paddingVertical: 2,
+                    }}>
+                    <Text className="font-body-semibold text-white" style={{ fontSize: 10.5 }}>
+                      {product.badge.toUpperCase()}
+                    </Text>
                   </View>
-                );
-              })}
-            </View>
+                ) : null}
+                <View style={{ padding: 10, minHeight: 96 }} className="justify-between">
+                  <Text
+                    className="font-body-semibold text-white"
+                    style={{ fontSize: 14.5, lineHeight: 17 }}
+                    numberOfLines={3}>
+                    {product.title}
+                  </Text>
+                  <DisplayText size={13} style={{ marginTop: 10 }}>
+                    {formatPrice(
+                      currency === 'GBP' ? product.price_gbp : product.price_usd,
+                      currency
+                    )}
+                  </DisplayText>
+                </View>
+              </Pressable>
+            ))}
           </View>
         )}
       </ScrollView>

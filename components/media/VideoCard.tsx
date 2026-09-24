@@ -2,20 +2,30 @@ import React from 'react';
 import { View, Text, Image, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ReactionBadge } from '@/components/media/ReactionBadge';
-import type { VideoCardItem } from '@/lib/data/media';
+import { resolveImage } from '@/lib/media/resolveImage';
+import type { Video } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
 
 const CARD_WIDTH = 164;
 const IMAGE_HEIGHT = 167;
 
 /** Portrait video card with duration pill (ref/video-all.jpeg). */
-export function VideoCard({ item, onPress }: { item: VideoCardItem; onPress: () => void }) {
+interface Props {
+  video: Pick<Video, 'title' | 'duration' | 'thumbnail_url'>;
+  reactions: number;
+  reacted?: boolean;
+  onPress: () => void;
+  /** Fixed width for rails; omit to fill the parent (grids). */
+  width?: number;
+}
+
+export function VideoCard({ video, reactions, reacted, onPress, width = CARD_WIDTH }: Props) {
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       style={{
-        width: CARD_WIDTH,
+        width,
         height: 293,
         borderRadius: 5,
         marginRight: 12,
@@ -24,8 +34,8 @@ export function VideoCard({ item, onPress }: { item: VideoCardItem; onPress: () 
       className="overflow-hidden active:opacity-85">
       <View style={{ height: IMAGE_HEIGHT }}>
         <Image
-          source={item.image}
-          style={{ width: CARD_WIDTH, height: IMAGE_HEIGHT }}
+          source={resolveImage(video.thumbnail_url)}
+          style={{ width, height: IMAGE_HEIGHT }}
           resizeMode="cover"
         />
         <View
@@ -43,7 +53,7 @@ export function VideoCard({ item, onPress }: { item: VideoCardItem; onPress: () 
           <Text
             className="font-body-semibold"
             style={{ fontSize: 13, color: '#000', marginLeft: 4 }}>
-            {item.duration}
+            {video.duration}
           </Text>
         </View>
       </View>
@@ -54,9 +64,14 @@ export function VideoCard({ item, onPress }: { item: VideoCardItem; onPress: () 
           className="font-body-semibold text-white"
           style={{ fontSize: 16, lineHeight: 17.5 }}
           numberOfLines={3}>
-          {item.title}
+          {video.title}
         </Text>
-        <ReactionBadge kind="happy" count={item.reactions} size={19} />
+        <ReactionBadge
+          kind="happy"
+          count={reactions}
+          size={19}
+          color={reacted ? ARSENAL.red : '#FFF'}
+        />
       </View>
     </Pressable>
   );

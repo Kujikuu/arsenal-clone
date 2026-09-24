@@ -4,20 +4,27 @@ import { ARSENAL } from '@/theme/arsenal';
 
 const ITEM_WIDTH = 80;
 
-interface Props {
-  months: readonly string[];
-  selected: string;
+export interface MonthOption {
+  /** "2026-09" */
+  key: string;
+  /** "SEP" */
+  month: string;
   year: string;
-  onSelect: (month: string) => void;
+}
+
+interface Props {
+  months: readonly MonthOption[];
+  selected: string | null;
+  onSelect: (key: string) => void;
 }
 
 /** Horizontally scrolling month strip with vertical dividers (ref/match-fixtures.jpeg). */
-export function MonthSelector({ months, selected, year, onSelect }: Props) {
+export function MonthSelector({ months, selected, onSelect }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const { width } = useWindowDimensions();
 
   useEffect(() => {
-    const index = months.indexOf(selected);
+    const index = months.findIndex((m) => m.key === selected);
     if (index < 0) return;
     const x = index * ITEM_WIDTH - (width - ITEM_WIDTH) / 2;
     scrollRef.current?.scrollTo({ x: Math.max(0, x), animated: false });
@@ -30,16 +37,16 @@ export function MonthSelector({ months, selected, year, onSelect }: Props) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ alignItems: 'stretch' }}>
-        {months.map((month, index) => {
-          const isSelected = month === selected;
+        {months.map((option, index) => {
+          const isSelected = option.key === selected;
           const textColor = isSelected ? ARSENAL.white : '#BDBBBC';
           return (
-            <View key={month} className="flex-row">
+            <View key={option.key} className="flex-row">
               {index > 0 && (
                 <View style={{ width: 1, backgroundColor: '#3A3839', marginVertical: 0 }} />
               )}
               <Pressable
-                onPress={() => onSelect(month)}
+                onPress={() => onSelect(option.key)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: isSelected }}
                 style={{
@@ -57,12 +64,12 @@ export function MonthSelector({ months, selected, year, onSelect }: Props) {
                   }}
                   className="items-center justify-center">
                   <Text className="font-body-medium" style={{ fontSize: 17, color: textColor }}>
-                    {month}
+                    {option.month}
                   </Text>
                   <Text
                     className="font-body"
                     style={{ fontSize: 17, color: textColor, marginTop: 1 }}>
-                    {year}
+                    {option.year}
                   </Text>
                 </View>
               </Pressable>

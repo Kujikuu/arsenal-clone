@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,277 +6,314 @@ import {
   Image,
   Pressable,
   TextInput,
-  ActivityIndicator,
-  Linking,
-  Platform,
+  useWindowDimensions,
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { DisplayText } from '@/components/ui/DisplayText';
+import { PillButton } from '@/components/ui/PillButton';
+import { SegmentedPills } from '@/components/ui/SegmentedPills';
+import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
+import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
+import { useSquad } from '@/lib/api/squad';
 import { useStoreProduct } from '@/lib/api/store';
+import { formatPrice } from '@/lib/format';
+import { resolveImage } from '@/lib/media/resolveImage';
+import { useSettings } from '@/lib/settings/SettingsProvider';
+import { ARSENAL } from '@/theme/arsenal';
 
-const PLAYER_PRESETS = [
-  { name: 'SAKA', number: '7' },
-  { name: 'ØDEGAARD', number: '8' },
-  { name: 'RICE', number: '41' },
-  { name: 'HAVERTZ', number: '29' },
-  { name: 'SALIBA', number: '2' },
-  { name: 'MARTINELLI', number: '11' },
-];
+const VIEW_MODES = ['PHOTOS', 'CUSTOMISE'] as const;
+type ViewMode = (typeof VIEW_MODES)[number];
+
+function shirtName(player: { known_as?: string | null; last_name: string }) {
+  const name =
+    player.known_as && !player.known_as.includes(' ') ? player.known_as : player.last_name;
+  return name.replace(/\s*\(.*\)/, '').toUpperCase();
+}
 
 export default function ProductDetailModal() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { product, loading } = useStoreProduct(id as string);
+  const { width } = useWindowDimensions();
+  const { settings } = useSettings();
+  const { data: product, loading, error, refetch } = useStoreProduct(id);
+  const squad = useSquad('men');
 
-  const [selectedSize, setSelectedSize] = useState('L');
-  const [customName, setCustomName] = useState('SAKA');
-  const [customNumber, setCustomNumber] = useState('7');
-  const [viewMode, setViewMode] = useState<'product' | 'customizer'>('customizer');
+  const [viewMode, setViewMode] = useState<ViewMode>('PHOTOS');
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [size, setSize] = useState<string | null>(null);
+  const [customName, setCustomName] = useState('');
+  const [customNumber, setCustomNumber] = useState('');
 
-  if (loading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-arsenal-dark">
-        <ActivityIndicator size="large" color="#DB0007" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (product?.is_customizable) setViewMode('CUSTOMISE');
+  }, [product?.is_customizable]);
 
   if (!product) {
     return (
-      <View className="flex-1 items-center justify-center bg-arsenal-dark p-6">
-        <Ionicons name="alert-circle-outline" size={48} color="#EF4444" />
-        <Text className="mt-4 text-lg font-bold text-white">Product Not Found</Text>
-        <Pressable
-          onPress={() => router.back()}
-          className="mt-6 rounded-lg bg-arsenal-red px-4 py-2">
-          <Text className="font-bold text-white">Go Back</Text>
-        </Pressable>
+      <View className="flex-1 bg-black">
+        <TheArsenalHeader left="close" />
+        {error ? (
+          <ErrorState error={error} onRetry={refetch} />
+        ) : loading ? (
+          <LoadingState />
+        ) : (
+          <EmptyState icon="bag-outline" title="Product not found" />
+        )}
       </View>
     );
   }
 
-  const handleBuy = async () => {
-    const targetUrl = product.external_buy_url || 'https://arsenaldirect.arsenal.com';
-    if (Platform.OS !== 'web') {
-      await WebBrowser.openBrowserAsync(targetUrl);
-    } else {
-      Linking.openURL(targetUrl);
-    }
-  };
+  const currency = settings.currency;
+  const price = currency === 'GBP' ? product.price_gbp : product.price_usd;
+  const gallery = product.gallery_urls.length ? product.gallery_urls : [product.main_image_url];
+  const heroHeight = width * 0.85;
+  const presets = (squad.data ?? []).slice(0, 12);
+
+  const buy = () => WebBrowser.openBrowserAsync(product.external_buy_url);
 
   return (
-    <View className="flex-1 bg-arsenal-dark">
-      {/* Top Bar */}
-      <View
-        style={{ paddingTop: Math.max(insets.top, 12) + 4 }}
-        className="flex-row items-center justify-between border-b border-slate-800 bg-slate-950 px-4 pb-3">
-        <Pressable
-          onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-slate-800 active:opacity-70">
-          <Ionicons name="close" size={22} color="#FFFFFF" />
-        </Pressable>
-
-        <Text className="text-xs font-black uppercase tracking-widest text-white">
-          {product.category}
-        </Text>
-
-        <View className="w-9" />
-      </View>
-
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 60 }}>
-        {/* VIEW MODE TOGGLE FOR CUSTOMIZABLE SHIRTS */}
+    <View className="flex-1 bg-black">
+      <TheArsenalHeader
+        left="close"
+        title={<DisplayText size={13}>{product.category.toUpperCase()}</DisplayText>}
+      />
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         {product.is_customizable && (
-          <View className="mx-4 mt-3 flex-row rounded-xl border border-slate-800 bg-slate-900 p-1">
-            <Pressable
-              onPress={() => setViewMode('customizer')}
-              className={`flex-1 items-center rounded-lg py-1.5 ${
-                viewMode === 'customizer' ? 'bg-arsenal-red' : 'bg-transparent'
-              }`}>
-              <Text
-                className={`text-xs font-black uppercase ${
-                  viewMode === 'customizer' ? 'text-white' : 'text-slate-400'
-                }`}>
-                Shirt Customizer
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setViewMode('product')}
-              className={`flex-1 items-center rounded-lg py-1.5 ${
-                viewMode === 'product' ? 'bg-arsenal-red' : 'bg-transparent'
-              }`}>
-              <Text
-                className={`text-xs font-black uppercase ${
-                  viewMode === 'product' ? 'text-white' : 'text-slate-400'
-                }`}>
-                Photo Gallery
-              </Text>
-            </Pressable>
-          </View>
-        )}
-
-        {/* HERO IMAGE OR LIVE SHIRT CUSTOMIZER PREVIEW */}
-        {product.is_customizable && viewMode === 'customizer' ? (
-          <View className="relative mx-4 mt-4 h-72 items-center justify-center overflow-hidden rounded-3xl border-2 border-red-500/50 bg-gradient-to-b from-red-700 via-arsenal-red to-red-950 shadow-2xl">
-            {/* White Sleeves outline simulation */}
-            <View className="absolute inset-y-0 left-0 w-12 rounded-l-3xl bg-white/90 opacity-90" />
-            <View className="absolute inset-y-0 right-0 w-12 rounded-r-3xl bg-white/90 opacity-90" />
-
-            <View className="z-10 items-center">
-              <Text className="text-2xl font-black uppercase tracking-widest text-white/90 shadow-md">
-                {customName || 'GUNNER'}
-              </Text>
-              <Text className="mt-1 text-8xl font-black tracking-tight text-white shadow-lg">
-                {customNumber || '10'}
-              </Text>
-              <View className="mt-2 rounded-full bg-black/40 px-3 py-1">
-                <Text className="text-[10px] font-bold tracking-widest text-amber-300">
-                  OFFICIAL ARSENAL 24/25 FONT
-                </Text>
-              </View>
-            </View>
-          </View>
-        ) : (
-          <View className="relative mx-4 mt-4 h-72 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-            <Image
-              source={{ uri: product.main_image_url }}
-              className="h-full w-full"
-              resizeMode="cover"
+          <View className="flex-row px-4" style={{ paddingVertical: 12 }}>
+            <SegmentedPills
+              options={VIEW_MODES}
+              value={viewMode}
+              onChange={setViewMode}
+              height={34}
+              fontSize={13}
             />
           </View>
         )}
 
-        {/* PRODUCT DETAILS */}
-        <View className="p-5">
-          <View className="mb-2 flex-row items-center justify-between">
-            <View className="rounded bg-arsenal-red px-2.5 py-0.5">
-              <Text className="text-[10px] font-black uppercase tracking-wider text-white">
-                {product.badge || 'OFFICIAL PRODUCT'}
-              </Text>
-            </View>
-            <Text className="text-2xl font-black text-arsenal-gold">
-              £{product.price_gbp.toFixed(2)}
-            </Text>
+        {viewMode === 'CUSTOMISE' && product.is_customizable ? (
+          <View
+            style={{
+              height: heroHeight,
+              marginHorizontal: 16,
+              borderRadius: 8,
+              backgroundColor: ARSENAL.red,
+            }}
+            className="items-center justify-center overflow-hidden">
+            <ZigzagPattern
+              width={width - 32}
+              height={heroHeight}
+              run={40}
+              rise={90}
+              spacing={30}
+              color="#FFFFFF"
+              strokeWidth={0.8}
+              opacity={0.15}
+            />
+            <View
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 46,
+                backgroundColor: '#F4F4F4',
+              }}
+            />
+            <View
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                bottom: 0,
+                width: 46,
+                backgroundColor: '#F4F4F4',
+              }}
+            />
+            <DisplayText size={24}>{customName || 'YOUR NAME'}</DisplayText>
+            <DisplayText size={110} style={{ marginTop: 6 }}>
+              {customNumber || '00'}
+            </DisplayText>
           </View>
+        ) : (
+          <View>
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(e) =>
+                setPhotoIndex(Math.round(e.nativeEvent.contentOffset.x / width))
+              }>
+              {gallery.map((url, i) => (
+                <Image
+                  key={`${url}-${i}`}
+                  source={resolveImage(url)}
+                  style={{ width, height: heroHeight }}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+            {gallery.length > 1 && (
+              <View className="flex-row justify-center" style={{ marginTop: 10 }}>
+                {gallery.map((_, i) => (
+                  <View
+                    key={i}
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: 4,
+                      marginHorizontal: 3,
+                      backgroundColor: i === photoIndex ? ARSENAL.red : ARSENAL.chip,
+                    }}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
 
-          <Text className="text-xl font-black leading-snug text-white">{product.title}</Text>
-
-          <Text className="mt-2.5 text-xs leading-relaxed text-slate-300">
+        <View style={{ padding: 16 }}>
+          {product.badge ? (
+            <DisplayText size={11} color="#C8C6C7" heavy={false}>
+              {product.badge.toUpperCase()}
+            </DisplayText>
+          ) : null}
+          <Text
+            className="font-body-semibold text-white"
+            style={{ fontSize: 22, lineHeight: 26, marginTop: 8 }}>
+            {product.title}
+          </Text>
+          <DisplayText size={20} style={{ marginTop: 12 }}>
+            {formatPrice(price, currency)}
+          </DisplayText>
+          <Text
+            className="font-body"
+            style={{ fontSize: 15.5, lineHeight: 22, color: '#C8C6C7', marginTop: 14 }}>
             {product.description}
           </Text>
 
-          {/* PLAYER PRESET CHIPS */}
           {product.is_customizable && (
-            <View className="mt-5">
-              <Text className="mb-2 text-xs font-black uppercase tracking-wider text-white">
-                Choose Player or Enter Custom
+            <View style={{ marginTop: 24 }}>
+              <Text className="font-body-semibold text-white" style={{ fontSize: 16 }}>
+                Add a name and number
               </Text>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                className="flex-row space-x-2">
-                {PLAYER_PRESETS.map((p) => {
-                  const isSelected = customName === p.name && customNumber === p.number;
+                style={{ marginTop: 12, marginHorizontal: -16 }}
+                contentContainerStyle={{ paddingHorizontal: 16 }}>
+                {presets.map((p) => {
+                  const name = shirtName(p);
+                  const number = String(p.shirt_number);
+                  const selected = customName === name && customNumber === number;
                   return (
                     <Pressable
-                      key={p.name}
+                      key={p.id}
                       onPress={() => {
-                        setCustomName(p.name);
-                        setCustomNumber(p.number);
+                        setCustomName(name);
+                        setCustomNumber(number);
+                        setViewMode('CUSTOMISE');
                       }}
-                      className={`mr-2 rounded-xl border px-3 py-2 ${
-                        isSelected
-                          ? 'border-arsenal-red bg-arsenal-red'
-                          : 'border-slate-800 bg-slate-900'
-                      }`}>
-                      <Text
-                        className={`text-xs font-bold ${
-                          isSelected ? 'text-white' : 'text-slate-300'
-                        }`}>
-                        {p.name} {p.number}
+                      accessibilityRole="button"
+                      style={{
+                        height: 34,
+                        borderRadius: 17,
+                        paddingHorizontal: 14,
+                        marginRight: 8,
+                        backgroundColor: selected ? ARSENAL.red : ARSENAL.chip,
+                      }}
+                      className="items-center justify-center">
+                      <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
+                        {name} {number}
                       </Text>
                     </Pressable>
                   );
                 })}
               </ScrollView>
-
-              {/* Custom Input Fields */}
-              <View className="mt-3 flex-row space-x-3">
-                <View className="flex-2 mr-2 flex-grow">
-                  <Text className="mb-1 text-[10px] font-bold uppercase text-slate-400">
-                    Custom Name
-                  </Text>
-                  <TextInput
-                    value={customName}
-                    onChangeText={(txt) => setCustomName(txt.toUpperCase().slice(0, 12))}
-                    placeholder="YOUR NAME"
-                    placeholderTextColor="#64748B"
-                    className="rounded-xl border border-slate-800 bg-slate-900 p-3 text-xs font-black uppercase text-white"
-                  />
-                </View>
-
-                <View className="w-24">
-                  <Text className="mb-1 text-[10px] font-bold uppercase text-slate-400">
-                    Number
-                  </Text>
-                  <TextInput
-                    value={customNumber}
-                    onChangeText={(txt) => setCustomNumber(txt.replace(/[^0-9]/g, '').slice(0, 2))}
-                    keyboardType="numeric"
-                    placeholder="10"
-                    placeholderTextColor="#64748B"
-                    className="rounded-xl border border-slate-800 bg-slate-900 p-3 text-center text-xs font-black text-white"
-                  />
-                </View>
+              <View className="flex-row" style={{ marginTop: 12 }}>
+                <TextInput
+                  value={customName}
+                  onChangeText={(t) => setCustomName(t.toUpperCase().slice(0, 12))}
+                  onFocus={() => setViewMode('CUSTOMISE')}
+                  placeholder="NAME"
+                  placeholderTextColor="#8E8C8D"
+                  autoCapitalize="characters"
+                  className="flex-1 font-body-semibold text-white"
+                  style={{
+                    height: 48,
+                    borderRadius: 8,
+                    backgroundColor: ARSENAL.pill,
+                    paddingHorizontal: 14,
+                    fontSize: 15,
+                  }}
+                />
+                <TextInput
+                  value={customNumber}
+                  onChangeText={(t) => setCustomNumber(t.replace(/[^0-9]/g, '').slice(0, 2))}
+                  onFocus={() => setViewMode('CUSTOMISE')}
+                  placeholder="No."
+                  placeholderTextColor="#8E8C8D"
+                  keyboardType="number-pad"
+                  className="font-body-semibold text-white"
+                  style={{
+                    width: 80,
+                    height: 48,
+                    borderRadius: 8,
+                    backgroundColor: ARSENAL.pill,
+                    marginLeft: 10,
+                    textAlign: 'center',
+                    fontSize: 15,
+                  }}
+                />
               </View>
             </View>
           )}
 
-          {/* SIZE SELECTOR */}
-          <View className="mt-5">
-            <Text className="mb-2 text-xs font-black uppercase tracking-wider text-white">
-              Select Size
-            </Text>
-            <View className="flex-row space-x-2">
-              {product.sizes.map((s) => {
-                const isSelected = selectedSize === s;
-                return (
-                  <Pressable
-                    key={s}
-                    onPress={() => setSelectedSize(s)}
-                    className={`mr-2 h-12 w-12 items-center justify-center rounded-xl border ${
-                      isSelected
-                        ? 'border-arsenal-red bg-arsenal-red'
-                        : 'border-slate-800 bg-slate-900'
-                    }`}>
-                    <Text
-                      className={`text-xs font-black ${
-                        isSelected ? 'text-white' : 'text-slate-300'
-                      }`}>
-                      {s}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* CHECKOUT ACTION */}
-          <Pressable
-            onPress={handleBuy}
-            className="mt-6 flex-row items-center justify-center rounded-2xl bg-arsenal-red py-4 shadow-2xl active:opacity-85">
-            <Ionicons name="bag-check" size={20} color="#FFFFFF" />
-            <Text className="ml-2 text-sm font-black uppercase tracking-wider text-white">
-              Buy on Arsenal Direct (£{product.price_gbp.toFixed(2)})
-            </Text>
-          </Pressable>
-          <Text className="mt-2 text-center text-[10px] text-slate-500">
-            Secure checkout directly at arsenaldirect.arsenal.com
+          <Text className="font-body-semibold text-white" style={{ fontSize: 16, marginTop: 24 }}>
+            Size
           </Text>
+          <View className="flex-row flex-wrap" style={{ marginTop: 12 }}>
+            {product.sizes.map((s) => (
+              <Pressable
+                key={s}
+                onPress={() => setSize(s)}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: size === s }}
+                style={{
+                  minWidth: 56,
+                  height: 42,
+                  borderRadius: 6,
+                  marginRight: 8,
+                  marginBottom: 8,
+                  paddingHorizontal: 12,
+                  backgroundColor: size === s ? ARSENAL.red : ARSENAL.surfaceRaised,
+                }}
+                className="items-center justify-center">
+                <Text className="font-body-semibold text-white" style={{ fontSize: 14 }}>
+                  {s}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       </ScrollView>
+
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: Math.max(insets.bottom, 12) + 6,
+          borderTopWidth: 1,
+          borderTopColor: ARSENAL.divider,
+        }}>
+        <PillButton
+          label={size ? `BUY ON ARSENAL DIRECT · ${size}` : 'SELECT A SIZE'}
+          disabled={!size}
+          onPress={buy}
+        />
+      </View>
     </View>
   );
 }

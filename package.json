@@ -12,7 +12,9 @@
     "prebuild": "expo prebuild",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "db:fetch-squad": "node scripts/fetch_pl_squad.mjs",
+    "db:seed": "node scripts/gen_seed.mjs > supabase/seed.sql"
   },
   "dependencies": {
     "@expo-google-fonts/kumbh-sans": "^0.4.2",
@@ -33,6 +35,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "expo": "~56.0.4",
+    "expo-calendar": "~56.0.10",
     "expo-constants": "~56.0.15",
     "expo-dev-client": "~56.0.15",
     "expo-device": "~56.0.4",
@@ -61,6 +64,7 @@
     "react-native-svg": "15.15.4",
     "react-native-uitextview": "^1.1.4",
     "react-native-web": "~0.21.0",
+    "react-native-webview": "13.16.1",
     "react-native-worklets": "0.8.3",
     "rn-icon-mapper": "^0.0.1",
     "tailwind-merge": "^2.2.1",

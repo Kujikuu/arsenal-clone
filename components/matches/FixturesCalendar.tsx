@@ -1,26 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import type { Fixture } from '@/lib/data/fixtures';
 import { FixtureCard } from '@/components/matches/FixtureCard';
+import type { Match } from '@/types/database';
 import { ARSENAL } from '@/theme/arsenal';
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-// September 2026 starts on a Tuesday.
-const LEADING_BLANKS = 1;
-const DAYS_IN_MONTH = 30;
 
 interface Props {
-  fixtures: Fixture[];
+  /** "2026-09" */
+  monthKey: string;
+  matches: Match[];
   onMatchCentre: (id: string) => void;
 }
 
-export function FixturesCalendar({ fixtures, onMatchCentre }: Props) {
-  const [selectedDay, setSelectedDay] = useState(19);
+/** Day of the month in UK time. */
+function ukDay(iso: string): number {
+  return Number(
+    new Date(iso).toLocaleDateString('en-GB', { timeZone: 'Europe/London', day: 'numeric' })
+  );
+}
+
+/** Month grid; days with a fixture are ringed and tapping one shows its card. */
+export function FixturesCalendar({ monthKey, matches, onMatchCentre }: Props) {
+  const [year, month] = monthKey.split('-').map(Number);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  // Monday-first offset of the 1st of the month.
+  const leadingBlanks = (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+
+  const byDay = useMemo(() => {
+    const map = new Map<number, Match[]>();
+    matches.forEach((m) => {
+      const day = ukDay(m.match_date);
+      map.set(day, [...(map.get(day) ?? []), m]);
+    });
+    return map;
+  }, [matches]);
+
+  const firstMatchDay = matches.length ? ukDay(matches[0].match_date) : 1;
+  const [selectedDay, setSelectedDay] = useState(firstMatchDay);
+  useEffect(() => setSelectedDay(firstMatchDay), [monthKey, firstMatchDay]);
+
   const cells = [
-    ...Array.from({ length: LEADING_BLANKS }, () => null),
-    ...Array.from({ length: DAYS_IN_MONTH }, (_, i) => i + 1),
+    ...Array.from({ length: leadingBlanks }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
-  const selectedFixture = fixtures.find((f) => f.dayNumber === selectedDay);
+  const selected = byDay.get(selectedDay) ?? [];
 
   return (
     <View className="px-4 pt-4">
@@ -34,13 +58,14 @@ export function FixturesCalendar({ fixtures, onMatchCentre }: Props) {
         </View>
         <View className="flex-row flex-wrap">
           {cells.map((day, i) => {
-            const hasMatch = day !== null && fixtures.some((f) => f.dayNumber === day);
-            const selected = day === selectedDay;
+            const hasMatch = day !== null && byDay.has(day);
+            const isSelected = day === selectedDay;
             return (
               <Pressable
                 key={i}
                 disabled={day === null}
                 onPress={() => day !== null && setSelectedDay(day)}
+                accessibilityLabel={day ? `${day}${hasMatch ? ', match day' : ''}` : undefined}
                 style={{ width: `${100 / 7}%`, height: 40 }}
                 className="items-center justify-center">
                 {day !== null && (
@@ -49,14 +74,14 @@ export function FixturesCalendar({ fixtures, onMatchCentre }: Props) {
                       width: 32,
                       height: 32,
                       borderRadius: 16,
-                      backgroundColor: selected ? ARSENAL.red : 'transparent',
-                      borderWidth: hasMatch && !selected ? 1 : 0,
+                      backgroundColor: isSelected ? ARSENAL.red : 'transparent',
+                      borderWidth: hasMatch && !isSelected ? 1 : 0,
                       borderColor: ARSENAL.red,
                     }}
                     className="items-center justify-center">
                     <Text
                       className="font-body-semibold text-sm"
-                      style={{ color: hasMatch || selected ? '#FFF' : ARSENAL.textDim }}>
+                      style={{ color: hasMatch || isSelected ? '#FFF' : ARSENAL.textDim }}>
                       {day}
                     </Text>
                   </View>
@@ -66,8 +91,8 @@ export function FixturesCalendar({ fixtures, onMatchCentre }: Props) {
           })}
         </View>
       </View>
-      {selectedFixture ? (
-        <FixtureCard fixture={selectedFixture} onMatchCentre={onMatchCentre} />
+      {selected.length ? (
+        selected.map((m) => <FixtureCard key={m.id} match={m} onMatchCentre={onMatchCentre} />)
       ) : (
         <Text className="py-6 text-center font-body text-sm text-neutral-400">
           No fixture on this day.

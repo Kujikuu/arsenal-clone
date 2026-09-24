@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import type { ReactionKind } from '@/lib/data/media';
+import type { ReactionKind } from '@/types/database';
 
 interface Props {
   kind: ReactionKind;
