@@ -1,5 +1,13 @@
-import React from 'react';
-import { Text, Alert } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Text, Alert, AppState, Linking } from 'react-native';
+import { PillButton } from '@/components/ui/PillButton';
+import { useAuth } from '@/lib/auth/AuthProvider';
+import {
+  getPushPermission,
+  registerPushToken,
+  requestPushPermission,
+  type PushPermission,
+} from '@/lib/notifications';
 import { Card, SectionTitle } from '@/components/ui/Card';
 import { SubScreen } from '@/components/ui/SubScreen';
 import { SwitchRow } from '@/components/ui/SwitchRow';
@@ -47,14 +55,53 @@ const GROUPS: { title: string; rows: { key: Key; title: string; detail: string }
   },
 ];
 
+const PERMISSION_COPY: Record<Exclude<PushPermission, 'granted'>, string> = {
+  undetermined: 'Allow notifications so we can send the alerts you choose below.',
+  denied: 'Notifications are turned off for this app. Turn them on in your device settings.',
+  unsupported: 'Push alerts need the installed app on a physical device.',
+};
+
+/** Tracks the OS permission, re-checking when the user comes back from Settings. */
+function usePushPermission() {
+  const [permission, setPermission] = useState<PushPermission | null>(null);
+  const refresh = useCallback(() => {
+    getPushPermission()
+      .then(setPermission)
+      .catch(() => setPermission('unsupported'));
+  }, []);
+  useEffect(() => {
+    refresh();
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && refresh());
+    return () => sub.remove();
+  }, [refresh]);
+  return [permission, setPermission] as const;
+}
+
 /** Notification preferences bound to public.user_settings. */
 export default function NotificationsScreen() {
   const { settings, update, synced } = useSettings();
+  const { user } = useAuth();
+  const [permission, setPermission] = usePushPermission();
 
-  const toggle = (key: Key, value: boolean) =>
-    update({ [key]: value }).catch(() =>
+  const enablePush = async () => {
+    const result = await requestPushPermission();
+    setPermission(result);
+    if (result === 'granted') await registerPushToken();
+    else if (result === 'denied') Linking.openSettings();
+  };
+
+  const toggle = (key: Key, value: boolean) => {
+    if (value && user && permission === 'undetermined') enablePush();
+    return update({ [key]: value }).catch(() =>
       Alert.alert('Could not save', 'Your notification settings were not updated.')
     );
+  };
+
+  const pushNotice = !user
+    ? 'Sign in to receive these alerts on this device.'
+    : permission && permission !== 'granted'
+      ? PERMISSION_COPY[permission]
+      : null;
 
   return (
     <SubScreen title="Notifications">
@@ -65,6 +112,22 @@ export default function NotificationsScreen() {
           ? 'Your choices are saved to your account and apply on every device.'
           : 'Sign in to keep these choices on every device. For now they are saved on this device.'}
       </Text>
+      {pushNotice ? (
+        <Card style={{ marginTop: 16, padding: 16 }}>
+          <Text
+            className="font-body"
+            style={{ fontSize: 14, lineHeight: 20, color: PALETTE.white }}>
+            {pushNotice}
+          </Text>
+          {user && (permission === 'undetermined' || permission === 'denied') ? (
+            <PillButton
+              label={permission === 'denied' ? 'OPEN SETTINGS' : 'TURN ON NOTIFICATIONS'}
+              onPress={permission === 'denied' ? () => Linking.openSettings() : enablePush}
+              style={{ marginTop: 12 }}
+            />
+          ) : null}
+        </Card>
+      ) : null}
       {GROUPS.map((group) => (
         <React.Fragment key={group.title}>
           <SectionTitle>{group.title}</SectionTitle>

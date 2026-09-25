@@ -18,8 +18,9 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { vexo } from 'vexo-analytics';
 
-import { AuthProvider } from '@/lib/auth/AuthProvider';
+import { AuthProvider, useAuth } from '@/lib/auth/AuthProvider';
 import { withMonitoring } from '@/lib/monitoring';
+import { usePushNotifications } from '@/lib/notifications';
 import { SettingsProvider } from '@/lib/settings/SettingsProvider';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { NAV_THEME } from '@/theme';
@@ -33,6 +34,13 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const VEXO_KEY = process.env.EXPO_PUBLIC_VEXO_KEY;
 if (VEXO_KEY && !__DEV__) vexo(VEXO_KEY);
+
+/** Registers the device for push and routes notification taps. Renders nothing. */
+function PushNotifications() {
+  const { user } = useAuth();
+  usePushNotifications(user?.id);
+  return null;
+}
 
 const CARD = { presentation: 'card', headerShown: false } as const;
 const MODAL = { presentation: 'modal', headerShown: false } as const;
@@ -60,6 +68,7 @@ function RootLayout() {
       <StatusBar style="light" />
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AuthProvider>
+          <PushNotifications />
           <SettingsProvider>
             <ActionSheetProvider>
               <NavThemeProvider value={NAV_THEME[colorScheme]}>

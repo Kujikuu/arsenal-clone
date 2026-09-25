@@ -27,6 +27,12 @@
           "calendarPermission": "The Arsenal adds upcoming fixtures to your calendar when you choose to sync them."
         }
       ],
+      [
+        "expo-notifications",
+        {
+          "color": "#D32D2F"
+        }
+      ],
       "@sentry/react-native"
     ],
     "experiments": {

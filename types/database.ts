@@ -25,6 +25,8 @@ export interface Article {
   read_time: string;
   published_at: string;
   is_featured: boolean;
+  /** Sends a breaking-news push when set (see push_notifications migration). */
+  is_breaking?: boolean;
   tag?: string | null;
   team_type: ContentTeamType;
   youtube_id?: string | null;
