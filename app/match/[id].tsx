@@ -23,6 +23,7 @@ import { resolveImage } from '@/lib/media/resolveImage';
 import type { Match, MatchEvent } from '@/types/database';
 import { PALETTE } from '@/theme/palette';
 import { isClubTeam } from '@/lib/brand';
+import { useRealtimeRefetch } from '@/lib/api/realtime';
 
 const MATCH_TABS = ['THREAD', 'LINE UPS', 'STATS', 'MEDIA'] as const;
 type MatchTab = (typeof MATCH_TABS)[number];
@@ -50,6 +51,14 @@ export default function MatchDetailScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const centre = useMatchCentre(id);
+  useRealtimeRefetch(
+    `match:${id}`,
+    [
+      { table: 'matches', filter: `id=eq.${id}` },
+      { table: 'match_events', filter: `match_id=eq.${id}` },
+    ],
+    centre.refetch
+  );
   const [activeTab, setActiveTab] = useState<MatchTab>('THREAD');
   const [lineupSide, setLineupSide] = useState<'home' | 'away' | null>(null);
   const [refreshing, setRefreshing] = useState(false);

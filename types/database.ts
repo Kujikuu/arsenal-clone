@@ -70,6 +70,8 @@ export interface Match {
   stadium: string;
   referee?: string | null;
   audio_url?: string | null;
+  /** Set on rows imported from football-data.org, e.g. 'fd:537785'. */
+  external_id?: string | null;
 }
 
 export type MatchEventType =

@@ -46,3 +46,15 @@ jobs:
             psql -v ON_ERROR_STOP=1 -q -f "$f"
           done
           psql -v ON_ERROR_STOP=1 -q -f supabase/seed.sql
+
+  edge-functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Typecheck
+        run: deno check supabase/functions/*/index.ts
+      - name: Test
+        run: deno test supabase/functions/

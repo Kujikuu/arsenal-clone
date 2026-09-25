@@ -21,6 +21,7 @@ import { useSettings } from '@/lib/settings/SettingsProvider';
 import { isFiltered, useFilterStore } from '@/store/filterStore';
 import type { Match, TeamType } from '@/types/database';
 import { PALETTE } from '@/theme/palette';
+import { useRealtimeRefetch } from '@/lib/api/realtime';
 
 const TEAM_CATEGORIES = ['MEN', 'WOMEN', 'ACADEMY'] as const;
 const SUB_TABS = ['FIXTURES', 'TABLES', 'PLAYERS'] as const;
@@ -89,6 +90,11 @@ export default function MatchesTabScreen() {
     competition: filter.competition,
     clubOnly: filter.teamSelection === 'club',
   });
+  useRealtimeRefetch(
+    `fixtures:${teamType}`,
+    [{ table: 'matches', filter: `team_type=eq.${teamType}` }],
+    fixtures.refetch
+  );
   const standings = useStandings(teamType, filter.season);
   const squad = useSquad(teamType);
 

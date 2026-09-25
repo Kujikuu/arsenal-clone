@@ -351,3 +351,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 [functions.send-notifications]
 # Called by pg_cron with NOTIFY_CRON_SECRET, not a user JWT.
 verify_jwt = false
+
+[functions.sync-football-data]
+# Called by pg_cron with SYNC_CRON_SECRET, not a user JWT.
+verify_jwt = false
