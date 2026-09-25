@@ -11,6 +11,7 @@ import { useExperience } from '@/lib/api/experiences';
 import { formatDuration, formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const BOOKABLE_IN_APP = new Set(['tour', 'legends']);
 
@@ -100,7 +101,7 @@ export default function ExperienceScreen() {
             />
           ) : null}
           <PillButton
-            label="MORE INFO ON PALETTE.COM"
+            label={`MORE INFO ON ${BRAND.website.toUpperCase()}`}
             variant={BOOKABLE_IN_APP.has(experience.category) ? 'secondary' : 'primary'}
             onPress={() => WebBrowser.openBrowserAsync(experience.book_url)}
             style={{ marginTop: 12 }}

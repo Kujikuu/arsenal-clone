@@ -12,7 +12,8 @@ import {
   type FdStandings,
 } from './mapping.ts';
 
-const API = 'https://api.football-data.org/v4';
+// Overridable for local testing against a mock server.
+const API = Deno.env.get('FOOTBALL_DATA_API_URL') ?? 'https://api.football-data.org/v4';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,

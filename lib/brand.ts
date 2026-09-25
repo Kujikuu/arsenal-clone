@@ -14,6 +14,7 @@ export const BRAND = {
   womenTeam: 'Arsenal Women',
   tv: 'Arsenal TV',
   shop: 'Arsenal Direct',
+  website: 'arsenal.com',
   calendarTitle: 'Arsenal Fixtures',
   /** YouTube channel handle used for "watch on YouTube" fallbacks. */
   youtubeHandle: 'arsenal',

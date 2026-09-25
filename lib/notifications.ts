@@ -103,16 +103,26 @@ function routeFrom(response: Notifications.NotificationResponse | null | undefin
  */
 export function usePushNotifications(userId: string | undefined) {
   const router = useRouter();
-  const lastResponse = Notifications.useLastNotificationResponse();
 
   useEffect(() => {
     if (userId) registerPushToken();
   }, [userId]);
 
   useEffect(() => {
-    const route = routeFrom(lastResponse);
-    if (!route) return;
-    router.push(route);
-    Notifications.clearLastNotificationResponse();
-  }, [lastResponse, router]);
+    // The notification APIs are native-only; skip them on web.
+    if (Platform.OS === 'web') return;
+    const open = (response: Notifications.NotificationResponse | null) => {
+      const route = routeFrom(response);
+      if (route) router.push(route);
+    };
+    // A tap that launched the app, then taps while it is running.
+    Notifications.getLastNotificationResponseAsync()
+      .then((response) => {
+        open(response);
+        return Notifications.clearLastNotificationResponseAsync();
+      })
+      .catch((error) => reportError(error, { where: 'getLastNotificationResponse' }));
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
+    return () => sub.remove();
+  }, [router]);
 }

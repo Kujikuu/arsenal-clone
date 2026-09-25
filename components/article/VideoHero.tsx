@@ -55,18 +55,7 @@ export function VideoHero({
           </>
         )}
 
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={10}
-          accessibilityLabel="Back"
-          style={{ position: 'absolute', left: 22, top: 2 }}>
-          <Feather name="chevron-left" size={30} color="#FFF" />
-        </Pressable>
-
-        {rightAction ? (
-          <View style={{ position: 'absolute', right: 22, top: 2 }}>{rightAction}</View>
-        ) : null}
-
+        {/* Drawn before the header buttons so its full-size play target doesn't cover them. */}
         {duration && !playing ? (
           <VideoChrome
             title={title}
@@ -77,6 +66,18 @@ export function VideoHero({
               else if (watchUrl) WebBrowser.openBrowserAsync(watchUrl);
             }}
           />
+        ) : null}
+
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={10}
+          accessibilityLabel="Back"
+          style={{ position: 'absolute', left: 22, top: 2 }}>
+          <Feather name="chevron-left" size={30} color="#FFF" />
+        </Pressable>
+
+        {rightAction ? (
+          <View style={{ position: 'absolute', right: 22, top: 2 }}>{rightAction}</View>
         ) : null}
       </View>
     </View>

@@ -232,6 +232,7 @@ export default function MatchDetailScreen() {
           home={{ name: match.home_team, logo: match.home_team_logo }}
           away={{ name: match.away_team, logo: match.away_team_logo }}
           score={score}
+          live={match.status === 'live'}
           homeGoals={goalsFor(events, 'home')}
           awayGoals={goalsFor(events, 'away')}
           onListen={

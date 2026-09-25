@@ -27,6 +27,8 @@ interface Props {
   score: string;
   homeGoals: GoalEvent[];
   awayGoals: GoalEvent[];
+  /** Shows the LIVE banner; hidden before kick-off and after full time. */
+  live: boolean;
   /** Hidden when the match has no audio stream. */
   onListen?: () => void;
 }
@@ -75,11 +77,15 @@ export function MatchHero(props: Props) {
 
   return (
     <View>
-      <Image
-        source={BANNER}
-        style={{ width, height: width * BANNER_ASPECT, marginTop: 44 }}
-        resizeMode="cover"
-      />
+      {props.live ? (
+        <Image
+          source={BANNER}
+          style={{ width, height: width * BANNER_ASPECT, marginTop: 44 }}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={{ height: 44 }} />
+      )}
 
       <View className="flex-row items-center" style={{ paddingHorizontal: 16, height: 106 }}>
         <View

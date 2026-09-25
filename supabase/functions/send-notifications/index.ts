@@ -2,7 +2,8 @@
 // Runs every minute from pg_cron (see README.md in this folder).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+// Overridable for local testing against a mock server.
+const EXPO_PUSH_URL = Deno.env.get('EXPO_PUSH_URL') ?? 'https://exp.host/--/api/v2/push/send';
 /** Events older than this are dropped rather than sent late (e.g. after seeding or downtime). */
 const MAX_AGE_MINUTES = 30;
 const EVENTS_PER_RUN = 20;
