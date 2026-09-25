@@ -79,6 +79,8 @@ function RootLayout() {
                   <Stack.Screen name="store/[id]" options={MODAL} />
                   <Stack.Screen name="auth/login" options={MODAL} />
                   <Stack.Screen name="auth/signup" options={MODAL} />
+                  <Stack.Screen name="auth/reset-password" options={CARD} />
+                  <Stack.Screen name="auth/callback" options={CARD} />
                   <Stack.Screen
                     name="search/index"
                     options={{ ...MODAL, presentation: 'fullScreenModal' }}

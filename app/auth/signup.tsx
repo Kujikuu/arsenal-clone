@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { AuthScreen } from '@/components/auth/AuthScreen';
 import { FormField } from '@/components/ui/FormField';
 import { PillButton } from '@/components/ui/PillButton';
+import { authRedirectUrl } from '@/lib/auth/linking';
 import { supabase } from '@/lib/supabase';
 import { PALETTE } from '@/theme/palette';
 import { BRAND } from '@/lib/brand';
@@ -30,7 +31,10 @@ export default function SignupModal() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { full_name: fullName.trim() } },
+      options: {
+        data: { full_name: fullName.trim() },
+        emailRedirectTo: authRedirectUrl('auth/callback'),
+      },
     });
     setLoading(false);
 

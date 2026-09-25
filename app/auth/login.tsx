@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { AuthScreen } from '@/components/auth/AuthScreen';
 import { FormField } from '@/components/ui/FormField';
 import { PillButton } from '@/components/ui/PillButton';
+import { authRedirectUrl } from '@/lib/auth/linking';
 import { supabase } from '@/lib/supabase';
 import { PALETTE } from '@/theme/palette';
 
@@ -36,7 +37,9 @@ export default function LoginModal() {
       Alert.alert('Enter your email', 'Type your email address above and tap this again.');
       return;
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: authRedirectUrl('auth/reset-password'),
+    });
     Alert.alert(
       error ? 'Could not send reset email' : 'Check your inbox',
       error ? error.message : 'We have sent you a link to reset your password.'
