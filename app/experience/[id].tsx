@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { Card } from '@/components/ui/Card';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { PillButton } from '@/components/ui/PillButton';
@@ -10,7 +10,8 @@ import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useExperience } from '@/lib/api/experiences';
 import { formatDuration, formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const BOOKABLE_IN_APP = new Set(['tour', 'legends']);
 
@@ -22,7 +23,7 @@ export default function ExperienceScreen() {
   if (!experience) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         {error ? (
           <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
@@ -42,7 +43,7 @@ export default function ExperienceScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader left="back" />
+      <AppHeader left="back" />
       <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
         <Image
           source={resolveImage(experience.image_url)}
@@ -72,7 +73,7 @@ export default function ExperienceScreen() {
                 style={{
                   paddingVertical: 18,
                   borderTopWidth: i ? 1 : 0,
-                  borderTopColor: ARSENAL.chip,
+                  borderTopColor: PALETTE.chip,
                 }}
                 className="items-center">
                 <DisplayText size={9.5} color="#C8C6C7" heavy={false}>
@@ -100,7 +101,7 @@ export default function ExperienceScreen() {
             />
           ) : null}
           <PillButton
-            label="MORE INFO ON ARSENAL.COM"
+            label={`MORE INFO ON ${BRAND.website.toUpperCase()}`}
             variant={BOOKABLE_IN_APP.has(experience.category) ? 'secondary' : 'primary'}
             onPress={() => WebBrowser.openBrowserAsync(experience.book_url)}
             style={{ marginTop: 12 }}

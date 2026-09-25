@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop, Path, Circle } from 'react-native-svg';
 import { TeamLogo } from '@/components/ui/TeamLogo';
 import type { Standing } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const ROW_HEIGHT = 48;
 const HEADER_HEIGHT = 40;
@@ -36,7 +36,7 @@ function FormMarker({ form }: { form: TableForm }) {
     <Svg width={10} height={8}>
       <Path
         d={up ? 'M5 0 L10 8 H0 Z' : 'M0 0 H10 L5 8 Z'}
-        fill={up ? ARSENAL.formUp : ARSENAL.formDown}
+        fill={up ? PALETTE.formUp : PALETTE.formDown}
       />
     </Svg>
   );
@@ -61,15 +61,15 @@ function RightFade() {
 
 const rowStyle = {
   height: ROW_HEIGHT,
-  backgroundColor: ARSENAL.surface,
+  backgroundColor: PALETTE.surface,
   borderBottomWidth: 1,
-  borderBottomColor: ARSENAL.dividerSoft,
+  borderBottomColor: PALETTE.dividerSoft,
 } as const;
 
 const headerStyle = {
   height: HEADER_HEIGHT,
   borderBottomWidth: 1,
-  borderBottomColor: ARSENAL.divider,
+  borderBottomColor: PALETTE.divider,
 } as const;
 
 /** Standings with a fixed club column and horizontally scrolling stats (ref/match-table.jpeg). */

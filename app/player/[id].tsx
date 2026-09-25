@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { PlayerCard, playerCardData } from '@/components/matches/PlayerCard';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { usePlayer } from '@/lib/api/squad';
 import type { Player } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const PROFILE_TABS = ['PROFILE', 'STATS'] as const;
 type ProfileTab = (typeof PROFILE_TABS)[number];
@@ -43,7 +44,7 @@ function detailRows(player: Player): { label: string; value: string }[] {
     { label: 'POSITION', value: player.position },
     { label: 'DATE OF BIRTH', value: formatDate(player.date_of_birth) },
     { label: 'PLACE OF BIRTH', value: player.place_of_birth },
-    { label: 'SIGNED FOR ARSENAL', value: formatSigned(player.signed_on) },
+    { label: `SIGNED FOR ${BRAND.club.toUpperCase()}`, value: formatSigned(player.signed_on) },
   ];
   return rows.filter((r): r is { label: string; value: string } => Boolean(r.value));
 }
@@ -66,13 +67,13 @@ function DetailList({ rows }: { rows: { label: string; value: string }[] }) {
       style={{
         marginHorizontal: 16,
         marginTop: 26,
-        backgroundColor: ARSENAL.surface,
+        backgroundColor: PALETTE.surface,
         borderRadius: 8,
       }}>
       {rows.map((row, i) => (
         <View
           key={row.label}
-          style={{ height: 95, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: ARSENAL.chip }}
+          style={{ height: 95, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: PALETTE.chip }}
           className="items-center justify-center">
           <DisplayText size={9.5} color="#C8C6C7" heavy={false}>
             {row.label}
@@ -96,7 +97,7 @@ export default function PlayerDetailScreen() {
   if (error) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         <ErrorState error={error} onRetry={refetch} />
       </View>
     );
@@ -105,7 +106,7 @@ export default function PlayerDetailScreen() {
   if (!player) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         {loading ? (
           <LoadingState />
         ) : (
@@ -123,7 +124,7 @@ export default function PlayerDetailScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader left="back" />
+      <AppHeader left="back" />
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }}>
         <PlayerCard height={186} player={playerCardData(player)} />
@@ -163,7 +164,7 @@ export default function PlayerDetailScreen() {
               className="font-body"
               style={{
                 fontSize: 14,
-                color: ARSENAL.textMuted,
+                color: PALETTE.textMuted,
                 marginHorizontal: 16,
                 marginTop: 20,
               }}>

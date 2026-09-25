@@ -10,7 +10,7 @@ import {
   StoreTabIcon,
   ProfileTabIcon,
 } from '@/components/CustomTabIcons';
-import { TAB_BAR_CONTENT_HEIGHT } from '@/theme/arsenal';
+import { TAB_BAR_CONTENT_HEIGHT } from '@/theme/palette';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();

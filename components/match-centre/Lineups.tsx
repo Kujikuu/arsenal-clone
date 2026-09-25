@@ -7,7 +7,7 @@ import { DisplayText } from '@/components/ui/DisplayText';
 import { EmptyState } from '@/components/ui/States';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { MatchLineupPlayer } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props<T extends string> {
   teams: readonly T[];
@@ -28,10 +28,10 @@ function LineupRow({ player }: { player: MatchLineupPlayer }) {
   const photo = resolveImage(player.photo_url);
   return (
     <View
-      style={{ height: 71, backgroundColor: ARSENAL.surface, borderRadius: 8, marginBottom: 13 }}
+      style={{ height: 71, backgroundColor: PALETTE.surface, borderRadius: 8, marginBottom: 13 }}
       className="flex-row items-center px-4">
       <View style={{ width: 32 }} className="items-center">
-        <DisplayText size={15} color={ARSENAL.red} heavy={false}>
+        <DisplayText size={15} color={PALETTE.red} heavy={false}>
           {player.shirt_number}
         </DisplayText>
       </View>
@@ -48,7 +48,7 @@ function LineupRow({ player }: { player: MatchLineupPlayer }) {
         <Image source={photo} style={{ width: 50, height: 60 }} resizeMode="contain" />
       ) : (
         <View style={{ width: 50 }} className="items-center">
-          <Ionicons name="shirt-outline" size={26} color={ARSENAL.textDim} />
+          <Ionicons name="shirt-outline" size={26} color={PALETTE.textDim} />
         </View>
       )}
     </View>

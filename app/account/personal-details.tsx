@@ -11,7 +11,7 @@ import { SwitchRow } from '@/components/ui/SwitchRow';
 import { LoadingState } from '@/components/ui/States';
 import { updateProfile, type ProfilePatch } from '@/lib/api/account';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const DEFAULT_DOB = new Date(1995, 0, 1);
 
@@ -104,7 +104,7 @@ export default function PersonalDetailsScreen() {
         </DisplayText>
         <Text
           className="font-body"
-          style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 10 }}>
+          style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 10 }}>
           {profile.membership_tier} · {user.email}
         </Text>
       </Card>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, type TextProps, type TextStyle } from 'react-native';
-import { FONT } from '@/theme/arsenal';
+import { FONT } from '@/theme/palette';
 
 interface Props extends TextProps {
   size: number;

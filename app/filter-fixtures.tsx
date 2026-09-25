@@ -14,9 +14,11 @@ import {
   type TeamSelection,
 } from '@/store/filterStore';
 import type { TeamType } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
-const TEAMS: TeamSelection[] = ['Arsenal', 'All'];
+const TEAMS: TeamSelection[] = ['club', 'all'];
+const TEAM_SELECTION_LABEL: Record<TeamSelection, string> = { club: BRAND.club, all: 'All' };
 const TEAM_LABEL: Record<TeamType, string> = { men: "Men's", women: "Women's", academy: 'Academy' };
 
 type SectionKey = 'teams' | 'competitions' | 'season';
@@ -145,7 +147,7 @@ export default function FilterFixturesModal() {
           style={{ position: 'absolute', left: 16 }}>
           <Text
             className="font-body-medium"
-            style={{ fontSize: 15, color: isDefault ? ARSENAL.textDim : '#FFF' }}>
+            style={{ fontSize: 15, color: isDefault ? PALETTE.textDim : '#FFF' }}>
             Reset
           </Text>
         </Pressable>
@@ -168,7 +170,7 @@ export default function FilterFixturesModal() {
           {TEAMS.map((t) => (
             <OptionRow
               key={t}
-              label={t}
+              label={TEAM_SELECTION_LABEL[t]}
               selected={draft.teamSelection === t}
               muted
               onPress={() => patch({ teamSelection: t })}
@@ -218,7 +220,7 @@ export default function FilterFixturesModal() {
           style={{
             height: 49,
             borderRadius: 25,
-            backgroundColor: dirty ? ARSENAL.red : ARSENAL.applyDisabled,
+            backgroundColor: dirty ? PALETTE.red : PALETTE.applyDisabled,
           }}
           className="items-center justify-center active:opacity-85">
           <Text

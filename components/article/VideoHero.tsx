@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 import { YouTubePlayer } from '@/components/media/YouTubePlayer';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   title: string;
@@ -55,18 +55,7 @@ export function VideoHero({
           </>
         )}
 
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={10}
-          accessibilityLabel="Back"
-          style={{ position: 'absolute', left: 22, top: 2 }}>
-          <Feather name="chevron-left" size={30} color="#FFF" />
-        </Pressable>
-
-        {rightAction ? (
-          <View style={{ position: 'absolute', right: 22, top: 2 }}>{rightAction}</View>
-        ) : null}
-
+        {/* Drawn before the header buttons so its full-size play target doesn't cover them. */}
         {duration && !playing ? (
           <VideoChrome
             title={title}
@@ -77,6 +66,18 @@ export function VideoHero({
               else if (watchUrl) WebBrowser.openBrowserAsync(watchUrl);
             }}
           />
+        ) : null}
+
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={10}
+          accessibilityLabel="Back"
+          style={{ position: 'absolute', left: 22, top: 2 }}>
+          <Feather name="chevron-left" size={30} color="#FFF" />
+        </Pressable>
+
+        {rightAction ? (
+          <View style={{ position: 'absolute', right: 22, top: 2 }}>{rightAction}</View>
         ) : null}
       </View>
     </View>
@@ -129,7 +130,7 @@ function VideoChrome({ title, duration, playing, onToggle }: ChromeProps) {
               width: 14,
               height: 14,
               borderRadius: 7,
-              backgroundColor: ARSENAL.red,
+              backgroundColor: PALETTE.red,
             }}
           />
         </View>

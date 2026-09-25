@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, Pressable, ActivityIndicator, type ViewStyle, type StyleProp } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   label: string;
@@ -26,10 +26,10 @@ export function PillButton({
   const background =
     variant === 'primary'
       ? inactive
-        ? ARSENAL.applyDisabled
-        : ARSENAL.red
+        ? PALETTE.applyDisabled
+        : PALETTE.red
       : variant === 'secondary'
-        ? ARSENAL.button
+        ? PALETTE.button
         : 'transparent';
 
   return (
@@ -44,7 +44,7 @@ export function PillButton({
           borderRadius: height / 2,
           backgroundColor: background,
           borderWidth: variant === 'outline' ? 1.2 : 0,
-          borderColor: ARSENAL.red,
+          borderColor: PALETTE.red,
           paddingHorizontal: 20,
         },
         style,

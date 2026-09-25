@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   label: string;
@@ -14,7 +14,7 @@ interface Props {
 export function SectionDivider({ label, expanded, onPress }: Props) {
   const content = (
     <View className="flex-row items-center">
-      <View style={{ height: 1.5, backgroundColor: ARSENAL.red }} className="flex-1" />
+      <View style={{ height: 1.5, backgroundColor: PALETTE.red }} className="flex-1" />
       <View className="mx-3 flex-row items-center">
         <Text className="font-body-semibold text-white" style={{ fontSize: 16 }}>
           {label}
@@ -28,7 +28,7 @@ export function SectionDivider({ label, expanded, onPress }: Props) {
           />
         )}
       </View>
-      <View style={{ height: 1.5, backgroundColor: ARSENAL.red }} className="flex-1" />
+      <View style={{ height: 1.5, backgroundColor: PALETTE.red }} className="flex-1" />
     </View>
   );
 

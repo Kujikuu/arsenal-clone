@@ -6,7 +6,7 @@ import { FormField } from '@/components/ui/FormField';
 import { PillButton } from '@/components/ui/PillButton';
 import { sendSupportMessage } from '@/lib/api/account';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const TOPICS = ['Tickets', 'Membership', 'App feedback', 'Stadium tours', 'Other'] as const;
 
@@ -68,7 +68,7 @@ export default function ContactScreen() {
       />
       <Text
         className="font-body-semibold"
-        style={{ fontSize: 12.5, letterSpacing: 0.6, color: ARSENAL.textMuted, marginBottom: 8 }}>
+        style={{ fontSize: 12.5, letterSpacing: 0.6, color: PALETTE.textMuted, marginBottom: 8 }}>
         TOPIC
       </Text>
       <View className="flex-row flex-wrap" style={{ marginBottom: 12 }}>
@@ -84,7 +84,7 @@ export default function ContactScreen() {
               paddingHorizontal: 14,
               marginRight: 8,
               marginBottom: 8,
-              backgroundColor: topic === t ? ARSENAL.red : ARSENAL.chip,
+              backgroundColor: topic === t ? PALETTE.red : PALETTE.chip,
             }}
             className="items-center justify-center">
             <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>

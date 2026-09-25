@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { useNow } from '@/lib/useNow';
 import type { FanPoll } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   poll: FanPoll;
@@ -20,14 +20,14 @@ export function PollCard({ poll, onVote }: Props) {
 
   return (
     <View
-      style={{ backgroundColor: ARSENAL.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
+      style={{ backgroundColor: PALETTE.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
       <DisplayText size={12} color="#C8C6C7" heavy={false}>
         {poll.category.toUpperCase()}
       </DisplayText>
       <Text className="font-body-semibold text-white" style={{ fontSize: 18, marginTop: 8 }}>
         {poll.title}
       </Text>
-      <Text className="font-body" style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 4 }}>
+      <Text className="font-body" style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 4 }}>
         {poll.description}
       </Text>
 
@@ -48,9 +48,9 @@ export function PollCard({ poll, onVote }: Props) {
                 height: 52,
                 borderRadius: 6,
                 marginBottom: 8,
-                backgroundColor: ARSENAL.surfaceRaised,
+                backgroundColor: PALETTE.surfaceRaised,
                 borderWidth: mine ? 1 : 0,
-                borderColor: ARSENAL.red,
+                borderColor: PALETTE.red,
               }}
               className="justify-center overflow-hidden active:opacity-80">
               {showResults && (
@@ -61,7 +61,7 @@ export function PollCard({ poll, onVote }: Props) {
                     top: 0,
                     bottom: 0,
                     width: `${pct}%`,
-                    backgroundColor: mine ? 'rgba(211,45,47,0.45)' : ARSENAL.chip,
+                    backgroundColor: mine ? 'rgba(211,45,47,0.45)' : PALETTE.chip,
                   }}
                 />
               )}
@@ -88,7 +88,7 @@ export function PollCard({ poll, onVote }: Props) {
           );
         })}
       </View>
-      <Text className="font-body" style={{ fontSize: 12.5, color: ARSENAL.textDim, marginTop: 2 }}>
+      <Text className="font-body" style={{ fontSize: 12.5, color: PALETTE.textDim, marginTop: 2 }}>
         {poll.total_votes.toLocaleString('en-GB')} votes
         {closed ? ' · Voting closed' : voted ? ' · Thanks for voting' : ''}
       </Text>

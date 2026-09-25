@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 export function LoadingState({ padded = true }: { padded?: boolean }) {
   return (
     <View className="items-center justify-center" style={{ paddingVertical: padded ? 48 : 0 }}>
-      <ActivityIndicator color={ARSENAL.red} />
+      <ActivityIndicator color={PALETTE.red} />
     </View>
   );
 }
@@ -24,7 +24,7 @@ interface MessageProps {
 export function EmptyState({ icon, title, message, actionLabel, onAction }: MessageProps) {
   return (
     <View className="items-center px-6" style={{ paddingVertical: 56 }}>
-      {icon && <Ionicons name={icon} size={38} color={ARSENAL.textDim} />}
+      {icon && <Ionicons name={icon} size={38} color={PALETTE.textDim} />}
       <Text
         className="text-center font-body-semibold text-white"
         style={{ fontSize: 16, marginTop: icon ? 12 : 0 }}>
@@ -33,7 +33,7 @@ export function EmptyState({ icon, title, message, actionLabel, onAction }: Mess
       {message ? (
         <Text
           className="text-center font-body"
-          style={{ fontSize: 14, lineHeight: 19, color: ARSENAL.textMuted, marginTop: 6 }}>
+          style={{ fontSize: 14, lineHeight: 19, color: PALETTE.textMuted, marginTop: 6 }}>
           {message}
         </Text>
       ) : null}
@@ -41,7 +41,7 @@ export function EmptyState({ icon, title, message, actionLabel, onAction }: Mess
         <Pressable
           onPress={onAction}
           accessibilityRole="button"
-          style={{ backgroundColor: ARSENAL.red, height: 38, borderRadius: 19, marginTop: 18 }}
+          style={{ backgroundColor: PALETTE.red, height: 38, borderRadius: 19, marginTop: 18 }}
           className="items-center justify-center px-6 active:opacity-80">
           <Text
             className="font-body-semibold text-white"

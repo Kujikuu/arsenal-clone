@@ -2,8 +2,9 @@ import type { ImageSourcePropType } from 'react-native';
 
 /**
  * Rows can point at artwork bundled with the app (the crops taken from ref/)
- * with a `local:` URL, e.g. `local:media/news_1.jpg`. Everything else is a
- * remote URL.
+ * with a `local:` URL, e.g. `local:media/news_1.jpg`, or at the Supabase
+ * `media` storage bucket with `media:`, e.g. `media:articles/a01.jpg`.
+ * Everything else is a remote URL.
  */
 const LOCAL_ASSETS: Record<string, ImageSourcePropType> = {
   'media/hbk_1_top.jpg': require('@/assets/media/hbk_1_top.jpg'),
@@ -28,6 +29,8 @@ const LOCAL_ASSETS: Record<string, ImageSourcePropType> = {
 };
 
 const LOCAL_PREFIX = 'local:';
+const MEDIA_PREFIX = 'media:';
+const MEDIA_BASE = `${process.env.EXPO_PUBLIC_SUPABASE_URL ?? ''}/storage/v1/object/public/media/`;
 
 export function resolveImage(url?: string | null): ImageSourcePropType | undefined {
   if (!url) return undefined;
@@ -36,5 +39,6 @@ export function resolveImage(url?: string | null): ImageSourcePropType | undefin
     if (!asset) console.warn(`[resolveImage] Unknown bundled asset: ${url}`);
     return asset;
   }
+  if (url.startsWith(MEDIA_PREFIX)) return { uri: MEDIA_BASE + url.slice(MEDIA_PREFIX.length) };
   return { uri: url };
 }

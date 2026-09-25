@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { PillButton } from '@/components/ui/PillButton';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { saveQuizAttempt, useQuiz } from '@/lib/api/quizzes';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { resolveImage } from '@/lib/media/resolveImage';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 type Phase = 'intro' | 'question' | 'result';
 
@@ -28,7 +28,7 @@ export default function QuizScreen() {
   if (!data?.quiz) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         {error ? (
           <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
@@ -78,7 +78,7 @@ export default function QuizScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader left="back" title={<DisplayText size={14}>QUIZ</DisplayText>} />
+      <AppHeader left="back" title={<DisplayText size={14}>QUIZ</DisplayText>} />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 48 }}>
         {phase === 'intro' && (
           <>
@@ -97,7 +97,7 @@ export default function QuizScreen() {
             </Text>
             <Text
               className="font-body"
-              style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 12 }}>
+              style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 12 }}>
               {total} questions
               {bestScore !== null ? ` · Your best: ${bestScore}/${total}` : ''}
             </Text>
@@ -116,13 +116,13 @@ export default function QuizScreen() {
               {`QUESTION ${index + 1} OF ${total}`}
             </DisplayText>
             <View
-              style={{ height: 4, backgroundColor: ARSENAL.track, borderRadius: 2, marginTop: 12 }}>
+              style={{ height: 4, backgroundColor: PALETTE.track, borderRadius: 2, marginTop: 12 }}>
               <View
                 style={{
                   width: `${((index + (picked !== null ? 1 : 0)) / total) * 100}%`,
                   height: 4,
                   borderRadius: 2,
-                  backgroundColor: ARSENAL.red,
+                  backgroundColor: PALETTE.red,
                 }}
               />
             </View>
@@ -137,17 +137,17 @@ export default function QuizScreen() {
                 const correct = i === question.correct_index;
                 const chosen = i === picked;
                 const background = !answered
-                  ? ARSENAL.surfaceRaised
+                  ? PALETTE.surfaceRaised
                   : correct
                     ? 'rgba(125,233,134,0.18)'
                     : chosen
                       ? 'rgba(238,79,76,0.2)'
-                      : ARSENAL.surfaceRaised;
+                      : PALETTE.surfaceRaised;
                 const border =
                   answered && correct
-                    ? ARSENAL.formUp
+                    ? PALETTE.formUp
                     : answered && chosen
-                      ? ARSENAL.formDown
+                      ? PALETTE.formDown
                       : 'transparent';
                 return (
                   <Pressable
@@ -169,10 +169,10 @@ export default function QuizScreen() {
                       {option}
                     </Text>
                     {answered && correct && (
-                      <Ionicons name="checkmark-circle" size={22} color={ARSENAL.formUp} />
+                      <Ionicons name="checkmark-circle" size={22} color={PALETTE.formUp} />
                     )}
                     {answered && chosen && !correct && (
-                      <Ionicons name="close-circle" size={22} color={ARSENAL.formDown} />
+                      <Ionicons name="close-circle" size={22} color={PALETTE.formDown} />
                     )}
                   </Pressable>
                 );
@@ -216,7 +216,7 @@ export default function QuizScreen() {
             </Text>
             <Text
               className="text-center font-body"
-              style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 10 }}>
+              style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 10 }}>
               {!user
                 ? 'Sign in to save your scores.'
                 : saveState === 'saved'

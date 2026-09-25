@@ -3,7 +3,7 @@ import { View, Pressable } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArsenalWordmark } from '@/components/ui/ArsenalWordmark';
+import { BrandWordmark } from '@/components/ui/BrandWordmark';
 
 type LeftAction = 'search' | 'back' | 'close' | 'none';
 
@@ -21,7 +21,7 @@ interface Props {
 
 const HEADER_HEIGHT = 50;
 
-export function TheArsenalHeader({
+export function AppHeader({
   left,
   showBack = false,
   onLeftPress,
@@ -65,7 +65,7 @@ export function TheArsenalHeader({
           )}
         </View>
 
-        <View className="flex-1 items-center">{title ?? <ArsenalWordmark />}</View>
+        <View className="flex-1 items-center">{title ?? <BrandWordmark />}</View>
 
         <View className="w-16 flex-row items-center justify-end">{rightAction}</View>
       </View>

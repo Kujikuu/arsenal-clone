@@ -2,8 +2,10 @@ import { Platform } from 'react-native';
 import * as Calendar from 'expo-calendar/legacy';
 import { fetchUpcomingMatches } from '@/lib/api/matches';
 import type { TeamType } from '@/types/database';
+import { BRAND } from '@/lib/brand';
+import { PALETTE } from '@/theme/palette';
 
-const CALENDAR_TITLE = 'Arsenal Fixtures';
+const CALENDAR_TITLE = BRAND.calendarTitle;
 const MATCH_MARKER = 'arsenal-match:';
 const MATCH_LENGTH_MS = 2 * 60 * 60 * 1000;
 
@@ -15,11 +17,11 @@ async function findOrCreateCalendar(): Promise<string> {
   const source =
     Platform.OS === 'ios'
       ? (await Calendar.getDefaultCalendarAsync()).source
-      : { isLocalAccount: true, name: 'The Arsenal', type: Calendar.SourceType.LOCAL };
+      : { isLocalAccount: true, name: BRAND.appName, type: Calendar.SourceType.LOCAL };
 
   return Calendar.createCalendarAsync({
     title: CALENDAR_TITLE,
-    color: '#D32D2F',
+    color: PALETTE.red,
     entityType: Calendar.EntityTypes.EVENT,
     sourceId: 'id' in source ? source.id : undefined,
     source,
@@ -36,7 +38,7 @@ export interface SyncResult {
 }
 
 /**
- * Mirror upcoming fixtures for the chosen teams into an "Arsenal Fixtures"
+ * Mirror upcoming fixtures for the chosen teams into the club fixtures
  * calendar. Re-running updates changed kick-offs and removes fixtures for
  * teams that were switched off.
  */

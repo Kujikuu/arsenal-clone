@@ -4,7 +4,7 @@ import { Card, SectionTitle } from '@/components/ui/Card';
 import { SubScreen } from '@/components/ui/SubScreen';
 import { SwitchRow } from '@/components/ui/SwitchRow';
 import { useSettings, type SettingsPatch } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Choice<T extends string> {
   value: T;
@@ -36,7 +36,7 @@ function ChoiceRow<T extends string>({
               paddingHorizontal: 16,
               marginRight: 8,
               marginBottom: 8,
-              backgroundColor: selected ? ARSENAL.red : ARSENAL.chip,
+              backgroundColor: selected ? PALETTE.red : PALETTE.chip,
             }}
             className="items-center justify-center">
             <Text className="font-body-semibold text-white" style={{ fontSize: 14 }}>

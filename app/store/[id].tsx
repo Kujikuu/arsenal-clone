@@ -11,7 +11,7 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { PillButton } from '@/components/ui/PillButton';
 import { SegmentedPills } from '@/components/ui/SegmentedPills';
@@ -22,7 +22,8 @@ import { useStoreProduct } from '@/lib/api/store';
 import { formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const VIEW_MODES = ['PHOTOS', 'CUSTOMISE'] as const;
 type ViewMode = (typeof VIEW_MODES)[number];
@@ -54,7 +55,7 @@ export default function ProductDetailModal() {
   if (!product) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="close" />
+        <AppHeader left="close" />
         {error ? (
           <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
@@ -76,7 +77,7 @@ export default function ProductDetailModal() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         left="close"
         title={<DisplayText size={13}>{product.category.toUpperCase()}</DisplayText>}
       />
@@ -99,7 +100,7 @@ export default function ProductDetailModal() {
               height: heroHeight,
               marginHorizontal: 16,
               borderRadius: 8,
-              backgroundColor: ARSENAL.red,
+              backgroundColor: PALETTE.red,
             }}
             className="items-center justify-center overflow-hidden">
             <ZigzagPattern
@@ -165,7 +166,7 @@ export default function ProductDetailModal() {
                       height: 7,
                       borderRadius: 4,
                       marginHorizontal: 3,
-                      backgroundColor: i === photoIndex ? ARSENAL.red : ARSENAL.chip,
+                      backgroundColor: i === photoIndex ? PALETTE.red : PALETTE.chip,
                     }}
                   />
                 ))}
@@ -222,7 +223,7 @@ export default function ProductDetailModal() {
                         borderRadius: 17,
                         paddingHorizontal: 14,
                         marginRight: 8,
-                        backgroundColor: selected ? ARSENAL.red : ARSENAL.chip,
+                        backgroundColor: selected ? PALETTE.red : PALETTE.chip,
                       }}
                       className="items-center justify-center">
                       <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
@@ -244,7 +245,7 @@ export default function ProductDetailModal() {
                   style={{
                     height: 48,
                     borderRadius: 8,
-                    backgroundColor: ARSENAL.pill,
+                    backgroundColor: PALETTE.pill,
                     paddingHorizontal: 14,
                     fontSize: 15,
                   }}
@@ -261,7 +262,7 @@ export default function ProductDetailModal() {
                     width: 80,
                     height: 48,
                     borderRadius: 8,
-                    backgroundColor: ARSENAL.pill,
+                    backgroundColor: PALETTE.pill,
                     marginLeft: 10,
                     textAlign: 'center',
                     fontSize: 15,
@@ -288,7 +289,7 @@ export default function ProductDetailModal() {
                   marginRight: 8,
                   marginBottom: 8,
                   paddingHorizontal: 12,
-                  backgroundColor: size === s ? ARSENAL.red : ARSENAL.surfaceRaised,
+                  backgroundColor: size === s ? PALETTE.red : PALETTE.surfaceRaised,
                 }}
                 className="items-center justify-center">
                 <Text className="font-body-semibold text-white" style={{ fontSize: 14 }}>
@@ -306,10 +307,10 @@ export default function ProductDetailModal() {
           paddingTop: 10,
           paddingBottom: Math.max(insets.bottom, 12) + 6,
           borderTopWidth: 1,
-          borderTopColor: ARSENAL.divider,
+          borderTopColor: PALETTE.divider,
         }}>
         <PillButton
-          label={size ? `BUY ON ARSENAL DIRECT · ${size}` : 'SELECT A SIZE'}
+          label={size ? `BUY ON ${BRAND.shop.toUpperCase()} · ${size}` : 'SELECT A SIZE'}
           disabled={!size}
           onPress={buy}
         />

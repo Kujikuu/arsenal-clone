@@ -3,7 +3,7 @@ import { View, Text, Image, Pressable, useWindowDimensions } from 'react-native'
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { TeamLogo } from '@/components/ui/TeamLogo';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const BANNER = require('@/assets/extracted/mc_live_banner.png');
 const BANNER_ASPECT = 296 / 540;
@@ -27,6 +27,8 @@ interface Props {
   score: string;
   homeGoals: GoalEvent[];
   awayGoals: GoalEvent[];
+  /** Shows the LIVE banner; hidden before kick-off and after full time. */
+  live: boolean;
   /** Hidden when the match has no audio stream. */
   onListen?: () => void;
 }
@@ -75,11 +77,15 @@ export function MatchHero(props: Props) {
 
   return (
     <View>
-      <Image
-        source={BANNER}
-        style={{ width, height: width * BANNER_ASPECT, marginTop: 44 }}
-        resizeMode="cover"
-      />
+      {props.live ? (
+        <Image
+          source={BANNER}
+          style={{ width, height: width * BANNER_ASPECT, marginTop: 44 }}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={{ height: 44 }} />
+      )}
 
       <View className="flex-row items-center" style={{ paddingHorizontal: 16, height: 106 }}>
         <View
@@ -87,7 +93,7 @@ export function MatchHero(props: Props) {
             width: 42,
             height: 42,
             borderRadius: 21,
-            backgroundColor: ARSENAL.surfaceRaised,
+            backgroundColor: PALETTE.surfaceRaised,
           }}
           className="items-center justify-center">
           <Image
@@ -118,11 +124,11 @@ export function MatchHero(props: Props) {
         <Team team={props.away} />
       </View>
 
-      <View style={[divider, { backgroundColor: ARSENAL.dividerStrong }]} />
+      <View style={[divider, { backgroundColor: PALETTE.dividerStrong }]} />
 
       <View className="flex-row" style={{ paddingTop: 10 }}>
         <GoalList goals={props.homeGoals} align="right" />
-        <View style={{ width: 1, backgroundColor: ARSENAL.dividerStrong, marginBottom: 6 }} />
+        <View style={{ width: 1, backgroundColor: PALETTE.dividerStrong, marginBottom: 6 }} />
         <GoalList goals={props.awayGoals} align="left" />
       </View>
 
@@ -135,7 +141,7 @@ export function MatchHero(props: Props) {
             height: 34,
             borderRadius: 17,
             borderWidth: 1.2,
-            borderColor: ARSENAL.red,
+            borderColor: PALETTE.red,
           }}
           className="flex-row items-center justify-center active:opacity-75">
           <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>

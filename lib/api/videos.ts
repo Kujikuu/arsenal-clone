@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { unwrap, useQuery } from '@/lib/api/useQuery';
 import type { ContentTeamType, Video, VideoCollection } from '@/types/database';
+import { BRAND } from '@/lib/brand';
 
 export function useVideos(teamType: ContentTeamType | null = null) {
   return useQuery(
@@ -73,5 +74,5 @@ export function useVideo(id: string | undefined) {
 /** Where to watch a clip: the YouTube upload when we have one, otherwise a search. */
 export function videoWatchUrl(video: Pick<Video, 'youtube_id' | 'title'>): string {
   if (video.youtube_id) return `https://www.youtube.com/watch?v=${video.youtube_id}`;
-  return `https://www.youtube.com/@arsenal/search?query=${encodeURIComponent(video.title)}`;
+  return `https://www.youtube.com/@${BRAND.youtubeHandle}/search?query=${encodeURIComponent(video.title)}`;
 }

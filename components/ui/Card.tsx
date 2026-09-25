@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, type ViewStyle, type StyleProp } from 'react-native';
 import { DisplayText } from '@/components/ui/DisplayText';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 /** Dark rounded surface used for grouped content (ref/player-profile2.jpeg). */
 export function Card({
@@ -13,7 +13,7 @@ export function Card({
 }) {
   return (
     <View
-      style={[{ backgroundColor: ARSENAL.surface, borderRadius: 8, paddingHorizontal: 16 }, style]}>
+      style={[{ backgroundColor: PALETTE.surface, borderRadius: 8, paddingHorizontal: 16 }, style]}>
       {children}
     </View>
   );
@@ -27,7 +27,7 @@ export function SectionTitle({ children, detail }: { children: string; detail?: 
       {detail ? (
         <Text
           className="font-body"
-          style={{ fontSize: 13.5, color: ARSENAL.textMuted, marginTop: 6, lineHeight: 18 }}>
+          style={{ fontSize: 13.5, color: PALETTE.textMuted, marginTop: 6, lineHeight: 18 }}>
           {detail}
         </Text>
       ) : null}

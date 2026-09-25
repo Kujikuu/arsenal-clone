@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const ITEM_WIDTH = 80;
 
@@ -39,7 +39,7 @@ export function MonthSelector({ months, selected, onSelect }: Props) {
         contentContainerStyle={{ alignItems: 'stretch' }}>
         {months.map((option, index) => {
           const isSelected = option.key === selected;
-          const textColor = isSelected ? ARSENAL.white : '#BDBBBC';
+          const textColor = isSelected ? PALETTE.white : '#BDBBBC';
           return (
             <View key={option.key} className="flex-row">
               {index > 0 && (
@@ -60,7 +60,7 @@ export function MonthSelector({ months, selected, onSelect }: Props) {
                     width: 75,
                     height: 68,
                     borderRadius: 2,
-                    backgroundColor: isSelected ? ARSENAL.red : 'transparent',
+                    backgroundColor: isSelected ? PALETTE.red : 'transparent',
                   }}
                   className="items-center justify-center">
                   <Text className="font-body-medium" style={{ fontSize: 17, color: textColor }}>

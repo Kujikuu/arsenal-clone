@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props<T extends string> {
   options: readonly T[];
@@ -20,7 +20,7 @@ export function SegmentedPills<T extends string>({
 }: Props<T>) {
   return (
     <View
-      style={{ height, borderRadius: height / 2, backgroundColor: ARSENAL.track }}
+      style={{ height, borderRadius: height / 2, backgroundColor: PALETTE.track }}
       className="flex-1 flex-row overflow-hidden">
       {options.map((option) => {
         const selected = option === value;
@@ -32,12 +32,12 @@ export function SegmentedPills<T extends string>({
             accessibilityState={{ selected }}
             style={{
               borderRadius: height / 2,
-              backgroundColor: selected ? ARSENAL.red : 'transparent',
+              backgroundColor: selected ? PALETTE.red : 'transparent',
             }}
             className="flex-1 items-center justify-center">
             <Text
               className="font-body-semibold"
-              style={{ fontSize, color: selected ? ARSENAL.white : '#B9B7B8', letterSpacing: 0.3 }}>
+              style={{ fontSize, color: selected ? PALETTE.white : '#B9B7B8', letterSpacing: 0.3 }}>
               {option}
             </Text>
           </Pressable>

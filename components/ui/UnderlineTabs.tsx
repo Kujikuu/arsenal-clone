@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props<T extends string> {
   tabs: readonly T[];
@@ -43,7 +43,7 @@ export function UnderlineTabs<T extends string>({
         className="items-center justify-center">
         <Text
           className={selected ? 'font-body-semibold' : 'font-body-medium'}
-          style={{ fontSize, color: selected ? ARSENAL.white : ARSENAL.textMuted }}>
+          style={{ fontSize, color: selected ? PALETTE.white : PALETTE.textMuted }}>
           {tab}
         </Text>
         {selected && (
@@ -51,7 +51,7 @@ export function UnderlineTabs<T extends string>({
             className="absolute bottom-0"
             style={{
               height: 3,
-              backgroundColor: ARSENAL.red,
+              backgroundColor: PALETTE.red,
               left: variant === 'equal' ? 12 : 0,
               right: variant === 'equal' ? 12 : 0,
             }}

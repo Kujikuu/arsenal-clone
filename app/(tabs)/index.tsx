@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { SegmentedPills } from '@/components/ui/SegmentedPills';
 import { SectionDivider } from '@/components/ui/SectionDivider';
@@ -20,7 +20,8 @@ import { monthKey } from '@/lib/format';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import { isFiltered, useFilterStore } from '@/store/filterStore';
 import type { Match, TeamType } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { useRealtimeRefetch } from '@/lib/api/realtime';
 
 const TEAM_CATEGORIES = ['MEN', 'WOMEN', 'ACADEMY'] as const;
 const SUB_TABS = ['FIXTURES', 'TABLES', 'PLAYERS'] as const;
@@ -87,8 +88,13 @@ export default function MatchesTabScreen() {
     teamType,
     season: filter.season,
     competition: filter.competition,
-    arsenalOnly: filter.teamSelection === 'Arsenal',
+    clubOnly: filter.teamSelection === 'club',
   });
+  useRealtimeRefetch(
+    `fixtures:${teamType}`,
+    [{ table: 'matches', filter: `team_type=eq.${teamType}` }],
+    fixtures.refetch
+  );
   const standings = useStandings(teamType, filter.season);
   const squad = useSquad(teamType);
 
@@ -135,7 +141,7 @@ export default function MatchesTabScreen() {
         />
         {filtered && (
           <View
-            style={{ backgroundColor: ARSENAL.red }}
+            style={{ backgroundColor: PALETTE.red }}
             className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full"
           />
         )}
@@ -237,7 +243,7 @@ export default function MatchesTabScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader rightAction={headerActions} />
+      <AppHeader rightAction={headerActions} />
 
       <UnderlineTabs
         tabs={TEAM_CATEGORIES}
@@ -272,7 +278,7 @@ export default function MatchesTabScreen() {
         className="flex-1 bg-black"
         contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ARSENAL.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
         }>
         {subTab === 'FIXTURES' && renderFixtures()}
         {subTab === 'TABLES' && renderTable()}

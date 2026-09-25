@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, RefreshControl, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
@@ -21,7 +21,9 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { formatKickOff, formatKickOffTime, hasScore } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { Match, MatchEvent } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { isClubTeam } from '@/lib/brand';
+import { useRealtimeRefetch } from '@/lib/api/realtime';
 
 const MATCH_TABS = ['THREAD', 'LINE UPS', 'STATS', 'MEDIA'] as const;
 type MatchTab = (typeof MATCH_TABS)[number];
@@ -49,6 +51,14 @@ export default function MatchDetailScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const centre = useMatchCentre(id);
+  useRealtimeRefetch(
+    `match:${id}`,
+    [
+      { table: 'matches', filter: `id=eq.${id}` },
+      { table: 'match_events', filter: `match_id=eq.${id}` },
+    ],
+    centre.refetch
+  );
   const [activeTab, setActiveTab] = useState<MatchTab>('THREAD');
   const [lineupSide, setLineupSide] = useState<'home' | 'away' | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -58,7 +68,7 @@ export default function MatchDetailScreen() {
   if (centre.error && !data) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         <ErrorState error={centre.error} onRetry={centre.refetch} />
       </View>
     );
@@ -67,7 +77,7 @@ export default function MatchDetailScreen() {
   if (!data) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         <LoadingState />
       </View>
     );
@@ -78,7 +88,7 @@ export default function MatchDetailScreen() {
   if (!match) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         <EmptyState
           icon="football-outline"
           title="Match not found"
@@ -91,10 +101,9 @@ export default function MatchDetailScreen() {
 
   const homeName = match.home_team.toUpperCase();
   const awayName = match.away_team.toUpperCase();
-  const arsenalPlaying =
-    match.home_team.startsWith('Arsenal') || match.away_team.startsWith('Arsenal');
-  // Default to the Arsenal side's line-up.
-  const side = lineupSide ?? (match.away_team.startsWith('Arsenal') ? 'away' : 'home');
+  const clubPlaying = isClubTeam(match.home_team) || isClubTeam(match.away_team);
+  // Default to the club's side of the line-up.
+  const side = lineupSide ?? (isClubTeam(match.away_team) ? 'away' : 'home');
   const score = hasScore(match)
     ? `${match.home_score} - ${match.away_score}`
     : formatKickOffTime(match.match_date);
@@ -124,7 +133,7 @@ export default function MatchDetailScreen() {
   const renderThread = () => (
     <View style={{ paddingTop: 18 }}>
       <View style={{ paddingHorizontal: 16 }}>
-        {match.status === 'scheduled' && arsenalPlaying && <PredictionCard match={match} />}
+        {match.status === 'scheduled' && clubPlaying && <PredictionCard match={match} />}
         {polls.map((poll) => (
           <PollCard key={poll.id} poll={poll} onVote={(optionId) => onVote(poll.id, optionId)} />
         ))}
@@ -208,16 +217,13 @@ export default function MatchDetailScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
-        left="back"
-        title={<DisplayText size={15}>{statusTitle(match)}</DisplayText>}
-      />
+      <AppHeader left="back" title={<DisplayText size={15}>{statusTitle(match)}</DisplayText>} />
 
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 48 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ARSENAL.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
         }>
         <MatchHero
           dateLine={formatKickOff(match.match_date)}
@@ -226,6 +232,7 @@ export default function MatchDetailScreen() {
           home={{ name: match.home_team, logo: match.home_team_logo }}
           away={{ name: match.away_team, logo: match.away_team_logo }}
           score={score}
+          live={match.status === 'live'}
           homeGoals={goalsFor(events, 'home')}
           awayGoals={goalsFor(events, 'away')}
           onListen={

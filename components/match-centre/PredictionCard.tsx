@@ -9,7 +9,7 @@ import { useSquad } from '@/lib/api/squad';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useNow } from '@/lib/useNow';
 import type { Match } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 function Stepper({
   label,
@@ -30,7 +30,7 @@ function Stepper({
           onPress={() => onChange(Math.max(0, value - 1))}
           accessibilityLabel={`Fewer goals for ${label}`}
           hitSlop={6}
-          style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: ARSENAL.chip }}
+          style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: PALETTE.chip }}
           className="items-center justify-center active:opacity-70">
           <Feather name="minus" size={18} color="#FFF" />
         </Pressable>
@@ -41,7 +41,7 @@ function Stepper({
           onPress={() => onChange(Math.min(15, value + 1))}
           accessibilityLabel={`More goals for ${label}`}
           hitSlop={6}
-          style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: ARSENAL.chip }}
+          style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: PALETTE.chip }}
           className="items-center justify-center active:opacity-70">
           <Feather name="plus" size={18} color="#FFF" />
         </Pressable>
@@ -94,7 +94,7 @@ export function PredictionCard({ match }: { match: Match }) {
 
   return (
     <View
-      style={{ backgroundColor: ARSENAL.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
+      style={{ backgroundColor: PALETTE.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
       <DisplayText size={13}>PREDICT THE SCORE</DisplayText>
       {!user ? (
         <>
@@ -120,7 +120,7 @@ export function PredictionCard({ match }: { match: Match }) {
           </DisplayText>
           <Text
             className="font-body"
-            style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 6 }}>
+            style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 6 }}>
             First scorer: {saved.first_scorer_pred}
           </Text>
           {!locked && (
@@ -165,7 +165,7 @@ export function PredictionCard({ match }: { match: Match }) {
                     borderRadius: 16,
                     paddingHorizontal: 14,
                     marginRight: 8,
-                    backgroundColor: selected ? ARSENAL.red : ARSENAL.chip,
+                    backgroundColor: selected ? PALETTE.red : PALETTE.chip,
                   }}
                   className="items-center justify-center">
                   <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>

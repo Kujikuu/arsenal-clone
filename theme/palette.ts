@@ -2,7 +2,7 @@
  * Colours sampled directly from the screenshots in ref/.
  * Use these instead of ad-hoc hex values so every screen stays in sync.
  */
-export const ARSENAL = {
+export const PALETTE = {
   black: '#000000',
   white: '#FFFFFF',
   red: '#D32D2F',

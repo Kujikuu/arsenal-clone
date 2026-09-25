@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { reportError } from '@/lib/monitoring';
 
 interface Options<T> {
   /** Skip fetching until this is true (e.g. waiting on a route param or a session). */
@@ -56,7 +57,7 @@ export function useQuery<T>(
       setError(null);
     } catch (err) {
       if (id !== requestId.current) return;
-      console.warn(`[useQuery] ${keyHash} failed:`, err);
+      reportError(err, { query: keyHash });
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       if (id === requestId.current) setLoading(false);

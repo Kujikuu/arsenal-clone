@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { MediaRowCard } from '@/components/media/MediaRowCard';
 import { SearchFilterSheet, type SearchFilters } from '@/components/search/SearchFilterSheet';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useDebounced, useSearch } from '@/lib/api/search';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { SearchResult } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const PREVIEW_COUNT = 4;
 
@@ -38,7 +39,7 @@ function SectionHeader({
             height: 33,
             borderRadius: 17,
             paddingHorizontal: 20,
-            backgroundColor: ARSENAL.red,
+            backgroundColor: PALETTE.red,
           }}
           className="items-center justify-center active:opacity-80">
           <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
@@ -103,9 +104,9 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         left="close"
-        backgroundColor={ARSENAL.surface}
+        backgroundColor={PALETTE.surface}
         rightAction={
           <Pressable
             onPress={() => setFiltersOpen(true)}
@@ -115,7 +116,7 @@ export default function SearchScreen() {
             <Ionicons name="options-outline" size={28} color={filtered ? '#FFF' : '#BDBBBC'} />
             {filtered && (
               <View
-                style={{ backgroundColor: ARSENAL.red }}
+                style={{ backgroundColor: PALETTE.red }}
                 className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full"
               />
             )}
@@ -125,12 +126,12 @@ export default function SearchScreen() {
 
       <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: '#333' }}>
         <View
-          style={{ height: 50, borderRadius: 8, backgroundColor: ARSENAL.pill }}
+          style={{ height: 50, borderRadius: 8, backgroundColor: PALETTE.pill }}
           className="flex-row items-center px-4">
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Search The Arsenal"
+            placeholder={`Search ${BRAND.appName}`}
             placeholderTextColor="#C8C6C7"
             returnKeyType="search"
             autoCorrect={false}

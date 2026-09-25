@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
@@ -13,7 +13,8 @@ import { useReels, type ReelFeed } from '@/lib/api/reels';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import type { Reel } from '@/types/database';
-import { ARSENAL, TAB_BAR_CONTENT_HEIGHT } from '@/theme/arsenal';
+import { PALETTE, TAB_BAR_CONTENT_HEIGHT } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 const FEED_TABS = ['FOR YOU', 'LATEST'] as const;
 type FeedTab = (typeof FEED_TABS)[number];
@@ -75,7 +76,7 @@ function Story({
 
   const onShare = async () => {
     try {
-      await Share.share({ message: `${story.title} - The Arsenal` });
+      await Share.share({ message: `${story.title} - ${BRAND.appName}` });
     } catch (error) {
       console.warn('[Reels] Share failed:', error);
     }
@@ -115,7 +116,7 @@ function Story({
           <MaterialCommunityIcons
             name={reaction.reacted ? 'emoticon-happy' : 'emoticon-happy-outline'}
             size={32}
-            color={reaction.reacted ? ARSENAL.red : '#FFF'}
+            color={reaction.reacted ? PALETTE.red : '#FFF'}
           />
         </Pressable>
         <Text className="font-body" style={{ fontSize: 14, color: '#D0CECF', marginTop: 12 }}>
@@ -221,7 +222,7 @@ export default function ReelsScreen() {
       )}
 
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-        <TheArsenalHeader backgroundColor="transparent" />
+        <AppHeader backgroundColor="transparent" />
         <View style={{ marginTop: -6 }}>
           <UnderlineTabs
             tabs={FEED_TABS}

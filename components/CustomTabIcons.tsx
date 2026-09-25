@@ -1,10 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
-import { BoltGlyph } from '@/components/ui/ArsenalWordmark';
-import { ARSENAL } from '@/theme/arsenal';
+import { BoltGlyph } from '@/components/ui/BrandWordmark';
+import { PALETTE } from '@/theme/palette';
 
-const tint = (focused: boolean) => (focused ? ARSENAL.red : ARSENAL.iconInactive);
+const tint = (focused: boolean) => (focused ? PALETTE.red : PALETTE.iconInactive);
 
 /** Filled pitch with black markings (ref/match-fixtures.jpeg). */
 export function PitchTabIcon({ focused }: { focused: boolean }) {
@@ -40,7 +40,7 @@ export function CenterBoltTabIcon({ focused }: { focused: boolean }) {
         width: 42,
         height: 42,
         borderRadius: 9,
-        backgroundColor: focused ? ARSENAL.red : ARSENAL.iconInactive,
+        backgroundColor: focused ? PALETTE.red : PALETTE.iconInactive,
         alignItems: 'center',
         justifyContent: 'center',
       }}>
