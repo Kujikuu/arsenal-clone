@@ -3,7 +3,7 @@ import { View, Text, Image, Pressable } from 'react-native';
 import { TeamLogo } from '@/components/ui/TeamLogo';
 import { formatFixtureDate, scoreOrTime } from '@/lib/format';
 import type { Match } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   match: Match;
@@ -29,7 +29,7 @@ export function FixtureCard({ match, onMatchCentre }: Props) {
   const played = match.status !== 'scheduled';
   return (
     <View
-      style={{ backgroundColor: ARSENAL.surface, borderRadius: 8, paddingHorizontal: 16 }}
+      style={{ backgroundColor: PALETTE.surface, borderRadius: 8, paddingHorizontal: 16 }}
       className="mb-4">
       <View style={{ paddingTop: 14, paddingBottom: 14, minHeight: 72 }} className="justify-center">
         {match.competition_logo ? (
@@ -69,9 +69,9 @@ export function FixtureCard({ match, onMatchCentre }: Props) {
             width: 75,
             height: 40,
             borderRadius: 4,
-            backgroundColor: played ? ARSENAL.scoreBox : 'transparent',
+            backgroundColor: played ? PALETTE.scoreBox : 'transparent',
             borderWidth: played ? 0 : 1,
-            borderColor: ARSENAL.scoreBox,
+            borderColor: PALETTE.scoreBox,
           }}
           className="items-center justify-center">
           <Text className="font-body-semibold text-white" style={{ fontSize: played ? 20 : 17 }}>
@@ -89,7 +89,7 @@ export function FixtureCard({ match, onMatchCentre }: Props) {
         style={{
           height: 34,
           borderRadius: 17,
-          backgroundColor: ARSENAL.button,
+          backgroundColor: PALETTE.button,
           marginVertical: 16,
         }}
         className="items-center justify-center active:opacity-80">

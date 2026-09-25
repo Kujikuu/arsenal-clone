@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { DisplayText } from '@/components/ui/DisplayText';
 import type { MatchStat } from '@/types/database';
-import { ARSENAL, FONT } from '@/theme/arsenal';
+import { PALETTE, FONT } from '@/theme/palette';
 
 /** Michroma's % glyph reads as "o/o", so the sign is set in the body face. */
 function StatValue({ value }: { value: string }) {
@@ -33,9 +33,9 @@ function StatRow({ stat }: { stat: MatchStat }) {
         <StatValue value={stat.away_value} />
       </View>
       <View
-        style={{ height: 8, borderRadius: 4, marginTop: 9, backgroundColor: ARSENAL.statRed }}
+        style={{ height: 8, borderRadius: 4, marginTop: 9, backgroundColor: PALETTE.statRed }}
         className="flex-row overflow-hidden">
-        <View style={{ width: homePct, backgroundColor: ARSENAL.statGrey }} />
+        <View style={{ width: homePct, backgroundColor: PALETTE.statGrey }} />
       </View>
     </View>
   );
@@ -48,7 +48,7 @@ export function StatsPanel({ stats }: { stats: MatchStat[] }) {
       style={{
         marginHorizontal: 16,
         marginTop: 30,
-        backgroundColor: ARSENAL.surface,
+        backgroundColor: PALETTE.surface,
         borderRadius: 12,
         paddingHorizontal: 13,
         paddingTop: 22,
@@ -56,7 +56,7 @@ export function StatsPanel({ stats }: { stats: MatchStat[] }) {
       }}>
       <Text
         className="text-center font-body-bold"
-        style={{ fontSize: 22, color: ARSENAL.opta, letterSpacing: -0.3 }}>
+        style={{ fontSize: 22, color: PALETTE.opta, letterSpacing: -0.3 }}>
         opta
       </Text>
       <View style={{ height: 1, backgroundColor: '#424041', marginTop: 14, marginBottom: 14 }} />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props<T extends string> {
   pills: readonly T[];
@@ -28,7 +28,7 @@ export function MediaPills<T extends string>({ pills, active, onChange }: Props<
               width: PILL_HEIGHT,
               height: PILL_HEIGHT,
               borderRadius: PILL_HEIGHT / 2,
-              backgroundColor: ARSENAL.pill,
+              backgroundColor: PALETTE.pill,
             }}
             className="items-center justify-center active:opacity-70">
             <Feather name="x" size={17} color="#FFF" />
@@ -49,7 +49,7 @@ export function MediaPills<T extends string>({ pills, active, onChange }: Props<
               borderRadius: PILL_HEIGHT / 2,
               paddingHorizontal: 11,
               marginRight: 9,
-              backgroundColor: selected ? ARSENAL.red : ARSENAL.pill,
+              backgroundColor: selected ? PALETTE.red : PALETTE.pill,
             }}
             className="items-center justify-center active:opacity-75">
             <Text

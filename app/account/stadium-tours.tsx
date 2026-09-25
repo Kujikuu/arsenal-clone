@@ -12,7 +12,7 @@ import { bookTour, cancelTour, useExperiences, useTourBookings } from '@/lib/api
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { formatDuration, formatLongDate, formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 function tomorrow(): Date {
   const d = new Date();
@@ -108,7 +108,7 @@ export default function StadiumToursScreen() {
                   onPress={() => cancel(b.id)}
                   hitSlop={8}
                   accessibilityLabel="Cancel booking">
-                  <Feather name="x-circle" size={22} color={ARSENAL.textMuted} />
+                  <Feather name="x-circle" size={22} color={PALETTE.textMuted} />
                 </Pressable>
               </View>
             </Card>
@@ -136,9 +136,9 @@ export default function StadiumToursScreen() {
                 style={{
                   borderRadius: 8,
                   marginBottom: 12,
-                  backgroundColor: ARSENAL.surface,
+                  backgroundColor: PALETTE.surface,
                   borderWidth: 1.5,
-                  borderColor: isSelected ? ARSENAL.red : 'transparent',
+                  borderColor: isSelected ? PALETTE.red : 'transparent',
                 }}
                 className="flex-row overflow-hidden">
                 <Image
@@ -177,7 +177,7 @@ export default function StadiumToursScreen() {
                 style={{
                   fontSize: 12.5,
                   letterSpacing: 0.6,
-                  color: ARSENAL.textMuted,
+                  color: PALETTE.textMuted,
                   marginBottom: 8,
                 }}>
                 GUESTS
@@ -186,7 +186,7 @@ export default function StadiumToursScreen() {
                 <Pressable
                   onPress={() => setGuests((g) => Math.max(1, g - 1))}
                   accessibilityLabel="Fewer guests"
-                  style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: ARSENAL.chip }}
+                  style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: PALETTE.chip }}
                   className="items-center justify-center">
                   <Feather name="minus" size={18} color="#FFF" />
                 </Pressable>
@@ -196,12 +196,12 @@ export default function StadiumToursScreen() {
                 <Pressable
                   onPress={() => setGuests((g) => Math.min(10, g + 1))}
                   accessibilityLabel="More guests"
-                  style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: ARSENAL.chip }}
+                  style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: PALETTE.chip }}
                   className="items-center justify-center">
                   <Feather name="plus" size={18} color="#FFF" />
                 </Pressable>
                 <View className="flex-1 items-end">
-                  <Text className="font-body" style={{ fontSize: 13, color: ARSENAL.textMuted }}>
+                  <Text className="font-body" style={{ fontSize: 13, color: PALETTE.textMuted }}>
                     Total
                   </Text>
                   <DisplayText size={17} style={{ marginTop: 4 }}>

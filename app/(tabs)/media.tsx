@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
@@ -28,7 +28,7 @@ import type { QueryResult } from '@/lib/api/useQuery';
 import { formatPrice, formatPublished } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { ContentTeamType } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const TEAM_CATS = ['ALL', 'MEN', 'WOMEN', 'ACADEMY', 'CLUB'] as const;
 const MEDIA_PILLS = ['NEWS', 'VIDEO', 'PHOTOS', 'QUIZ', 'EXPERIENCES'] as const;
@@ -151,7 +151,7 @@ function NewsModule({ teamType, register }: ModuleProps) {
                       <ReactionBadge
                         kind={item.reaction_kind}
                         count={r.total}
-                        color={r.reacted ? ARSENAL.red : '#FFF'}
+                        color={r.reacted ? PALETTE.red : '#FFF'}
                       />
                     </Pressable>
                   }
@@ -219,7 +219,7 @@ function CoverCard({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={{ borderRadius: 6, backgroundColor: ARSENAL.surfaceRaised, marginBottom: 16 }}
+      style={{ borderRadius: 6, backgroundColor: PALETTE.surfaceRaised, marginBottom: 16 }}
       className="overflow-hidden active:opacity-85">
       <Image
         source={resolveImage(image)}
@@ -236,7 +236,7 @@ function CoverCard({
         {detail ? (
           <Text
             className="font-body"
-            style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 4 }}>
+            style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 4 }}>
             {detail}
           </Text>
         ) : null}
@@ -352,7 +352,7 @@ export default function MediaScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader bordered />
+      <AppHeader bordered />
 
       <UnderlineTabs
         tabs={TEAM_CATS}
@@ -371,15 +371,15 @@ export default function MediaScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 24 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ARSENAL.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
         }>
         <Module key={`${activePill}-${teamCat}`} teamType={teamType} register={register} />
         {activePill === 'EXPERIENCES' && teamType && teamType !== 'club' ? (
           <View className="flex-row items-center justify-center" style={{ marginTop: 4 }}>
-            <Ionicons name="information-circle-outline" size={16} color={ARSENAL.textDim} />
+            <Ionicons name="information-circle-outline" size={16} color={PALETTE.textDim} />
             <Text
               className="font-body"
-              style={{ fontSize: 13, color: ARSENAL.textDim, marginLeft: 6 }}>
+              style={{ fontSize: 13, color: PALETTE.textDim, marginLeft: 6 }}>
               Experiences are open to every fan.
             </Text>
           </View>

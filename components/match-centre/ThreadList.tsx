@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { MatchEvent } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const CHIP_WIDTH = 42;
 
@@ -14,9 +14,9 @@ const EVENT_ICON: Partial<
   whistle: { name: 'timer-outline', size: 20, color: '#FFF' },
   goal: { name: 'soccer', size: 18, color: '#FFF' },
   penalty_goal: { name: 'soccer', size: 18, color: '#FFF' },
-  own_goal: { name: 'soccer', size: 18, color: ARSENAL.formDown },
+  own_goal: { name: 'soccer', size: 18, color: PALETTE.formDown },
   yellow_card: { name: 'cards', size: 18, color: '#F5C518' },
-  red_card: { name: 'cards', size: 18, color: ARSENAL.formDown },
+  red_card: { name: 'cards', size: 18, color: PALETTE.formDown },
   sub: { name: 'swap-horizontal', size: 20, color: '#FFF' },
   var: { name: 'monitor-eye', size: 18, color: '#FFF' },
 };
@@ -24,7 +24,7 @@ const EVENT_ICON: Partial<
 function Chip({ children }: { children: React.ReactNode }) {
   return (
     <View
-      style={{ width: CHIP_WIDTH, height: 27, borderRadius: 3, backgroundColor: ARSENAL.chip }}
+      style={{ width: CHIP_WIDTH, height: 27, borderRadius: 3, backgroundColor: PALETTE.chip }}
       className="items-center justify-center">
       {children}
     </View>
@@ -35,7 +35,7 @@ function ThreadCard({ event }: { event: MatchEvent }) {
   const icon = EVENT_ICON[event.type];
   return (
     <View
-      style={{ backgroundColor: ARSENAL.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
+      style={{ backgroundColor: PALETTE.surface, borderRadius: 8, padding: 16, marginBottom: 17 }}>
       <View className="flex-row items-center">
         <Chip>
           <Text className="font-body text-white" style={{ fontSize: 12 }}>

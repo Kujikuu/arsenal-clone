@@ -6,7 +6,8 @@ import { SwitchRow } from '@/components/ui/SwitchRow';
 import { syncFixturesToCalendar } from '@/lib/calendar';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import type { TeamType } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 interface Props {
   visible: boolean;
@@ -59,7 +60,7 @@ export function CalendarSyncSheet({ visible, onClose }: Props) {
       Alert.alert(
         'Calendar synced',
         parts.length
-          ? `Arsenal Fixtures calendar: ${parts.join(', ')}.`
+          ? `${BRAND.calendarTitle} calendar: ${parts.join(', ')}.`
           : 'There are no upcoming fixtures for the selected teams.'
       );
     } catch (error: any) {
@@ -74,16 +75,16 @@ export function CalendarSyncSheet({ visible, onClose }: Props) {
       <Pressable onPress={onClose} className="flex-1 justify-end bg-black/60">
         <Pressable
           onPress={(e) => e.stopPropagation()}
-          style={{ backgroundColor: ARSENAL.surface }}
+          style={{ backgroundColor: PALETTE.surface }}
           className="rounded-t-2xl p-6 pb-10">
           <View className="mb-5 h-1 w-12 self-center rounded-full bg-neutral-600" />
           <View className="mb-2 flex-row items-center">
-            <MaterialCommunityIcons name="calendar-sync-outline" size={24} color={ARSENAL.red} />
+            <MaterialCommunityIcons name="calendar-sync-outline" size={24} color={PALETTE.red} />
             <Text className="ml-2.5 font-body-bold text-lg text-white">Sync Fixtures</Text>
           </View>
           <Text className="mb-3 font-body text-sm text-neutral-400">
-            Add upcoming matches to an Arsenal Fixtures calendar on this device. Sync again any time
-            to pick up changed kick-off times.
+            Add upcoming matches to a {BRAND.calendarTitle} calendar on this device. Sync again any
+            time to pick up changed kick-off times.
           </Text>
 
           {OPTIONS.map((option, i) => (

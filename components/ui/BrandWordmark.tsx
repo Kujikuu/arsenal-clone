@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { DisplayText } from '@/components/ui/DisplayText';
+import { BRAND } from '@/lib/brand';
 
 export function BoltGlyph({ size = 18, color = '#FFFFFF' }: { size?: number; color?: string }) {
   return (
@@ -11,15 +12,15 @@ export function BoltGlyph({ size = 18, color = '#FFFFFF' }: { size?: number; col
   );
 }
 
-/** "THE ⚡ ARSENAL" wordmark used in every top header (ref/*.jpeg). */
-export function ArsenalWordmark({ size = 15.5 }: { size?: number }) {
+/** "THE ⚡ ARSENAL"-style wordmark used in every top header, driven by BRAND.wordmark. */
+export function BrandWordmark({ size = 15.5 }: { size?: number }) {
   return (
     <View className="flex-row items-center">
-      <DisplayText size={size}>THE</DisplayText>
+      <DisplayText size={size}>{BRAND.wordmark.before}</DisplayText>
       <View style={{ marginLeft: size * 0.3, marginRight: size * 0.42 }}>
         <BoltGlyph size={size * 1.55} />
       </View>
-      <DisplayText size={size}>ARSENAL</DisplayText>
+      <DisplayText size={size}>{BRAND.wordmark.after}</DisplayText>
     </View>
   );
 }

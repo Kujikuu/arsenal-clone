@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { FixtureCard } from '@/components/matches/FixtureCard';
 import type { Match } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -48,7 +48,7 @@ export function FixturesCalendar({ monthKey, matches, onMatchCentre }: Props) {
 
   return (
     <View className="px-4 pt-4">
-      <View style={{ backgroundColor: ARSENAL.surface, borderRadius: 8 }} className="mb-4 p-3">
+      <View style={{ backgroundColor: PALETTE.surface, borderRadius: 8 }} className="mb-4 p-3">
         <View className="mb-2 flex-row">
           {WEEKDAYS.map((d, i) => (
             <Text key={i} className="flex-1 text-center font-body-medium text-xs text-neutral-400">
@@ -74,14 +74,14 @@ export function FixturesCalendar({ monthKey, matches, onMatchCentre }: Props) {
                       width: 32,
                       height: 32,
                       borderRadius: 16,
-                      backgroundColor: isSelected ? ARSENAL.red : 'transparent',
+                      backgroundColor: isSelected ? PALETTE.red : 'transparent',
                       borderWidth: hasMatch && !isSelected ? 1 : 0,
-                      borderColor: ARSENAL.red,
+                      borderColor: PALETTE.red,
                     }}
                     className="items-center justify-center">
                     <Text
                       className="font-body-semibold text-sm"
-                      style={{ color: hasMatch || isSelected ? '#FFF' : ARSENAL.textDim }}>
+                      style={{ color: hasMatch || isSelected ? '#FFF' : PALETTE.textDim }}>
                       {day}
                     </Text>
                   </View>

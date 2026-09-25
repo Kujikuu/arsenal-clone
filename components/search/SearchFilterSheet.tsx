@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal } from 'react-native';
 import { PillButton } from '@/components/ui/PillButton';
 import type { SearchKind } from '@/lib/api/search';
 import type { ContentTeamType } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 export interface SearchFilters {
   kind: SearchKind;
@@ -44,7 +44,7 @@ function Chip({
         paddingHorizontal: 16,
         marginRight: 8,
         marginBottom: 8,
-        backgroundColor: selected ? ARSENAL.red : ARSENAL.chip,
+        backgroundColor: selected ? PALETTE.red : PALETTE.chip,
       }}
       className="items-center justify-center">
       <Text className="font-body-semibold text-white" style={{ fontSize: 14 }}>
@@ -67,7 +67,7 @@ export function SearchFilterSheet({ visible, value, onChange, onClose }: Props) 
       <Pressable onPress={onClose} className="flex-1 justify-end bg-black/60">
         <Pressable
           onPress={(e) => e.stopPropagation()}
-          style={{ backgroundColor: ARSENAL.surface }}
+          style={{ backgroundColor: PALETTE.surface }}
           className="rounded-t-2xl p-6 pb-10">
           <View className="mb-5 h-1 w-12 self-center rounded-full bg-neutral-600" />
           <Text className="mb-3 font-body-bold text-lg text-white">Show</Text>

@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { vexo } from 'vexo-analytics';
 
 import { AuthProvider } from '@/lib/auth/AuthProvider';
+import { withMonitoring } from '@/lib/monitoring';
 import { SettingsProvider } from '@/lib/settings/SettingsProvider';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { NAV_THEME } from '@/theme';
@@ -36,7 +37,7 @@ if (VEXO_KEY && !__DEV__) vexo(VEXO_KEY);
 const CARD = { presentation: 'card', headerShown: false } as const;
 const MODAL = { presentation: 'modal', headerShown: false } as const;
 
-export default function RootLayout() {
+function RootLayout() {
   const { colorScheme } = useColorScheme();
   const [fontsLoaded, fontError] = useFonts({
     KumbhSans_400Regular,
@@ -101,3 +102,5 @@ export default function RootLayout() {
     </>
   );
 }
+
+export default withMonitoring(RootLayout);

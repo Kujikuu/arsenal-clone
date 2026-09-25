@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useGallery } from '@/lib/api/photos';
 import { resolveImage } from '@/lib/media/resolveImage';
+import { BRAND } from '@/lib/brand';
 
 /** Full-screen, swipeable photo gallery. */
 export default function GalleryScreen() {
@@ -32,7 +33,7 @@ export default function GalleryScreen() {
       <Pressable
         onPress={() =>
           data?.gallery &&
-          Share.share({ message: `${data.gallery.title} - The Arsenal` }).catch(() => {})
+          Share.share({ message: `${data.gallery.title} - ${BRAND.appName}` }).catch(() => {})
         }
         hitSlop={10}
         accessibilityLabel="Share">

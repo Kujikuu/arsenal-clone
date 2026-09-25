@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, FlatList } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { MediaRowCard } from '@/components/media/MediaRowCard';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { searchContent } from '@/lib/api/search';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { ContentTeamType, SearchResult } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const PAGE_SIZE = 20;
 
@@ -50,9 +50,9 @@ export default function SearchResultsScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         left="back"
-        backgroundColor={ARSENAL.surface}
+        backgroundColor={PALETTE.surface}
         bordered
         title={
           <Text className="font-body text-white" style={{ fontSize: 18 }}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { DatePicker } from '@/components/nativewindui/DatePicker';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 /** "2026-10-10" for a local date, as stored in `date` columns. */
 export function toISODate(date: Date): string {
@@ -29,7 +29,7 @@ export function DateField({ label, value, onChange, minimumDate, maximumDate }: 
     <View style={{ marginBottom: 16 }}>
       <Text
         className="font-body-semibold"
-        style={{ fontSize: 12.5, letterSpacing: 0.6, color: ARSENAL.textMuted, marginBottom: 7 }}>
+        style={{ fontSize: 12.5, letterSpacing: 0.6, color: PALETTE.textMuted, marginBottom: 7 }}>
         {label.toUpperCase()}
       </Text>
       <View className="flex-row">
@@ -39,7 +39,7 @@ export function DateField({ label, value, onChange, minimumDate, maximumDate }: 
           minimumDate={minimumDate}
           maximumDate={maximumDate}
           themeVariant="dark"
-          accentColor={ARSENAL.red}
+          accentColor={PALETTE.red}
           onChange={(_, date) => date && onChange(date)}
         />
       </View>

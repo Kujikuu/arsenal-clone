@@ -5,7 +5,8 @@ import { AuthScreen } from '@/components/auth/AuthScreen';
 import { FormField } from '@/components/ui/FormField';
 import { PillButton } from '@/components/ui/PillButton';
 import { supabase } from '@/lib/supabase';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 export default function SignupModal() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function SignupModal() {
 
   return (
     <AuthScreen
-      title="JOIN THE ARSENAL"
+      title={`JOIN ${BRAND.appName.toUpperCase()}`}
       subtitle="Create an account to get your digital Gunner ID and personalise the app.">
       <FormField
         label="Full name"
@@ -85,7 +86,7 @@ export default function SignupModal() {
         onPress={() => router.replace('/auth/login')}
         className="items-center"
         style={{ marginTop: 20 }}>
-        <Text className="font-body" style={{ fontSize: 14, color: ARSENAL.textMuted }}>
+        <Text className="font-body" style={{ fontSize: 14, color: PALETTE.textMuted }}>
           Already have an account? <Text className="font-body-semibold text-white">Sign in</Text>
         </Text>
       </Pressable>

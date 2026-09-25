@@ -5,7 +5,7 @@ import { SubScreen } from '@/components/ui/SubScreen';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
 import { useLegalDocument } from '@/lib/api/account';
 import { formatLongDate } from '@/lib/format';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 /** Terms of use / privacy policy, served from public.legal_documents. */
 export default function LegalScreen() {
@@ -25,7 +25,7 @@ export default function LegalScreen() {
         <>
           <Text
             className="font-body"
-            style={{ fontSize: 13, color: ARSENAL.textMuted, marginTop: 20 }}>
+            style={{ fontSize: 13, color: PALETTE.textMuted, marginTop: 20 }}>
             Last updated {formatLongDate(doc.updated_at)}
           </Text>
           {doc.body.split('\n\n').map((para, i) => {

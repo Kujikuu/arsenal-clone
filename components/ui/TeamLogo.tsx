@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   uri?: string | null;
@@ -26,7 +26,7 @@ export function TeamLogo({ uri, name, size }: Props) {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: ARSENAL.chip,
+          backgroundColor: PALETTE.chip,
         }}
         className="items-center justify-center">
         <Text className="font-body-bold text-white" style={{ fontSize: size * 0.32 }}>

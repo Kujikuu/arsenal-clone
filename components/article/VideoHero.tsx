@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 import { YouTubePlayer } from '@/components/media/YouTubePlayer';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   title: string;
@@ -129,7 +129,7 @@ function VideoChrome({ title, duration, playing, onToggle }: ChromeProps) {
               width: 14,
               height: 14,
               borderRadius: 7,
-              backgroundColor: ARSENAL.red,
+              backgroundColor: PALETTE.red,
             }}
           />
         </View>

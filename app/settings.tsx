@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -72,9 +72,9 @@ export default function SettingsScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         left="back"
-        backgroundColor={ARSENAL.surface}
+        backgroundColor={PALETTE.surface}
         bordered
         title={
           <Text className="font-body text-white" style={{ fontSize: 18 }}>

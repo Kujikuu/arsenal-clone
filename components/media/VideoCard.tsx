@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ReactionBadge } from '@/components/media/ReactionBadge';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { Video } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const CARD_WIDTH = 164;
 const IMAGE_HEIGHT = 167;
@@ -29,7 +29,7 @@ export function VideoCard({ video, reactions, reacted, onPress, width = CARD_WID
         height: 293,
         borderRadius: 5,
         marginRight: 12,
-        backgroundColor: ARSENAL.surfaceRaised,
+        backgroundColor: PALETTE.surfaceRaised,
       }}
       className="overflow-hidden active:opacity-85">
       <View style={{ height: IMAGE_HEIGHT }}>
@@ -70,7 +70,7 @@ export function VideoCard({ video, reactions, reacted, onPress, width = CARD_WID
           kind="happy"
           count={reactions}
           size={19}
-          color={reacted ? ARSENAL.red : '#FFF'}
+          color={reacted ? PALETTE.red : '#FFF'}
         />
       </View>
     </Pressable>

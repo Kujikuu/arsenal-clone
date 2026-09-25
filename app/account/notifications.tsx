@@ -4,7 +4,8 @@ import { Card, SectionTitle } from '@/components/ui/Card';
 import { SubScreen } from '@/components/ui/SubScreen';
 import { SwitchRow } from '@/components/ui/SwitchRow';
 import { useSettings, type Settings } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 type Key = keyof Settings;
 
@@ -15,7 +16,7 @@ const GROUPS: { title: string; rows: { key: Key; title: string; detail: string }
       {
         key: 'notify_kickoff',
         title: 'Kick-off reminders',
-        detail: 'One hour before every Arsenal match.',
+        detail: `One hour before every ${BRAND.club} match.`,
       },
       { key: 'notify_lineups', title: 'Team news', detail: 'When the starting XI is announced.' },
       { key: 'notify_goals', title: 'Goals', detail: 'Every goal, as it happens.' },
@@ -27,7 +28,7 @@ const GROUPS: { title: string; rows: { key: Key; title: string; detail: string }
     rows: [
       {
         key: 'notify_women',
-        title: 'Arsenal Women',
+        title: BRAND.womenTeam,
         detail: 'Include matchday alerts for the women’s team.',
       },
       { key: 'notify_academy', title: 'Academy', detail: 'Include U21, U19 and U18 results.' },
@@ -59,7 +60,7 @@ export default function NotificationsScreen() {
     <SubScreen title="Notifications">
       <Text
         className="font-body"
-        style={{ fontSize: 14, lineHeight: 20, color: ARSENAL.textMuted, marginTop: 20 }}>
+        style={{ fontSize: 14, lineHeight: 20, color: PALETTE.textMuted, marginTop: 20 }}>
         {synced
           ? 'Your choices are saved to your account and apply on every device.'
           : 'Sign in to keep these choices on every device. For now they are saved on this device.'}

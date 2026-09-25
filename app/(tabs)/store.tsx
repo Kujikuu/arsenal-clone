@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
@@ -17,9 +17,9 @@ import { STORE_CATEGORIES, useStoreProducts, type StoreCategory } from '@/lib/ap
 import { formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
-/** Arsenal Direct shop in the app's black & red style. */
+/** Club shop in the app's black & red style. */
 export default function StoreScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -43,7 +43,7 @@ export default function StoreScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         rightAction={
           <Pressable
             onPress={toggleCurrency}
@@ -53,7 +53,7 @@ export default function StoreScreen() {
               height: 30,
               borderRadius: 15,
               paddingHorizontal: 10,
-              backgroundColor: ARSENAL.pill,
+              backgroundColor: PALETTE.pill,
             }}
             className="items-center justify-center active:opacity-70">
             <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
@@ -78,7 +78,7 @@ export default function StoreScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={ARSENAL.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
         }>
         {products.error ? (
           <ErrorState error={products.error} onRetry={products.refetch} />
@@ -98,7 +98,7 @@ export default function StoreScreen() {
                   marginRight: 12,
                   marginBottom: 14,
                   borderRadius: 6,
-                  backgroundColor: ARSENAL.surfaceRaised,
+                  backgroundColor: PALETTE.surfaceRaised,
                 }}
                 className="overflow-hidden active:opacity-85">
                 <Image
@@ -112,7 +112,7 @@ export default function StoreScreen() {
                       position: 'absolute',
                       left: 8,
                       top: 8,
-                      backgroundColor: ARSENAL.red,
+                      backgroundColor: PALETTE.red,
                       borderRadius: 3,
                       paddingHorizontal: 6,
                       paddingVertical: 2,

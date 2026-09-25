@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 /** Shared shell for sign in / sign up: pattern banner, heading and a form. */
 export function AuthScreen({
@@ -19,14 +19,14 @@ export function AuthScreen({
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 bg-black">
-      <TheArsenalHeader left="close" />
+      <AppHeader left="close" />
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 40 }}>
         <View
           style={{
             height: 120,
             marginHorizontal: 16,
             borderRadius: 8,
-            backgroundColor: ARSENAL.surface,
+            backgroundColor: PALETTE.surface,
           }}
           className="items-center justify-center overflow-hidden">
           <ZigzagPattern

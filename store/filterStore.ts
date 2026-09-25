@@ -6,7 +6,7 @@ import type { TeamType } from '@/types/database';
 export const CURRENT_SEASON = '2026/27';
 export const ALL_COMPETITIONS = 'All Competitions';
 
-export type TeamSelection = 'Arsenal' | 'All';
+export type TeamSelection = 'club' | 'all';
 
 export interface FixtureFilter {
   teamSelection: TeamSelection;
@@ -15,7 +15,7 @@ export interface FixtureFilter {
 }
 
 export const DEFAULT_FILTER: FixtureFilter = {
-  teamSelection: 'Arsenal',
+  teamSelection: 'club',
   competition: ALL_COMPETITIONS,
   season: CURRENT_SEASON,
 };
@@ -36,8 +36,20 @@ export const useFilterStore = create<FilterState>()(
     }),
     {
       name: 'arsenal.fixture-filters',
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
+      // v1 stored the team selection as the display labels 'Arsenal' / 'All'.
+      migrate: (persisted, version) => {
+        const state = persisted as Pick<FilterState, 'filters'>;
+        if (version < 2 && state?.filters) {
+          for (const team of Object.keys(state.filters) as TeamType[]) {
+            const filter = state.filters[team];
+            const legacy = (filter as { teamSelection: string }).teamSelection;
+            filter.teamSelection = legacy === 'All' ? 'all' : 'club';
+          }
+        }
+        return state as FilterState;
+      },
     }
   )
 );

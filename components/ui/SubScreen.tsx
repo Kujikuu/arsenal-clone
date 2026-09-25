@@ -7,8 +7,8 @@ import {
   Platform,
   RefreshControl,
 } from 'react-native';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
-import { ARSENAL } from '@/theme/arsenal';
+import { AppHeader } from '@/components/AppHeader';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   title: string;
@@ -33,9 +33,9 @@ export function SubScreen({ title, children, footer, onRefresh }: Props) {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         left="back"
-        backgroundColor={ARSENAL.surface}
+        backgroundColor={PALETTE.surface}
         bordered
         title={
           <Text className="font-body text-white" style={{ fontSize: 18 }} numberOfLines={1}>
@@ -49,7 +49,7 @@ export function SubScreen({ title, children, footer, onRefresh }: Props) {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
         refreshControl={
           refresh ? (
-            <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={ARSENAL.red} />
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={PALETTE.red} />
           ) : undefined
         }>
         {children}

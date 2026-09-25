@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { formatKickOff, formatLongDate, formatPrice } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
 import type { TicketSale, UserTicket } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 /** Deterministic bar pattern drawn from the ticket's barcode string. */
 function Barcode({ code }: { code: string }) {
@@ -95,7 +95,7 @@ function SaleCard({
   const open = sale.status === 'open';
   return (
     <Card style={{ paddingVertical: 16, marginBottom: 14 }}>
-      <DisplayText size={10} color={open ? ARSENAL.formUp : '#C8C6C7'} heavy={false}>
+      <DisplayText size={10} color={open ? PALETTE.formUp : '#C8C6C7'} heavy={false}>
         {open
           ? `${sale.phase.toUpperCase()} · ON SALE NOW`
           : `${sale.phase.toUpperCase()} · OPENS ${formatLongDate(sale.opens_at).toUpperCase()}`}
@@ -106,13 +106,13 @@ function SaleCard({
       <Text className="font-body" style={{ fontSize: 14, color: '#C8C6C7', marginTop: 4 }}>
         {match.competition} · {formatKickOff(match.match_date)}
       </Text>
-      <Text className="font-body" style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 4 }}>
+      <Text className="font-body" style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 4 }}>
         From {formatPrice(sale.price_from_gbp, 'GBP')}
       </Text>
       {owned ? (
         <Text
           className="font-body-semibold"
-          style={{ fontSize: 14, color: ARSENAL.formUp, marginTop: 12 }}>
+          style={{ fontSize: 14, color: PALETTE.formUp, marginTop: 12 }}>
           You have a ticket for this match.
         </Text>
       ) : open ? (
@@ -186,7 +186,7 @@ export default function TicketsScreen() {
       ) : upcomingTickets.length ? (
         upcomingTickets.map((t) => <TicketCard key={t.id} ticket={t} />)
       ) : (
-        <Text className="font-body" style={{ fontSize: 15, color: ARSENAL.textMuted }}>
+        <Text className="font-body" style={{ fontSize: 15, color: PALETTE.textMuted }}>
           Tickets you buy appear here with your seat and barcode.
         </Text>
       )}
@@ -197,7 +197,7 @@ export default function TicketsScreen() {
       ) : sales.loading && !sales.data?.length ? (
         <LoadingState />
       ) : !sales.data?.length ? (
-        <Text className="font-body" style={{ fontSize: 15, color: ARSENAL.textMuted }}>
+        <Text className="font-body" style={{ fontSize: 15, color: PALETTE.textMuted }}>
           No sales are scheduled right now.
         </Text>
       ) : (

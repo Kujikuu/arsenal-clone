@@ -5,7 +5,7 @@ import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { resolveImage } from '@/lib/media/resolveImage';
 import type { Player } from '@/types/database';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 export interface PlayerPhoto {
   source?: ImageSourcePropType;
@@ -66,8 +66,8 @@ function PanelPhoto({ photo, height }: { photo: PlayerPhoto; height: number }) {
       <Svg width={fade} height={height} style={StyleSheet.absoluteFill} pointerEvents="none">
         <Defs>
           <LinearGradient id="panelFade" x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0" stopColor={ARSENAL.surface} stopOpacity="1" />
-            <Stop offset="1" stopColor={ARSENAL.surface} stopOpacity="0" />
+            <Stop offset="0" stopColor={PALETTE.surface} stopOpacity="1" />
+            <Stop offset="1" stopColor={PALETTE.surface} stopOpacity="0" />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width={fade} height={height} fill="url(#panelFade)" />
@@ -86,7 +86,7 @@ export function PlayerCard({ player, height = 190, onPress }: Props) {
   const body = (
     <View
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-      style={{ height, backgroundColor: ARSENAL.surface }}
+      style={{ height, backgroundColor: PALETTE.surface }}
       className="flex-row overflow-hidden">
       {width > 0 && (
         <ZigzagPattern
@@ -119,7 +119,7 @@ export function PlayerCard({ player, height = 190, onPress }: Props) {
       )}
 
       <View className="flex-1 justify-center" style={{ paddingLeft: 17, paddingTop: 34 }}>
-        <DisplayText size={18} color={ARSENAL.red}>
+        <DisplayText size={18} color={PALETTE.red}>
           {player.shirtNumber}
         </DisplayText>
         <DisplayText size={11.5} style={{ marginTop: 8, lineHeight: 14 }}>

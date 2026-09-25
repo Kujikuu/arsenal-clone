@@ -26,7 +26,8 @@
         {
           "calendarPermission": "The Arsenal adds upcoming fixtures to your calendar when you choose to sync them."
         }
-      ]
+      ],
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -35,15 +36,18 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": ["assets/**"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.afifistudio.arsenalclone"
+      "bundleIdentifier": "com.afifistudio.arsenalclone",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "package": "com.afifistudio.arsenalclone"
     },
@@ -52,6 +56,14 @@
       "eas": {
         "projectId": "f28948eb-c6cf-459e-bb8a-1d329fb88916"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f28948eb-c6cf-459e-bb8a-1d329fb88916",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     }
   }
 }

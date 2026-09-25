@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, Share, Image, useWindowDimensions } 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { MediaRowCard } from '@/components/media/MediaRowCard';
 import { ReactionIcon } from '@/components/media/ReactionBadge';
 import { YouTubePlayer } from '@/components/media/YouTubePlayer';
@@ -15,7 +15,8 @@ import { useVideo, videoWatchUrl } from '@/lib/api/videos';
 import { formatPublished } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 export default function VideoPlayerModal() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -29,9 +30,9 @@ export default function VideoPlayerModal() {
 
   const video = data?.video;
   const header = (
-    <TheArsenalHeader
+    <AppHeader
       left="close"
-      title={<DisplayText size={14}>ARSENAL TV</DisplayText>}
+      title={<DisplayText size={14}>{BRAND.tv.toUpperCase()}</DisplayText>}
       rightAction={
         video ? (
           <Pressable
@@ -88,7 +89,7 @@ export default function VideoPlayerModal() {
             className="absolute inset-0 items-center justify-center"
             style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
             <View
-              style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: ARSENAL.red }}
+              style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: PALETTE.red }}
               className="items-center justify-center">
               <Ionicons name="play" size={30} color="#FFF" style={{ marginLeft: 4 }} />
             </View>
@@ -122,7 +123,7 @@ export default function VideoPlayerModal() {
       )}
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 48 }}>
-        <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: ARSENAL.divider }}>
+        <View style={{ padding: 16, borderBottomWidth: 1, borderBottomColor: PALETTE.divider }}>
           <DisplayText size={11} color="#C8C6C7" heavy={false}>
             {`${video.category.toUpperCase()} · ${formatPublished(video.published_at)}`}
           </DisplayText>
@@ -133,7 +134,7 @@ export default function VideoPlayerModal() {
           </Text>
           <Text
             className="font-body"
-            style={{ fontSize: 14, color: ARSENAL.textMuted, marginTop: 6 }}>
+            style={{ fontSize: 14, color: PALETTE.textMuted, marginTop: 6 }}>
             {video.duration}
             {video.views_count ? ` · ${video.views_count}` : ''}
           </Text>
@@ -145,7 +146,7 @@ export default function VideoPlayerModal() {
               <ReactionIcon
                 kind="happy"
                 size={24}
-                color={reaction.reacted ? ARSENAL.red : '#FFF'}
+                color={reaction.reacted ? PALETTE.red : '#FFF'}
               />
               <Text className="font-body text-white" style={{ fontSize: 15, marginLeft: 8 }}>
                 {reaction.total}
@@ -174,7 +175,7 @@ export default function VideoPlayerModal() {
                   height: 32,
                   borderRadius: 16,
                   paddingHorizontal: 14,
-                  backgroundColor: ARSENAL.button,
+                  backgroundColor: PALETTE.button,
                 }}
                 className="items-center justify-center">
                 <Text className="font-body-semibold text-white" style={{ fontSize: 12 }}>

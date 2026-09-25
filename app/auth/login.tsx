@@ -5,7 +5,7 @@ import { AuthScreen } from '@/components/auth/AuthScreen';
 import { FormField } from '@/components/ui/FormField';
 import { PillButton } from '@/components/ui/PillButton';
 import { supabase } from '@/lib/supabase';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 export default function LoginModal() {
   const router = useRouter();
@@ -68,7 +68,7 @@ export default function LoginModal() {
         onSubmitEditing={handleSignIn}
       />
       <Pressable onPress={handleReset} hitSlop={8} className="self-end" style={{ marginTop: -4 }}>
-        <Text className="font-body-medium" style={{ fontSize: 14, color: ARSENAL.textMuted }}>
+        <Text className="font-body-medium" style={{ fontSize: 14, color: PALETTE.textMuted }}>
           Forgot password?
         </Text>
       </Pressable>
@@ -85,7 +85,7 @@ export default function LoginModal() {
         style={{ marginTop: 12 }}
       />
       <Pressable onPress={() => router.back()} className="items-center" style={{ marginTop: 20 }}>
-        <Text className="font-body" style={{ fontSize: 14, color: ARSENAL.textMuted }}>
+        <Text className="font-body" style={{ fontSize: 14, color: PALETTE.textMuted }}>
           Continue as guest
         </Text>
       </Pressable>

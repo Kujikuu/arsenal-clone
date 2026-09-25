@@ -6,7 +6,7 @@ import { VideoHero } from '@/components/article/VideoHero';
 import { ReactionIcon } from '@/components/media/ReactionBadge';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { useArticle } from '@/lib/api/articles';
 import { useBookmark } from '@/lib/api/bookmarks';
 import { useReactions } from '@/lib/api/reactions';
@@ -14,7 +14,8 @@ import { videoWatchUrl } from '@/lib/api/videos';
 import { formatPublished } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
+import { BRAND } from '@/lib/brand';
 
 /** Article with an inline video header (ref/post detail.jpeg). */
 export default function ArticleScreen() {
@@ -28,7 +29,7 @@ export default function ArticleScreen() {
   if (!article) {
     return (
       <View className="flex-1 bg-black">
-        <TheArsenalHeader left="back" />
+        <AppHeader left="back" />
         {error ? (
           <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
@@ -51,7 +52,7 @@ export default function ArticleScreen() {
   const reaction = reactions.get(article.id, article.reactions_base);
 
   const onShare = () =>
-    Share.share({ message: `${article.title} - The Arsenal` }).catch((e) =>
+    Share.share({ message: `${article.title} - ${BRAND.appName}` }).catch((e) =>
       console.warn('[Article] share failed:', e)
     );
 
@@ -111,7 +112,7 @@ export default function ArticleScreen() {
           <ReactionIcon
             kind={article.reaction_kind}
             size={26}
-            color={reaction.reacted ? ARSENAL.red : '#FFF'}
+            color={reaction.reacted ? PALETTE.red : '#FFF'}
           />
           <Text className="font-body text-white" style={{ fontSize: 15, marginLeft: 12 }}>
             {reaction.total}

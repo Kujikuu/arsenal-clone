@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, Pressable, type ImageSourcePropType } from 'react-native';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 interface Props {
   title: string;
@@ -16,7 +16,7 @@ export function MediaRowCard({ title, image, height = 118, footer, onPress }: Pr
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={{ height, borderRadius: 5, backgroundColor: ARSENAL.surfaceRaised, marginBottom: 9 }}
+      style={{ height, borderRadius: 5, backgroundColor: PALETTE.surfaceRaised, marginBottom: 9 }}
       className="flex-row overflow-hidden active:opacity-85">
       <Image source={image} style={{ width: '50%', height }} resizeMode="cover" />
       <View className="flex-1 justify-center" style={{ paddingHorizontal: 13 }}>

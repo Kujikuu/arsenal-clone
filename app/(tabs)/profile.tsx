@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { TheArsenalHeader } from '@/components/TheArsenalHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { ZigzagPattern } from '@/components/ui/ZigzagPattern';
 import { PillButton } from '@/components/ui/PillButton';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { formatLongDate } from '@/lib/format';
-import { ARSENAL } from '@/theme/arsenal';
+import { PALETTE } from '@/theme/palette';
 
 const TILE_SIZE = 107;
 const ICON_SIZE = 42;
@@ -78,7 +78,7 @@ export default function ProfileScreen() {
 
   return (
     <View className="flex-1 bg-black">
-      <TheArsenalHeader
+      <AppHeader
         rightAction={
           <Pressable
             onPress={() => router.push('/settings')}
@@ -137,7 +137,7 @@ export default function ProfileScreen() {
               height: 117,
               borderRadius: 8,
               padding: 5,
-              backgroundColor: ARSENAL.surface,
+              backgroundColor: PALETTE.surface,
               opacity: pressed === item.id ? 0.85 : 1,
             }}
             className="flex-row items-center">

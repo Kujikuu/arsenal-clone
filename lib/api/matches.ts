@@ -12,14 +12,15 @@ import type {
 } from '@/types/database';
 import { fetchPolls } from '@/lib/api/polls';
 import { ALL_COMPETITIONS } from '@/store/filterStore';
+import { CLUB_MATCH_FILTER } from '@/lib/brand';
 
 export interface FixtureFilters {
   teamType: TeamType;
   season: string;
   /** A competition name, or ALL_COMPETITIONS. */
   competition: string;
-  /** Only matches involving an Arsenal side. */
-  arsenalOnly: boolean;
+  /** Only matches involving one of the club's sides. */
+  clubOnly: boolean;
 }
 
 export async function fetchFixtures(filters: FixtureFilters): Promise<Match[]> {
@@ -31,7 +32,7 @@ export async function fetchFixtures(filters: FixtureFilters): Promise<Match[]> {
     .order('match_date', { ascending: true });
   if (filters.competition !== ALL_COMPETITIONS)
     query = query.eq('competition', filters.competition);
-  if (filters.arsenalOnly) query = query.or('home_team.ilike.Arsenal*,away_team.ilike.Arsenal*');
+  if (filters.clubOnly) query = query.or(CLUB_MATCH_FILTER);
   return unwrap(await query) as Match[];
 }
 
@@ -67,7 +68,7 @@ export async function fetchUpcomingMatches(teamTypes: TeamType[]): Promise<Match
       .in('team_type', teamTypes)
       .in('status', ['scheduled', 'live'])
       .gte('match_date', new Date().toISOString())
-      .or('home_team.ilike.Arsenal*,away_team.ilike.Arsenal*')
+      .or(CLUB_MATCH_FILTER)
       .order('match_date', { ascending: true })
   );
   return rows as Match[];
