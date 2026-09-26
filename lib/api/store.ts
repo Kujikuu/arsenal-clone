@@ -16,111 +16,8 @@ import type {
   ReturnableItem,
   ShippingAddress,
   ShippingOption,
-  StoreProduct,
   StoreReturn,
 } from '@/types/database';
-
-export const STORE_CATEGORIES = ['ALL', 'KITS', 'TRAINING', 'RETRO', 'ACCESSORIES'] as const;
-export type StoreCategory = (typeof STORE_CATEGORIES)[number];
-
-export const STORE_SORTS = [
-  { value: 'featured', label: 'Featured' },
-  { value: 'newest', label: 'Newest' },
-  { value: 'price_asc', label: 'Price: low to high' },
-  { value: 'price_desc', label: 'Price: high to low' },
-] as const;
-export type StoreSort = (typeof STORE_SORTS)[number]['value'];
-
-export interface StoreFilters {
-  search: string;
-  sort: StoreSort;
-  /** Only products with this size in stock. */
-  size: string | null;
-  /** In the display currency. */
-  maxPrice: number | null;
-}
-
-export const DEFAULT_STORE_FILTERS: StoreFilters = {
-  search: '',
-  sort: 'featured',
-  size: null,
-  maxPrice: null,
-};
-
-export const isStoreFiltered = (f: StoreFilters) =>
-  f.sort !== 'featured' || f.size !== null || f.maxPrice !== null;
-
-const PRODUCT_SELECT = '*, variants:store_product_variants(*)';
-
-const toDb = (c: StoreCategory) =>
-  (c.charAt(0) + c.slice(1).toLowerCase()) as StoreProduct['category'];
-
-const normalise = (p: StoreProduct): StoreProduct => ({
-  ...p,
-  price_gbp: Number(p.price_gbp),
-  price_usd: Number(p.price_usd),
-  customisation_price_gbp: Number(p.customisation_price_gbp),
-  customisation_price_usd: Number(p.customisation_price_usd),
-  variants: [...(p.variants ?? [])].sort((a, b) => a.position - b.position),
-});
-
-export const productPrice = (p: StoreProduct, currency: Currency) =>
-  currency === 'GBP' ? p.price_gbp : p.price_usd;
-
-export const customisationPrice = (p: StoreProduct, currency: Currency) =>
-  currency === 'GBP' ? p.customisation_price_gbp : p.customisation_price_usd;
-
-export const isSoldOut = (p: StoreProduct) =>
-  Boolean(p.variants?.length) && p.variants!.every((v) => v.stock <= 0);
-
-/** Sizes offered anywhere in the shop, for the size filter. */
-export const STORE_SIZE_FILTERS = ['XS', 'S', 'M', 'L', 'XL', '2XL', 'One Size'] as const;
-export const STORE_PRICE_FILTERS = [25, 50, 100] as const;
-
-/** Commas and parentheses would break PostgREST's filter syntax. */
-const searchPattern = (search: string) => `%${search.replace(/[%_,()\\]/g, ' ').trim()}%`;
-
-export function useStoreProducts(
-  category: StoreCategory = 'ALL',
-  filters: StoreFilters = DEFAULT_STORE_FILTERS,
-  currency: Currency = 'GBP'
-) {
-  const priceColumn = currency === 'GBP' ? 'price_gbp' : 'price_usd';
-  return useQuery(
-    ['store-products', category, filters, currency],
-    async () => {
-      let query = supabase.from('store_products').select(PRODUCT_SELECT).eq('is_active', true);
-      if (category !== 'ALL') query = query.eq('category', toDb(category));
-      if (filters.search.trim()) query = query.ilike('title', searchPattern(filters.search));
-      if (filters.maxPrice !== null) query = query.lte(priceColumn, filters.maxPrice);
-      if (filters.sort === 'price_asc') query = query.order(priceColumn, { ascending: true });
-      else if (filters.sort === 'price_desc')
-        query = query.order(priceColumn, { ascending: false });
-      else if (filters.sort === 'newest') query = query.order('created_at', { ascending: false });
-      query = query.order('created_at').order('id');
-
-      const products = (unwrap(await query) as StoreProduct[]).map(normalise);
-      if (!filters.size) return products;
-      return products.filter((p) =>
-        p.variants?.some((v) => v.size === filters.size && v.stock > 0)
-      );
-    },
-    { initialData: [] }
-  );
-}
-
-export function useStoreProduct(id: string | undefined) {
-  return useQuery(
-    ['store-product', id],
-    async () => {
-      const row = unwrap(
-        await supabase.from('store_products').select(PRODUCT_SELECT).eq('id', id).maybeSingle()
-      ) as StoreProduct | null;
-      return row ? normalise(row) : null;
-    },
-    { enabled: Boolean(id) }
-  );
-}
 
 // ---------------------------------------------------------------- wishlist
 
@@ -186,21 +83,6 @@ export function useWishlistIds() {
   );
 
   return { ids: userId === loadedFor ? ids : [], toggle };
-}
-
-export function useWishlistProducts(userId: string | undefined, ids: string[]) {
-  return useQuery(
-    ['wishlist-products', userId, [...ids].sort()],
-    async () => {
-      if (!ids.length) return [];
-      const rows = unwrap(
-        await supabase.from('store_products').select(PRODUCT_SELECT).in('id', ids)
-      ) as StoreProduct[];
-      // Most recently saved first.
-      return rows.map(normalise).sort((a, b) => ids.indexOf(b.id) - ids.indexOf(a.id));
-    },
-    { enabled: Boolean(userId), initialData: [] }
-  );
 }
 
 // ---------------------------------------------------------------- addresses

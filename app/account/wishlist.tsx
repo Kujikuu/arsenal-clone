@@ -1,68 +1,97 @@
-import React from 'react';
-import { View, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ProductCard } from '@/components/store/ProductCard';
-import { SignInPrompt } from '@/components/ui/SignInPrompt';
-import { SubScreen } from '@/components/ui/SubScreen';
-import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import { useWishlistIds, useWishlistProducts } from '@/lib/api/store';
+import { QuickBuySheet } from '@/components/store/QuickBuySheet';
+import { TileGridSkeleton } from '@/components/store/ui/Misc';
+import { ProductTile } from '@/components/store/ui/ProductTile';
+import { StoreHeader } from '@/components/store/ui/StoreHeader';
+import { StoreHeading } from '@/components/store/ui/StoreText';
+import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
+import { useWishlistIds } from '@/lib/api/store';
+import { useBrowse } from '@/lib/api/storeCatalog';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useSettings } from '@/lib/settings/SettingsProvider';
+import { STORE } from '@/theme/store';
 
-/** Products the fan saved with the heart in the shop. */
+/** Products saved with the heart, most recently saved first. */
 export default function WishlistScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { user, loading: authLoading } = useAuth();
   const { settings } = useSettings();
   const wishlist = useWishlistIds();
-  const products = useWishlistProducts(user?.id, wishlist.ids);
-  const cardWidth = (width - 16 * 2 - 12) / 2;
-
-  if (!user) {
-    return (
-      <SubScreen title="Wishlist">
-        {authLoading ? (
-          <LoadingState />
-        ) : (
-          <SignInPrompt message="Sign in to save products for later." />
-        )}
-      </SubScreen>
-    );
-  }
-
+  const ids = [...wishlist.ids].reverse();
+  const products = useBrowse(settings.currency, { ids, limit: 100 }, ids.length > 0);
+  const [quickBuy, setQuickBuy] = useState<string | null>(null);
+  const tile = (width - 16 * 2 - 14) / 2;
   // Hearts removed here disappear straight away.
-  const list = (products.data ?? []).filter((p) => wishlist.ids.includes(p.id));
+  const list = ids.length
+    ? (products.data?.products ?? []).filter((p) => wishlist.ids.includes(p.id))
+    : [];
+
+  const header = (
+    <View
+      style={{ backgroundColor: STORE.muted, paddingVertical: 14, marginBottom: 18 }}
+      className="items-center">
+      <StoreHeading size={16}>{`Wishlist (${wishlist.ids.length})`}</StoreHeading>
+    </View>
+  );
 
   return (
-    <SubScreen title="Wishlist" onRefresh={products.refetch}>
-      {products.error ? (
-        <ErrorState error={products.error} onRetry={products.refetch} />
-      ) : products.loading && !list.length ? (
-        <LoadingState />
-      ) : !list.length ? (
-        <EmptyState
-          icon="heart-outline"
-          title="Nothing saved yet"
-          message="Tap the heart on any product to keep it here."
-          actionLabel="BROWSE THE SHOP"
-          onAction={() => router.push('/store')}
-        />
+    <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
+      <StoreHeader left="back" />
+      {!user ? (
+        authLoading ? null : (
+          <StoreEmpty
+            icon="heart-outline"
+            title="Sign in to see your wishlist"
+            message="Save products with the heart and find them here on any device."
+            actionLabel="Sign in"
+            onAction={() => router.push('/auth/login')}
+          />
+        )
       ) : (
-        <View className="flex-row flex-wrap" style={{ paddingTop: 16, marginRight: -12 }}>
-          {list.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              width={cardWidth}
-              currency={settings.currency}
-              saved
-              onPress={() => router.push(`/store/${product.id}`)}
-              onToggleSaved={() => wishlist.toggle(product.id)}
-            />
-          ))}
-        </View>
+        <FlatList
+          data={list}
+          keyExtractor={(p) => p.id}
+          numColumns={2}
+          columnWrapperStyle={{ paddingHorizontal: 16, justifyContent: 'space-between' }}
+          ListHeaderComponent={header}
+          ListEmptyComponent={
+            products.error ? (
+              <StoreError error={products.error} onRetry={products.refetch} />
+            ) : ids.length && products.loading ? (
+              <TileGridSkeleton tileWidth={tile} />
+            ) : (
+              <StoreEmpty
+                icon="heart-outline"
+                title="Nothing saved yet"
+                message="Tap the heart on any product to keep it here."
+                actionLabel="Browse the shop"
+                onAction={() => router.navigate('/store')}
+              />
+            )
+          }
+          renderItem={({ item }) => (
+            <View style={{ width: tile, marginBottom: 26 }}>
+              <ProductTile
+                product={item}
+                width={tile}
+                currency={settings.currency}
+                saved
+                onPress={() => router.push(`/store/${item.id}`)}
+                onToggleSaved={() => wishlist.toggle(item.id)}
+                onQuickBuy={() => setQuickBuy(item.id)}
+              />
+            </View>
+          )}
+        />
       )}
-    </SubScreen>
+      <QuickBuySheet
+        productId={quickBuy}
+        currency={settings.currency}
+        onClose={() => setQuickBuy(null)}
+      />
+    </View>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Pressable, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import type { StoreProductVariant } from '@/types/database';
 import { STORE } from '@/theme/store';
 
@@ -22,7 +23,11 @@ export function SizeGrid({ variants, value, onChange, onNotify }: Props) {
         return (
           <View key={v.id} style={{ width: '25%', padding: 4 }}>
             <Pressable
-              onPress={() => (out ? onNotify(v) : onChange(v.id))}
+              onPress={() => {
+                if (out) return onNotify(v);
+                Haptics.selectionAsync().catch(() => {});
+                onChange(v.id);
+              }}
               accessibilityRole="radio"
               accessibilityLabel={out ? `${v.size}, sold out. Email me when it's back` : v.size}
               accessibilityState={{ checked: selected }}

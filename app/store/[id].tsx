@@ -69,6 +69,7 @@ export default function ProductScreen() {
   const recentIds = useRecentlyViewed((s) => s.ids);
   const scroller = useRef<ScrollView>(null);
   const personaliseY = useRef(0);
+  const reviewsY = useRef(0);
 
   const editing = edit ? lines.find((l) => l.key === edit) : undefined;
   const [variantId, setVariantId] = useState<string | null>(editing?.variantId ?? null);
@@ -267,7 +268,9 @@ export default function ProductScreen() {
           </View>
           {data.rating ? (
             <Pressable
-              onPress={() => scroller.current?.scrollToEnd({ animated: true })}
+              onPress={() =>
+                scroller.current?.scrollTo({ y: reviewsY.current - 20, animated: true })
+              }
               accessibilityRole="link"
               accessibilityLabel={`${data.rating.average} out of 5, ${data.rating.total} reviews`}
               className="flex-row items-center"
@@ -443,7 +446,9 @@ export default function ProductScreen() {
           </View>
         ) : null}
 
-        <View style={{ paddingHorizontal: 16 }}>
+        <View
+          style={{ paddingHorizontal: 16 }}
+          onLayout={(e) => (reviewsY.current = e.nativeEvent.layout.y)}>
           <Reviews productId={product.id} rating={data.rating} />
         </View>
         <StoreFooter />
