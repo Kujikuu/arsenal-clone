@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { unwrap, useQuery } from '@/lib/api/useQuery';
 import type {
@@ -226,4 +227,66 @@ export async function subscribeStockAlert(userId: string, variantId: string) {
     .from('stock_notifications')
     .upsert({ user_id: userId, variant_id: variantId }, { onConflict: 'user_id,variant_id' });
   if (error) throw error;
+}
+
+// ---------------------------------------------------------------- paged listings
+
+export const PAGE_SIZE = 24;
+
+/** Listing pages that append with loadMore(); resets when params or currency change. */
+export function useInfiniteBrowse(currency: Currency, params: BrowseParams, enabled = true) {
+  const key = JSON.stringify([currency, params]);
+  const [state, setState] = useState<{
+    key: string;
+    products: StoreTile[];
+    total: number;
+    facets: BrowseResult['facets'] | null;
+    loading: boolean;
+    error: Error | null;
+  }>({ key: '', products: [], total: 0, facets: null, loading: enabled, error: null });
+  const request = useRef(0);
+
+  const load = useCallback(
+    async (offset: number) => {
+      const id = ++request.current;
+      setState((s) => ({ ...s, loading: true, error: null }));
+      try {
+        const result = await browseStore(currency, { ...params, limit: PAGE_SIZE, offset });
+        if (id !== request.current) return;
+        setState((s) => ({
+          key,
+          products: offset === 0 ? result.products : [...s.products, ...result.products],
+          total: result.total,
+          facets: offset === 0 || !s.facets ? result.facets : s.facets,
+          loading: false,
+          error: null,
+        }));
+      } catch (err) {
+        if (id !== request.current) return;
+        setState((s) => ({ ...s, loading: false, error: err as Error }));
+      }
+    },
+    // params are captured through key
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key]
+  );
+
+  useEffect(() => {
+    if (enabled) load(0);
+  }, [load, enabled]);
+
+  const current = state.key === key;
+  return {
+    products: current ? state.products : [],
+    total: current ? state.total : 0,
+    facets: current ? state.facets : null,
+    loading: state.loading || !current,
+    error: state.error,
+    hasMore: current && state.products.length < state.total,
+    loadMore: () => {
+      if (!state.loading && current && state.products.length < state.total)
+        load(state.products.length);
+    },
+    refetch: () => load(0),
+  };
 }
