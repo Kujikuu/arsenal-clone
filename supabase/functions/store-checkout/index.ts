@@ -19,8 +19,10 @@ interface Order {
   id: string;
   order_number: string;
   user_id: string;
+  status: string;
   currency: string;
   total: number | string;
+  amount_due: number | string;
 }
 
 const fail = (status: number, message: string, reason?: string) =>
@@ -96,12 +98,21 @@ Deno.serve(async (req) => {
       p_items: request.items,
       p_address_id: request.addressId,
       p_promo_code: request.promoCode,
+      p_zone: request.zone,
+      p_method: request.method,
+      p_gift_card: request.giftCard,
     })
     .single<Order>();
   if (error || !order) {
     const described = describeOrderError(error ?? {});
     if (described.status >= 500) console.error('create_store_order failed', error);
     return fail(described.status, described.message, described.reason);
+  }
+
+  // A gift card covered everything: the order is already paid.
+  if (order.status === 'paid') {
+    await cancelStalePaymentIntents(user.id, order.id);
+    return Response.json({ orderId: order.id, orderNumber: order.order_number, paid: true });
   }
 
   try {
@@ -112,7 +123,7 @@ Deno.serve(async (req) => {
     );
     const paymentIntent = await stripe.paymentIntents.create(
       {
-        amount: toMinorUnits(order.total),
+        amount: toMinorUnits(order.amount_due),
         currency: order.currency.toLowerCase(),
         customer,
         automatic_payment_methods: { enabled: true },
@@ -133,6 +144,7 @@ Deno.serve(async (req) => {
     return Response.json({
       orderId: order.id,
       orderNumber: order.order_number,
+      paid: false,
       paymentIntentClientSecret: paymentIntent.client_secret,
       ephemeralKey: ephemeralKey.secret,
       customerId: customer,

@@ -4,9 +4,23 @@
 
 export type Currency = 'GBP' | 'USD';
 
+export type Zone = 'UK' | 'EU' | 'US' | 'ROW';
+export type DeliveryMethod = 'standard' | 'express' | 'nominated';
+
+export interface PrintRequest {
+  type: 'player' | 'custom';
+  player_id?: string | null;
+  special_id?: string | null;
+  name?: string | null;
+  number?: string | null;
+  font?: string | null;
+  patch_id?: string | null;
+}
+
 export interface CheckoutItem {
   variant_id: string;
   quantity: number;
+  print?: PrintRequest | null;
   custom_name?: string | null;
   custom_number?: string | null;
 }
@@ -16,7 +30,13 @@ export interface CheckoutRequest {
   items: CheckoutItem[];
   addressId: string;
   promoCode: string | null;
+  zone: Zone;
+  method: DeliveryMethod;
+  giftCard: string | null;
 }
+
+const ZONES: readonly string[] = ['UK', 'EU', 'US', 'ROW'];
+const METHODS: readonly string[] = ['standard', 'express', 'nominated'];
 
 export class BadRequest extends Error {
   constructor(
@@ -38,9 +58,33 @@ const optionalText = (v: unknown, max: number): string | null => {
   return v;
 };
 
+function parsePrint(print: unknown): PrintRequest | null {
+  if (print === undefined || print === null) return null;
+  if (!isRecord(print) || (print.type !== 'player' && print.type !== 'custom')) {
+    throw new BadRequest('Invalid personalisation');
+  }
+  return {
+    type: print.type,
+    player_id: optionalText(print.player_id, 64),
+    special_id: optionalText(print.special_id, 64),
+    name: optionalText(print.name, 12),
+    number: optionalText(print.number, 2),
+    font: optionalText(print.font, 32),
+    patch_id: optionalText(print.patch_id, 64),
+  };
+}
+
 export function parseCheckoutRequest(body: unknown): CheckoutRequest {
   if (!isRecord(body)) throw new BadRequest('Invalid request');
-  const { currency, items, addressId, promoCode } = body;
+  const {
+    currency,
+    items,
+    addressId,
+    promoCode,
+    zone = 'UK',
+    method = 'standard',
+    giftCard,
+  } = body;
 
   if (currency !== 'GBP' && currency !== 'USD') throw new BadRequest('Unsupported currency');
   if (typeof addressId !== 'string' || !addressId) {
@@ -51,11 +95,23 @@ export function parseCheckoutRequest(body: unknown): CheckoutRequest {
   if (promoCode !== undefined && promoCode !== null && typeof promoCode !== 'string') {
     throw new BadRequest('Invalid promo code', 'promo');
   }
+  if (typeof zone !== 'string' || !ZONES.includes(zone)) {
+    throw new BadRequest('Choose where we are delivering to', 'shipping');
+  }
+  if (typeof method !== 'string' || !METHODS.includes(method)) {
+    throw new BadRequest('Choose a delivery option', 'shipping');
+  }
+  if (giftCard !== undefined && giftCard !== null && typeof giftCard !== 'string') {
+    throw new BadRequest('Invalid gift card', 'gift_card');
+  }
 
   return {
     currency,
     addressId,
     promoCode: typeof promoCode === 'string' && promoCode.trim() ? promoCode.trim() : null,
+    zone: zone as Zone,
+    method: method as DeliveryMethod,
+    giftCard: typeof giftCard === 'string' && giftCard.trim() ? giftCard.trim() : null,
     items: items.map((item) => {
       if (!isRecord(item) || typeof item.variant_id !== 'string' || !item.variant_id) {
         throw new BadRequest('Invalid item in your bag');
@@ -72,6 +128,7 @@ export function parseCheckoutRequest(body: unknown): CheckoutRequest {
       return {
         variant_id: item.variant_id,
         quantity,
+        print: parsePrint(item.print),
         custom_name: optionalText(item.custom_name, 12),
         custom_number: optionalText(item.custom_number, 2),
       };

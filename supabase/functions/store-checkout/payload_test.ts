@@ -16,10 +16,41 @@ Deno.test('parses a valid request and normalises optional fields', () => {
     currency: 'GBP',
     addressId: 'addr1',
     promoCode: 'gooner10',
+    zone: 'UK',
+    method: 'standard',
+    giftCard: null,
     items: [
-      { variant_id: 'v1', quantity: 2, custom_name: 'SAKA', custom_number: '7' },
-      { variant_id: 'v2', quantity: 1, custom_name: null, custom_number: null },
+      { variant_id: 'v1', quantity: 2, print: null, custom_name: 'SAKA', custom_number: '7' },
+      { variant_id: 'v2', quantity: 1, print: null, custom_name: null, custom_number: null },
     ],
+  });
+});
+
+Deno.test('reads delivery, gift card and printing', () => {
+  const parsed = parseCheckoutRequest({
+    ...valid,
+    zone: 'US',
+    method: 'express',
+    giftCard: ' GOONERGIFT25 ',
+    items: [
+      {
+        variant_id: 'v1',
+        quantity: 1,
+        print: { type: 'player', player_id: 'p07', font: 'arsenal', patch_id: 'pl' },
+      },
+    ],
+  });
+  assertEquals(parsed.zone, 'US');
+  assertEquals(parsed.method, 'express');
+  assertEquals(parsed.giftCard, 'GOONERGIFT25');
+  assertEquals(parsed.items[0].print, {
+    type: 'player',
+    player_id: 'p07',
+    special_id: null,
+    name: null,
+    number: null,
+    font: 'arsenal',
+    patch_id: 'pl',
   });
 });
 
@@ -44,6 +75,14 @@ Deno.test('rejects malformed requests', () => {
     { ...valid, items: [{ variant_id: 'v1', quantity: 1, custom_name: 'A'.repeat(13) }] },
     { ...valid, items: [{ variant_id: 'v1', quantity: 1, custom_number: 100 }] },
     { ...valid, promoCode: 42 },
+    { ...valid, zone: 'MARS' },
+    { ...valid, method: 'teleport' },
+    { ...valid, giftCard: 12 },
+    { ...valid, items: [{ variant_id: 'v1', quantity: 1, print: { type: 'engrave' } }] },
+    {
+      ...valid,
+      items: [{ variant_id: 'v1', quantity: 1, print: { type: 'custom', name: 'A'.repeat(13) } }],
+    },
   ];
   for (const body of bad) assertThrows(() => parseCheckoutRequest(body), BadRequest);
 });

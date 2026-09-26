@@ -10,7 +10,10 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+import { storeCatalogue } from './store_catalogue.mjs';
+
 // ---------------------------------------------------------------- helpers
+
 const q = (v) => {
   if (v === null || v === undefined) return 'null';
   if (typeof v === 'number') return String(v);
@@ -2483,6 +2486,48 @@ You can view and edit your details in the app. Deleting your account from Settin
 
 Contact us from Settings to ask about your data.`,
   },
+  {
+    slug: 'delivery',
+    title: 'Delivery Information',
+    updated_at: '2026-09-01T00:00:00Z',
+    body: `We deliver worldwide from the club's warehouse in London.
+
+UK
+Standard delivery (3-5 working days) is £4.95, or free on orders over £75. Express delivery (1-2 working days) is £7.95 and nominated day delivery is £9.95.
+
+Europe
+Standard delivery (5-8 working days) is £9.95, or free over £150. Express delivery (2-4 working days) is £19.95.
+
+United States
+Standard delivery (5-10 working days) is $12, or free over $150. Express delivery (2-4 working days) is $25.
+
+Rest of the world
+Standard delivery (7-14 working days) and express delivery (3-6 working days) are priced at checkout.
+
+Printed items
+Shirts printed with a name, number, patch or Champions print are dispatched within 2 working days, then the delivery times above apply.
+
+Duties and taxes
+Orders delivered outside the UK may be charged import duties and taxes by the destination country.`,
+  },
+  {
+    slug: 'returns',
+    title: 'Returns & Refunds',
+    updated_at: '2026-09-01T00:00:00Z',
+    body: `We understand that sometimes things just don't work out. If for any reason you are unhappy with your purchase, you can return it within 28 days of receipt.
+
+How to return
+Open My Orders in your account, choose the order and tap Request a return. Select the items and a reason, and we'll email your return label.
+
+Personalised items
+We are unable to accept returns for items printed to your specification with a player's name, a personalised name and/or squad number, a patch or Champions printing, unless they are faulty. Please check your personalisation details and size carefully before ordering.
+
+Refunds
+Refunds are made to your original payment method within 5 working days of your return arriving. Gift card payments are refunded to the gift card.
+
+Faulty items
+If an item is faulty, contact us from Settings and we'll arrange a replacement or refund.`,
+  },
 ];
 
 const polls = [
@@ -2597,202 +2642,12 @@ const pollOptions = [
   },
 ];
 
-const products = [
-  {
-    id: 'sp01',
-    category: 'Kits',
-    title: 'Arsenal 26/27 Home Authentic Shirt',
-    description:
-      'Engineered for peak performance at the Emirates: the iconic red body, crisp white sleeves and moisture-wicking HEAT.RDY technology.',
-    price_gbp: 115,
-    price_usd: 145,
-    main_image_url: IMG.ball,
-    gallery_urls: [IMG.ball, IMG.action],
-    sizes: ['S', 'M', 'L', 'XL', '2XL'],
-    is_customizable: true,
-    badge: 'New Season',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp02',
-    category: 'Kits',
-    title: 'Arsenal 26/27 Away Shirt',
-    description: 'A modern away shirt with breathable AEROREADY fabric and a tonal cannon pattern.',
-    price_gbp: 85,
-    price_usd: 110,
-    main_image_url: IMG.action,
-    gallery_urls: [IMG.action],
-    sizes: ['S', 'M', 'L', 'XL', '2XL'],
-    is_customizable: true,
-    badge: 'Away Kit',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp03',
-    category: 'Kits',
-    title: 'Arsenal 26/27 Third Shirt',
-    description: 'A modern reimagining of 1990s flair with bold trims.',
-    price_gbp: 85,
-    price_usd: 110,
-    main_image_url: IMG.crowd,
-    gallery_urls: [IMG.crowd],
-    sizes: ['S', 'M', 'L', 'XL'],
-    is_customizable: true,
-    badge: 'Third Kit',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp04',
-    category: 'Training',
-    title: 'Arsenal Pro Training Top',
-    description:
-      'As worn by the squad at Sobha Realty Training Centre. Quarter-zip collar with thumbholes.',
-    price_gbp: 70,
-    price_usd: 90,
-    main_image_url: IMG.training,
-    gallery_urls: [IMG.training],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
-    is_customizable: false,
-    badge: 'Training Wear',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp05',
-    category: 'Retro',
-    title: 'Arsenal 1991/93 "Bruised Banana" Away Shirt',
-    description: 'The cult classic retro jersey with its iconic zigzag pattern.',
-    price_gbp: 65,
-    price_usd: 85,
-    main_image_url: IMG.stadium,
-    gallery_urls: [IMG.stadium],
-    sizes: ['S', 'M', 'L', 'XL'],
-    is_customizable: false,
-    badge: 'Heritage',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp06',
-    category: 'Accessories',
-    title: 'Arsenal Cannon Cuff Beanie',
-    description: 'Knitted beanie with the embroidered Arsenal cannon.',
-    price_gbp: 22,
-    price_usd: 28,
-    main_image_url: IMG.women,
-    gallery_urls: [IMG.women],
-    sizes: ['One Size'],
-    is_customizable: false,
-    badge: null,
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp07',
-    category: 'Kits',
-    title: 'Arsenal 26/27 Home Kids Kit',
-    description:
-      'Shirt, shorts and socks in the new home colours, sized for young Gunners. Add their name and number.',
-    price_gbp: 60,
-    price_usd: 78,
-    main_image_url: IMG.ball,
-    gallery_urls: [IMG.ball, IMG.crowd],
-    sizes: ['3-4Y', '5-6Y', '7-8Y', '9-10Y', '11-12Y'],
-    is_customizable: true,
-    customisation_price_gbp: 10,
-    customisation_price_usd: 13,
-    badge: 'Kids',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp08',
-    category: 'Training',
-    title: 'Arsenal Training Shorts',
-    description: 'Lightweight shorts with an elasticated waist and zipped side pocket.',
-    price_gbp: 35,
-    price_usd: 45,
-    main_image_url: IMG.training,
-    gallery_urls: [IMG.training, IMG.keeper],
-    sizes: ['S', 'M', 'L', 'XL'],
-    is_customizable: false,
-    badge: null,
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp09',
-    category: 'Retro',
-    title: 'Arsenal 1971 Double Winners Jacket',
-    description: 'A heritage track jacket celebrating the first league and cup double.',
-    price_gbp: 75,
-    price_usd: 95,
-    main_image_url: IMG.stadium,
-    gallery_urls: [IMG.stadium, IMG.crowd],
-    sizes: ['S', 'M', 'L', 'XL', '2XL'],
-    is_customizable: false,
-    badge: 'Limited',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp10',
-    category: 'Accessories',
-    title: 'Arsenal Home Bar Scarf',
-    description:
-      'Classic red and white bar scarf with woven crest, made for matchdays at the Emirates.',
-    price_gbp: 18,
-    price_usd: 24,
-    main_image_url: IMG.crowd,
-    gallery_urls: [IMG.crowd],
-    sizes: ['One Size'],
-    is_customizable: false,
-    badge: null,
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp11',
-    category: 'Accessories',
-    title: 'Arsenal Crest Football',
-    description: 'Size 5 training ball with the Arsenal crest and machine-stitched panels.',
-    price_gbp: 20,
-    price_usd: 26,
-    main_image_url: IMG.action,
-    gallery_urls: [IMG.action],
-    sizes: ['Size 5'],
-    is_customizable: false,
-    badge: 'Bestseller',
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-  {
-    id: 'sp12',
-    category: 'Training',
-    title: 'Arsenal Goalkeeper Gloves',
-    description: 'Latex palm and negative cut for grip in all conditions.',
-    price_gbp: 45,
-    price_usd: 58,
-    main_image_url: IMG.keeper,
-    gallery_urls: [IMG.keeper],
-    sizes: ['7', '8', '9', '10'],
-    is_customizable: false,
-    badge: null,
-    external_buy_url: 'https://arsenaldirect.arsenal.com',
-  },
-];
-
-// Stock per size. Most sizes are well stocked; a few are low or sold out so
-// the shop shows "only N left" and disabled sizes.
-const LOW_STOCK = {
-  'sp01:2XL': 3,
-  'sp03:XL': 0,
-  'sp05:S': 2,
-  'sp09:S': 0,
-  'sp09:M': 4,
-  'sp12:10': 0,
-};
-const variants = products.flatMap((p) =>
-  p.sizes.map((size, i) => ({
-    product_id: p.id,
-    size,
-    sku: `${p.id}-${size.replace(/\s+/g, '')}`.toUpperCase(),
-    stock: LOW_STOCK[`${p.id}:${size}`] ?? 40,
-    position: i + 1,
-  }))
-);
+const store = storeCatalogue(IMG);
+const knownCategories = new Set(store.categories.map((c) => c.id));
+for (const pc of store.productCategories) {
+  if (!knownCategories.has(pc.category_id))
+    throw new Error(`Unknown store category ${pc.category_id} on ${pc.product_id}`);
+}
 
 const PROMO_DEFAULTS = {
   percent_off: null,
@@ -2880,16 +2735,24 @@ insert('fan_polls', polls);
 // Keep real vote counts on re-runs.
 insert('poll_options', pollOptions, { keep: ['votes_count'] });
 section('Store');
-insert(
-  'store_products',
-  products.map((p) => ({
-    customisation_price_gbp: 15,
-    customisation_price_usd: 20,
-    ...p,
-  }))
-);
-// Keep live stock and redemption counts on re-runs.
-insert('store_product_variants', variants, { conflict: 'product_id, size', keep: ['stock'] });
+insert('store_categories', store.categories);
+insert('store_size_charts', store.sizeCharts);
+insert('store_products', store.products);
+// Keep live stock, redemptions, balances and review votes on re-runs.
+insert('store_product_variants', store.variants, { conflict: 'product_id, size', keep: ['stock'] });
+emit('delete from public.store_product_categories;');
+insert('store_product_categories', store.productCategories, { conflict: null });
+insert('store_print_specials', store.specials);
+insert('store_patches', store.patches);
+insert('store_print_options', store.printOptions, { conflict: 'product_id' });
+emit('delete from public.store_product_patches;');
+insert('store_product_patches', store.productPatches, { conflict: null });
+insert('store_promotions', store.promotions);
+insert('store_shipping_rates', store.shippingRates, { conflict: 'zone, method' });
+insert('gift_cards', store.giftCards, { conflict: 'code', keep: ['balance'] });
+insert('store_reviews', store.reviews, { keep: ['helpful_count', 'unhelpful_count'] });
+insert('store_questions', store.questions);
+insert('store_home_modules', store.homeModules);
 insert(
   'promo_codes',
   promoCodes.map((c) => ({ ...PROMO_DEFAULTS, ...c })),
