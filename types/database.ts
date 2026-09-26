@@ -698,3 +698,35 @@ export interface StoreQuestion {
   answered_at: string | null;
   created_at: string;
 }
+
+// ---------------------------------------------------------------- returns
+
+export type ReturnStatus = 'requested' | 'approved' | 'received' | 'refunded' | 'rejected';
+export type ReturnReason =
+  'too_small' | 'too_big' | 'not_as_described' | 'faulty' | 'changed_mind' | 'other';
+
+export interface StoreReturn {
+  id: string;
+  return_number: string;
+  order_id: string;
+  status: ReturnStatus;
+  reason: ReturnReason;
+  notes: string | null;
+  refund_amount: number | null;
+  created_at: string;
+  order?: Pick<Order, 'order_number' | 'currency'> | null;
+  items?: {
+    order_item_id: string;
+    quantity: number;
+    item?: Pick<OrderItem, 'title' | 'size' | 'image_url'> | null;
+  }[];
+}
+
+export interface ReturnableItem {
+  order_item_id: string;
+  title: string;
+  size: string;
+  image_url: string | null;
+  returnable_quantity: number;
+  reason: string | null;
+}

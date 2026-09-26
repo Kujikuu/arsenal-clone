@@ -148,6 +148,7 @@ function RootLayout() {
                     <Stack.Screen name="account/orders" options={CARD} />
                     <Stack.Screen name="account/wishlist" options={CARD} />
                     <Stack.Screen name="account/addresses" options={CARD} />
+                    <Stack.Screen name="account/returns" options={CARD} />
                   </Stack>
                 </NavThemeProvider>
               </ActionSheetProvider>

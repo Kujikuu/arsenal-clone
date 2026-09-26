@@ -893,7 +893,9 @@ export function storeCatalogue(IMG) {
           care: CARE,
         },
       },
-      ['retro-shop', 'mens-retro', 'classics']
+      ['retro-shop', 'mens-retro', 'classics'],
+      // Legends printing on heritage shirts uses the club's own lettering.
+      { print: { ...menPrint, fonts: ['arsenal', 'premier_league'] } }
     );
   }
   add(

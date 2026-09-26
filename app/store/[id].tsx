@@ -45,11 +45,14 @@ const KIT_ROLE_LABEL = {
 
 /** Product page in the club store layout. */
 export default function ProductScreen() {
-  const { id, player, personalise, edit } = useLocalSearchParams<{
+  const { id, player, personalise, edit, name, number } = useLocalSearchParams<{
     id: string;
     player?: string;
     personalise?: string;
     edit?: string;
+    /** Custom print to start with, e.g. a legend's name and number. */
+    name?: string;
+    number?: string;
   }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -95,10 +98,15 @@ export default function ProductScreen() {
     }
   }, [player, data?.print, print]);
 
-  // From quick buy's PERSONALISE: start a custom print and scroll to it.
+  // From quick buy's PERSONALISE (or a legend): start a custom print and scroll to it.
   useEffect(() => {
-    if (personalise && data?.print && !print) {
-      setPrint({ type: 'custom', font: data.print.fonts[0] });
+    if ((personalise || name || number) && data?.print && !print) {
+      setPrint({
+        type: 'custom',
+        font: data.print.fonts[0],
+        name: name ? name.toUpperCase().slice(0, 12) : null,
+        number: number ? number.replace(/[^0-9]/g, '').slice(0, 2) : null,
+      });
       setTimeout(
         () => scroller.current?.scrollTo({ y: personaliseY.current - 80, animated: true }),
         400

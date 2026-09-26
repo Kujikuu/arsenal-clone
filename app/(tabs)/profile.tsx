@@ -37,6 +37,11 @@ const MENU = [
     icon: <Feather name="shopping-bag" size={ICON_SIZE} color="#FFF" />,
   },
   {
+    id: 'returns',
+    title: 'RETURNS',
+    icon: <Feather name="rotate-ccw" size={ICON_SIZE} color="#FFF" />,
+  },
+  {
     id: 'wishlist',
     title: 'WISHLIST',
     icon: <Feather name="heart" size={ICON_SIZE} color="#FFF" />,

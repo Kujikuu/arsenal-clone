@@ -11,9 +11,13 @@ import type {
   Currency,
   Order,
   OrderStatus,
+  ReturnReason,
+  ReturnStatus,
+  ReturnableItem,
   ShippingAddress,
   ShippingOption,
   StoreProduct,
+  StoreReturn,
 } from '@/types/database';
 
 export const STORE_CATEGORIES = ['ALL', 'KITS', 'TRAINING', 'RETRO', 'ACCESSORIES'] as const;
@@ -417,5 +421,66 @@ export function useOrder(id: string | undefined) {
       return row ? normaliseOrder(row) : null;
     },
     { enabled: Boolean(id) }
+  );
+}
+
+// ---------------------------------------------------------------- returns
+
+export const RETURN_REASONS: { value: ReturnReason; label: string }[] = [
+  { value: 'too_small', label: 'Too small' },
+  { value: 'too_big', label: 'Too big' },
+  { value: 'not_as_described', label: 'Not as described' },
+  { value: 'faulty', label: 'Faulty or damaged' },
+  { value: 'changed_mind', label: 'Changed my mind' },
+  { value: 'other', label: 'Other' },
+];
+
+export const RETURN_STATUS_LABEL: Record<ReturnStatus, string> = {
+  requested: 'Requested',
+  approved: 'Approved – send it back',
+  received: 'Received',
+  refunded: 'Refunded',
+  rejected: 'Not accepted',
+};
+
+export function useReturnableItems(orderId: string | undefined, enabled = true) {
+  return useQuery(
+    ['returnable', orderId],
+    async () =>
+      unwrap(
+        await supabase.rpc('returnable_order_items', { p_order_id: orderId })
+      ) as ReturnableItem[],
+    { enabled: Boolean(orderId) && enabled, initialData: [] }
+  );
+}
+
+export async function requestReturn(params: {
+  orderId: string;
+  items: { order_item_id: string; quantity: number }[];
+  reason: ReturnReason;
+  notes: string;
+}): Promise<StoreReturn> {
+  return unwrap(
+    await supabase.rpc('request_store_return', {
+      p_order_id: params.orderId,
+      p_items: params.items,
+      p_reason: params.reason,
+      p_notes: params.notes,
+    })
+  ) as StoreReturn;
+}
+
+const RETURN_SELECT =
+  '*, order:orders(order_number, currency), items:store_return_items(order_item_id, quantity, item:order_items(title, size, image_url))';
+
+export function useReturns(userId: string | undefined, orderId?: string) {
+  return useQuery(
+    ['returns', userId, orderId ?? null],
+    async () => {
+      let q = supabase.from('store_returns').select(RETURN_SELECT).eq('user_id', userId);
+      if (orderId) q = q.eq('order_id', orderId);
+      return unwrap(await q.order('created_at', { ascending: false })) as StoreReturn[];
+    },
+    { enabled: Boolean(userId), initialData: [] }
   );
 }
