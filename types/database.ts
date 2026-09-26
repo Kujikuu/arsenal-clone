@@ -598,6 +598,7 @@ export interface StoreProductPage {
     profile_group_id?: string | null;
     details: ProductDetails;
     returnable: boolean;
+    member_discount_eligible: boolean;
     back_image_url?: string | null;
   };
   price: number;

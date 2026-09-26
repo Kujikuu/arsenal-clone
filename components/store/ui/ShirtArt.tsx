@@ -59,6 +59,9 @@ const FONT_FAMILY: Record<KitFont, string> = {
   pride: FONT.bodyMedium,
 };
 
+/** Average glyph width in ems per kit font. */
+const FONT_EM: Record<KitFont, number> = { premier_league: 0.64, arsenal: 1.02, pride: 0.6 };
+
 const SLEEVE_L = 'M62 34 L24 58 L40 92 L62 80 Z';
 const SLEEVE_R = 'M138 34 L176 58 L160 92 L138 80 Z';
 const BODY_FRONT = 'M62 34 L84 24 Q100 38 116 24 L138 34 L138 186 L62 186 Z';
@@ -90,7 +93,11 @@ export function ShirtArt({
   const printColor = champions ? '#C9A646' : k.print;
   const printName = champions && !name ? 'CHAMPIONS' : name;
   const printNumber = champions && number == null ? '26' : number;
-  const nameSize = printName && printName.length > 9 ? 11 : 14;
+  // Fit printing across the back (about 72 units wide); the display face runs much wider.
+  const em = FONT_EM[font];
+  const nameSize = printName ? Math.min(14, 72 / (printName.length * em)) : 14;
+  const numberSize =
+    printNumber != null ? Math.min(62, 74 / (String(printNumber).length * em)) : 62;
 
   return (
     <Svg width={size} height={size} viewBox="0 0 200 200">
@@ -146,8 +153,8 @@ export function ShirtArt({
             {printNumber != null && printNumber !== '' ? (
               <SvgText
                 x={100}
-                y={136}
-                fontSize={62}
+                y={112 + numberSize * 0.4}
+                fontSize={numberSize}
                 fontFamily={FONT_FAMILY[font]}
                 fill={printColor}
                 stroke={style === 'home' && !champions ? k.trim : undefined}

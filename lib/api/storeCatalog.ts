@@ -8,6 +8,8 @@ import type {
   StoreCategoryRow,
   StoreProfile,
   StoreProductPage,
+  StoreQuestion,
+  StoreReview,
   StoreTile,
 } from '@/types/database';
 
@@ -289,4 +291,159 @@ export function useInfiniteBrowse(currency: Currency, params: BrowseParams, enab
     },
     refetch: () => load(0),
   };
+}
+
+// ---------------------------------------------------------------- reviews & questions
+
+export const REVIEW_SORTS = [
+  { value: 'recent', label: 'Most recent' },
+  { value: 'helpful', label: 'Most helpful' },
+  { value: 'highest', label: 'Highest rating' },
+  { value: 'lowest', label: 'Lowest rating' },
+] as const;
+export type ReviewSort = (typeof REVIEW_SORTS)[number]['value'];
+
+export const REVIEWS_PAGE = 5;
+
+export function useReviews(
+  productId: string | undefined,
+  opts: { sort: ReviewSort; rating: number | null; search: string; limit: number }
+) {
+  return useQuery(
+    ['reviews', productId, opts],
+    async () => {
+      let q = supabase
+        .from('store_reviews')
+        .select('*', { count: 'exact' })
+        .eq('product_id', productId);
+      if (opts.rating) q = q.eq('rating', opts.rating);
+      const term = opts.search.replace(/[%_,()\\]/g, ' ').trim();
+      if (term) q = q.or(`title.ilike.%${term}%,body.ilike.%${term}%`);
+      q =
+        opts.sort === 'helpful'
+          ? q.order('helpful_count', { ascending: false })
+          : opts.sort === 'highest'
+            ? q.order('rating', { ascending: false })
+            : opts.sort === 'lowest'
+              ? q.order('rating', { ascending: true })
+              : q;
+      const { data, error, count } = await q
+        .order('created_at', { ascending: false })
+        .range(0, opts.limit - 1);
+      if (error) throw error;
+      return { reviews: (data ?? []) as StoreReview[], total: count ?? 0 };
+    },
+    { enabled: Boolean(productId) }
+  );
+}
+
+export function useMyReviewVotes(userId: string | undefined, reviewIds: string[]) {
+  return useQuery(
+    ['review-votes', userId, reviewIds],
+    async () => {
+      const rows = unwrap(
+        await supabase
+          .from('store_review_votes')
+          .select('review_id, helpful')
+          .eq('user_id', userId)
+          .in('review_id', reviewIds)
+      ) as { review_id: string; helpful: boolean }[];
+      return Object.fromEntries(rows.map((r) => [r.review_id, r.helpful])) as Record<
+        string,
+        boolean
+      >;
+    },
+    { enabled: Boolean(userId) && reviewIds.length > 0, initialData: {} }
+  );
+}
+
+export async function voteReview(userId: string, reviewId: string, helpful: boolean | null) {
+  const { error } =
+    helpful === null
+      ? await supabase
+          .from('store_review_votes')
+          .delete()
+          .eq('user_id', userId)
+          .eq('review_id', reviewId)
+      : await supabase
+          .from('store_review_votes')
+          .upsert(
+            { user_id: userId, review_id: reviewId, helpful },
+            { onConflict: 'review_id,user_id' }
+          );
+  if (error) throw error;
+}
+
+export async function writeReview(input: {
+  productId: string;
+  rating: number;
+  title: string;
+  body: string;
+}): Promise<StoreReview> {
+  return unwrap(
+    await supabase
+      .from('store_reviews')
+      .insert({
+        product_id: input.productId,
+        rating: input.rating,
+        title: input.title,
+        body: input.body,
+      })
+      .select()
+      .single()
+  ) as StoreReview;
+}
+
+export function useQuestions(productId: string | undefined) {
+  return useQuery(
+    ['questions', productId],
+    async () =>
+      unwrap(
+        await supabase
+          .from('store_questions')
+          .select('*')
+          .eq('product_id', productId)
+          .order('created_at', { ascending: false })
+      ) as StoreQuestion[],
+    { enabled: Boolean(productId), initialData: [] }
+  );
+}
+
+export async function askQuestion(productId: string, question: string) {
+  const { error } = await supabase
+    .from('store_questions')
+    .insert({ product_id: productId, question });
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------- delivery
+
+export interface ShippingRate {
+  zone: string;
+  method: 'standard' | 'express' | 'nominated';
+  label: string;
+  eta: string;
+  price_gbp: number;
+  price_usd: number;
+  free_over_gbp: number | null;
+  free_over_usd: number | null;
+}
+
+export function useShippingRates(zone: string) {
+  return useQuery(
+    ['shipping-rates', zone],
+    async () =>
+      (
+        unwrap(
+          await supabase.from('store_shipping_rates').select('*').eq('zone', zone).order('position')
+        ) as ShippingRate[]
+      ).map((r) => ({
+        ...r,
+        price_gbp: Number(r.price_gbp),
+        price_usd: Number(r.price_usd),
+        free_over_gbp: r.free_over_gbp == null ? null : Number(r.free_over_gbp),
+        free_over_usd: r.free_over_usd == null ? null : Number(r.free_over_usd),
+      })),
+    { initialData: [] }
+  );
 }
