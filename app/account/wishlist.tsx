@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router';
 import { QuickBuySheet } from '@/components/store/QuickBuySheet';
 import { TileGridSkeleton } from '@/components/store/ui/Misc';
 import { ProductTile } from '@/components/store/ui/ProductTile';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
 import { useWishlistIds } from '@/lib/api/store';
@@ -12,6 +11,9 @@ import { useBrowse } from '@/lib/api/storeCatalog';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
+import { DisplayText } from '@/components/ui/DisplayText';
 
 /** Products saved with the heart, most recently saved first. */
 export default function WishlistScreen() {
@@ -39,7 +41,11 @@ export default function WishlistScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" />
+      <AppHeader
+        left="back"
+        title={<DisplayText size={14}>WISHLIST</DisplayText>}
+        rightAction={<StoreHeaderActions />}
+      />
       {!user ? (
         authLoading ? null : (
           <StoreEmpty

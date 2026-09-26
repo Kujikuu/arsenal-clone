@@ -13,8 +13,6 @@ import { QuickBuySheet } from '@/components/store/QuickBuySheet';
 import { StoreButton } from '@/components/store/ui/Buttons';
 import { Breadcrumb, LinkRow, TileGridSkeleton, type Crumb } from '@/components/store/ui/Misc';
 import { ProductTile } from '@/components/store/ui/ProductTile';
-import { StoreFooter } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
 import { useWishlistIds } from '@/lib/api/store';
 import {
@@ -30,6 +28,8 @@ import {
 } from '@/lib/api/storeCatalog';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 const VIRTUAL_TITLES: Record<string, string> = { sale: '20% Off', new: 'New In', search: 'Search' };
 
@@ -196,13 +196,13 @@ export default function CategoryListingScreen() {
           ) : null}
         </View>
       ) : null}
-      <StoreFooter />
+      <View style={{ height: 32 }} />
     </View>
   );
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" />
+      <AppHeader left="back" rightAction={<StoreHeaderActions />} />
       <FlatList
         data={listing.products}
         keyExtractor={(p) => p.id}

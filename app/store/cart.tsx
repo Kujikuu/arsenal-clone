@@ -11,8 +11,7 @@ import { Skeleton } from '@/components/store/ui/Misc';
 import { OrderSummary } from '@/components/store/ui/OrderSummary';
 import { ProductImage } from '@/components/store/ui/ProductImage';
 import { BottomSheet } from '@/components/store/ui/Sheets';
-import { PaymentBadges } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
+import { PaymentBadges } from '@/components/store/ui/PaymentBadges';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { StoreError } from '@/components/store/ui/StoreStates';
 import { quoteCart, useCartQuote, useWishlistIds } from '@/lib/api/store';
@@ -22,6 +21,8 @@ import { MAX_LINE_QUANTITY, linePrice, useCartStore, type CartLine } from '@/sto
 import { useRegionStore } from '@/store/regionStore';
 import type { CartQuoteLine, Currency } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { DisplayText } from '@/components/ui/DisplayText';
 
 function stockProblem(line: CartLine, quoted: CartQuoteLine | undefined, lines: CartLine[]) {
   if (!quoted) return null;
@@ -294,7 +295,7 @@ export default function BagScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" />
+      <AppHeader left="back" title={<DisplayText size={14}>BAG</DisplayText>} />
       <ScrollView
         contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
         keyboardShouldPersistTaps="handled">

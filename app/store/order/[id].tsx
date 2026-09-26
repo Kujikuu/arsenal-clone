@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/store/ui/Misc';
 import { OrderSummary } from '@/components/store/ui/OrderSummary';
 import { ProductImage } from '@/components/store/ui/ProductImage';
 import { BottomSheet } from '@/components/store/ui/Sheets';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
 import {
@@ -29,6 +28,8 @@ import { formatLongDate, formatPrice } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
 import type { Order, OrderStatus, ReturnReason } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { DisplayText } from '@/components/ui/DisplayText';
 
 const STEPS: { status: OrderStatus; label: string }[] = [
   { status: 'paid', label: 'Confirmed' },
@@ -289,7 +290,11 @@ export default function OrderScreen() {
 
   const shell = (children: React.ReactNode) => (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left={placed ? 'close' : 'back'} />
+      <AppHeader
+        left={placed ? 'close' : 'back'}
+        onLeftPress={placed ? () => router.replace('/store') : undefined}
+        title={<DisplayText size={14}>ORDER</DisplayText>}
+      />
       {children}
     </View>
   );

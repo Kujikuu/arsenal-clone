@@ -157,7 +157,11 @@ export default function MatchesTabScreen() {
         <EmptyState
           icon="calendar-outline"
           title="No fixtures found"
-          message={`Nothing matches ${filter.competition} in ${filter.season}.`}
+          message={
+            filtered
+              ? `Nothing matches ${filter.competition} in ${filter.season}.`
+              : `No ${filter.season} fixtures in the database yet. Load supabase/seed.sql or run the sync-football-data function.`
+          }
           actionLabel={filtered ? 'RESET FILTERS' : undefined}
           onAction={() => resetFilter(teamType)}
         />

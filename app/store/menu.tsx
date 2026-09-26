@@ -3,13 +3,15 @@ import { View, Text, ScrollView, Pressable } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { CannonLogo } from '@/components/store/ui/CannonLogo';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { StoreError } from '@/components/store/ui/StoreStates';
 import { Skeleton } from '@/components/store/ui/Misc';
 import { categoryHref, useStoreCategories } from '@/lib/api/storeCatalog';
 import type { StoreCategoryRow } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
+import { DisplayText } from '@/components/ui/DisplayText';
 
 interface Row {
   key: string;
@@ -94,7 +96,11 @@ export default function StoreMenuScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#F0F0F0' }}>
-      <StoreHeader left="close" />
+      <AppHeader
+        left="close"
+        title={<DisplayText size={14}>SHOP</DisplayText>}
+        rightAction={<StoreHeaderActions />}
+      />
       {current ? (
         <Pressable
           onPress={() => setTrail((t) => t.slice(0, -1))}

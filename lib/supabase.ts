@@ -22,13 +22,18 @@ const ExpoSSRStorage = {
   },
 };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: typeof window !== 'undefined' ? AsyncStorage : ExpoSSRStorage,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-  },
-});
+// Placeholders keep the app booting without a .env so screens can explain what's missing.
+export const supabase = createClient(
+  supabaseUrl || 'http://localhost',
+  supabaseAnonKey || 'missing',
+  {
+    auth: {
+      storage: typeof window !== 'undefined' ? AsyncStorage : ExpoSSRStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  }
+);
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);

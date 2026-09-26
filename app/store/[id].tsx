@@ -18,8 +18,6 @@ import { PriceTag, StarRating } from '@/components/store/ui/PriceTag';
 import { ProductImage } from '@/components/store/ui/ProductImage';
 import { parseShirtUrl } from '@/components/store/ui/ShirtArt';
 import { BottomSheet } from '@/components/store/ui/Sheets';
-import { StoreFooter } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
 import { useWishlistIds } from '@/lib/api/store';
@@ -35,6 +33,8 @@ import { useCartStore, type LinePrint } from '@/store/cartStore';
 import { useRecentlyViewed } from '@/store/recentStore';
 import type { StoreProductVariant } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 const KIT_ROLE_LABEL = {
   home: 'Home',
@@ -133,7 +133,7 @@ export default function ProductScreen() {
   if (!data) {
     return (
       <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-        <StoreHeader left="back" />
+        <AppHeader left="back" rightAction={<StoreHeaderActions />} />
         {page.error ? (
           <StoreError error={page.error} onRetry={page.refetch} />
         ) : page.loading ? (
@@ -224,7 +224,7 @@ export default function ProductScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" />
+      <AppHeader left="back" rightAction={<StoreHeaderActions />} />
       <ScrollView ref={scroller} contentContainerStyle={{ paddingBottom: 0 }}>
         <Breadcrumb items={crumbs} />
         <View style={{ height: 24 }} />
@@ -451,7 +451,7 @@ export default function ProductScreen() {
           onLayout={(e) => (reviewsY.current = e.nativeEvent.layout.y)}>
           <Reviews productId={product.id} rating={data.rating} />
         </View>
-        <StoreFooter />
+        <View style={{ height: 32 }} />
         <View style={{ height: insets.bottom }} />
       </ScrollView>
 

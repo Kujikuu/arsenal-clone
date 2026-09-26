@@ -6,14 +6,14 @@ import { PlayerCarousel } from '@/components/store/home/PlayerCarousel';
 import { ProductRow, ProductTabs } from '@/components/store/home/ProductRow';
 import { QuickBuySheet } from '@/components/store/QuickBuySheet';
 import { Skeleton } from '@/components/store/ui/Misc';
-import { StoreFooter } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { TrustBadges, TrustTicker } from '@/components/store/ui/Trust';
-import { StoreError } from '@/components/store/ui/StoreStates';
+import { StoreEmpty, StoreError } from '@/components/store/ui/StoreStates';
 import { useHomeModules } from '@/lib/api/storeCatalog';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import type { HomeModule } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreBrowseBar, StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 /** Shop home in the club store's layout, driven by store_home_modules. */
 export default function StoreScreen() {
@@ -89,7 +89,8 @@ export default function StoreScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader />
+      <AppHeader left="none" rightAction={<StoreHeaderActions />} />
+      <StoreBrowseBar />
       <ScrollView
         key={refreshKey}
         className="flex-1"
@@ -103,10 +104,16 @@ export default function StoreScreen() {
             <Skeleton height={520} radius={0} />
             <Skeleton height={40} style={{ marginTop: 16 }} />
           </View>
+        ) : !modules.length && !home.loading ? (
+          <StoreEmpty
+            icon="storefront-outline"
+            title="The shop is empty"
+            message="No shop content was found. Load supabase/seed.sql into your Supabase project, then pull to refresh."
+          />
         ) : (
           <View style={{ gap: 28 }}>{modules.map(render)}</View>
         )}
-        <StoreFooter />
+        <View style={{ height: 32 }} />
       </ScrollView>
       <QuickBuySheet productId={quickBuy} currency={currency} onClose={() => setQuickBuy(null)} />
     </View>
