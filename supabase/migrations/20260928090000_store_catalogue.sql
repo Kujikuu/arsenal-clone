@@ -223,6 +223,8 @@ alter table public.orders add column if not exists gift_card_code text reference
 alter table public.orders add column if not exists gift_card_amount numeric(10,2) not null default 0;
 -- What the card is charged: total minus gift card.
 alter table public.orders add column if not exists amount_due numeric(10,2);
+-- Set when the receipt email goes out, so webhook retries never resend it.
+alter table public.orders add column if not exists receipt_sent_at timestamptz;
 update public.orders set amount_due = total where amount_due is null;
 
 alter table public.order_items add column if not exists print_type text check (print_type in ('player', 'custom'));

@@ -355,7 +355,15 @@ export interface OrderItem {
   custom_name?: string | null;
   custom_number?: string | null;
   unit_price: number;
+  compare_at?: number | null;
   customisation_price: number;
+  print_type?: 'player' | 'custom' | null;
+  player_id?: string | null;
+  print_font?: KitFont | null;
+  patch_id?: string | null;
+  patch_name?: string | null;
+  print_price: number;
+  patch_price: number;
   quantity: number;
   line_total: number;
   position: number;
@@ -368,9 +376,15 @@ export interface Order {
   status: OrderStatus;
   currency: Currency;
   subtotal: number;
+  member_discount: number;
   discount: number;
   shipping: number;
   total: number;
+  gift_card_code?: string | null;
+  gift_card_amount: number;
+  amount_due: number;
+  shipping_zone?: string | null;
+  shipping_method?: 'standard' | 'express' | 'nominated' | null;
   promo_code?: string | null;
   shipping_address: Omit<ShippingAddress, 'id' | 'user_id' | 'is_default' | 'created_at'>;
   tracking_number?: string | null;
@@ -392,19 +406,48 @@ export interface CartQuoteLine {
   quantity: number;
   custom_name: string | null;
   custom_number: string | null;
+  returnable: boolean;
   unit_price: number;
+  compare_at: number | null;
+  print: {
+    type: 'player' | 'custom';
+    player_id: string | null;
+    special_id: string | null;
+    name: string | null;
+    number: string | null;
+    font: KitFont;
+    patch_id: string | null;
+    patch_name: string | null;
+  } | null;
+  print_price: number;
+  patch_price: number;
   customisation_price: number;
   line_total: number;
 }
 
+export interface ShippingOption {
+  method: 'standard' | 'express' | 'nominated';
+  label: string;
+  eta: string;
+  price: number;
+}
+
 export interface CartQuote {
   currency: Currency;
+  zone: string;
+  method: ShippingOption['method'];
   lines: CartQuoteLine[];
   subtotal: number;
+  member: boolean;
+  member_discount: number;
   discount: number;
   shipping: number;
   total: number;
-  free_shipping_threshold: number;
+  gift_card: { code: string; amount: number; balance_after: number } | null;
+  gift_card_error: string | null;
+  amount_due: number;
+  free_shipping_threshold: number | null;
+  shipping_options: ShippingOption[];
   promo: { code: string; description: string | null } | null;
   promo_error: string | null;
 }

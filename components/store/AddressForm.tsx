@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Alert } from 'react-native';
 import { FormField } from '@/components/ui/FormField';
+import { StoreButton } from '@/components/store/ui/Buttons';
+import { StoreField } from '@/components/store/ui/StoreField';
 import { PillButton } from '@/components/ui/PillButton';
 import { SwitchRow } from '@/components/ui/SwitchRow';
 import { saveAddress, type AddressInput } from '@/lib/api/store';
@@ -22,11 +24,22 @@ interface Props {
   profile?: Pick<UserProfile, 'full_name' | 'phone' | 'postcode' | 'country'> | null;
   /** Hide the default toggle, e.g. for a first address that becomes the default anyway. */
   forceDefault?: boolean;
+  /** Light shop styling (checkout) instead of the dark account styling. */
+  light?: boolean;
   onSaved: (address: ShippingAddress) => void;
   onCancel?: () => void;
 }
 
-export function AddressForm({ userId, address, profile, forceDefault, onSaved, onCancel }: Props) {
+export function AddressForm({
+  userId,
+  address,
+  profile,
+  forceDefault,
+  light,
+  onSaved,
+  onCancel,
+}: Props) {
+  const Field = light ? StoreField : FormField;
   const [form, setForm] = useState<AddressInput>({
     full_name: address?.full_name ?? profile?.full_name ?? '',
     line1: address?.line1 ?? '',
@@ -78,7 +91,7 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
 
   return (
     <View>
-      <FormField
+      <Field
         label="Full name"
         value={form.full_name}
         onChangeText={(v) => patch({ full_name: v })}
@@ -86,7 +99,7 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         autoComplete="name"
         maxLength={100}
       />
-      <FormField
+      <Field
         label="Address line 1"
         value={form.line1}
         onChangeText={(v) => patch({ line1: v })}
@@ -94,27 +107,27 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         autoComplete="address-line1"
         maxLength={120}
       />
-      <FormField
+      <Field
         label="Address line 2 (optional)"
         value={form.line2 ?? ''}
         onChangeText={(v) => patch({ line2: v })}
         autoComplete="address-line2"
         maxLength={120}
       />
-      <FormField
+      <Field
         label="Town or city"
         value={form.city}
         onChangeText={(v) => patch({ city: v })}
         error={errors.city}
         maxLength={80}
       />
-      <FormField
+      <Field
         label="County / state (optional)"
         value={form.region ?? ''}
         onChangeText={(v) => patch({ region: v })}
         maxLength={80}
       />
-      <FormField
+      <Field
         label="Postcode"
         value={form.postcode}
         onChangeText={(v) => patch({ postcode: v })}
@@ -123,7 +136,7 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         autoComplete="postal-code"
         maxLength={20}
       />
-      <FormField
+      <Field
         label="Country"
         value={form.country}
         onChangeText={(v) => patch({ country: v })}
@@ -131,7 +144,7 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         autoComplete="country"
         maxLength={60}
       />
-      <FormField
+      <Field
         label="Phone (for delivery updates)"
         value={form.phone ?? ''}
         onChangeText={(v) => patch({ phone: v })}
@@ -139,7 +152,7 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         autoComplete="tel"
         maxLength={30}
       />
-      {!forceDefault && (
+      {!forceDefault && !light && (
         <SwitchRow
           title="Default address"
           detail="Used first at checkout"
@@ -149,15 +162,27 @@ export function AddressForm({ userId, address, profile, forceDefault, onSaved, o
         />
       )}
       <View className="flex-row" style={{ marginTop: 16 }}>
-        {onCancel && (
-          <PillButton
-            label="CANCEL"
-            variant="outline"
-            onPress={onCancel}
-            style={{ flex: 1, marginRight: 10 }}
-          />
+        {onCancel &&
+          (light ? (
+            <StoreButton
+              label="Cancel"
+              variant="secondary"
+              onPress={onCancel}
+              style={{ flex: 1, marginRight: 10 }}
+            />
+          ) : (
+            <PillButton
+              label="CANCEL"
+              variant="outline"
+              onPress={onCancel}
+              style={{ flex: 1, marginRight: 10 }}
+            />
+          ))}
+        {light ? (
+          <StoreButton label="Save address" onPress={save} loading={saving} style={{ flex: 1 }} />
+        ) : (
+          <PillButton label="SAVE ADDRESS" onPress={save} loading={saving} style={{ flex: 1 }} />
         )}
-        <PillButton label="SAVE ADDRESS" onPress={save} loading={saving} style={{ flex: 1 }} />
       </View>
     </View>
   );

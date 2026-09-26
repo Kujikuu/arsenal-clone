@@ -4,6 +4,7 @@
 // PaymentSheet needs. The order is marked paid only by stripe-webhook.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import Stripe from 'npm:stripe@18';
+import { sendReceipt } from '../_shared/receipt.ts';
 import { BadRequest, describeOrderError, parseCheckoutRequest, toMinorUnits } from './payload.ts';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
@@ -112,6 +113,7 @@ Deno.serve(async (req) => {
   // A gift card covered everything: the order is already paid.
   if (order.status === 'paid') {
     await cancelStalePaymentIntents(user.id, order.id);
+    await sendReceipt(admin, order.id);
     return Response.json({ orderId: order.id, orderNumber: order.order_number, paid: true });
   }
 

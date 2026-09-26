@@ -12,6 +12,7 @@ import type {
   Order,
   OrderStatus,
   ShippingAddress,
+  ShippingOption,
   StoreProduct,
 } from '@/types/database';
 
@@ -240,36 +241,79 @@ export const formatAddress = (
 
 // ---------------------------------------------------------------- bag & checkout
 
+export interface QuoteOptions {
+  promoCode?: string | null;
+  zone?: string;
+  method?: ShippingOption['method'];
+  giftCard?: string | null;
+}
+
+const numberQuote = (q: CartQuote): CartQuote => ({
+  ...q,
+  subtotal: Number(q.subtotal),
+  member_discount: Number(q.member_discount),
+  discount: Number(q.discount),
+  shipping: Number(q.shipping),
+  total: Number(q.total),
+  amount_due: Number(q.amount_due),
+  free_shipping_threshold:
+    q.free_shipping_threshold == null ? null : Number(q.free_shipping_threshold),
+  gift_card: q.gift_card
+    ? {
+        ...q.gift_card,
+        amount: Number(q.gift_card.amount),
+        balance_after: Number(q.gift_card.balance_after),
+      }
+    : null,
+  shipping_options: q.shipping_options.map((o) => ({ ...o, price: Number(o.price) })),
+  lines: q.lines.map((l) => ({
+    ...l,
+    unit_price: Number(l.unit_price),
+    compare_at: l.compare_at == null ? null : Number(l.compare_at),
+    print_price: Number(l.print_price),
+    patch_price: Number(l.patch_price),
+    customisation_price: Number(l.customisation_price),
+    line_total: Number(l.line_total),
+  })),
+});
+
 export async function quoteCart(
   currency: Currency,
   lines: CartLine[],
-  promoCode: string | null
+  opts: QuoteOptions = {}
 ): Promise<CartQuote> {
-  return unwrap(
+  const q = unwrap(
     await supabase.rpc('quote_store_cart', {
       p_currency: currency,
       p_items: toOrderItems(lines),
-      p_promo_code: promoCode,
+      p_promo_code: opts.promoCode ?? null,
+      p_zone: opts.zone ?? 'UK',
+      p_method: opts.method ?? 'standard',
+      p_gift_card: opts.giftCard ?? null,
     })
   ) as CartQuote;
+  return numberQuote(q);
 }
 
-/** Server-side prices, stock and promo for the bag. */
-export function useCartQuote(currency: Currency, lines: CartLine[], promoCode: string | null) {
+/** Server-side prices, stock, promo, delivery and gift card for the bag. */
+export function useCartQuote(currency: Currency, lines: CartLine[], opts: QuoteOptions = {}) {
   return useQuery(
-    ['cart-quote', currency, toOrderItems(lines), promoCode],
-    () => quoteCart(currency, lines, promoCode),
+    ['cart-quote', currency, toOrderItems(lines), opts],
+    () => quoteCart(currency, lines, opts),
     { enabled: lines.length > 0 }
   );
 }
 
-export interface CheckoutSession {
-  orderId: string;
-  orderNumber: string;
-  paymentIntentClientSecret: string;
-  ephemeralKey: string;
-  customerId: string;
-}
+export type CheckoutSession =
+  | { orderId: string; orderNumber: string; paid: true }
+  | {
+      orderId: string;
+      orderNumber: string;
+      paid: false;
+      paymentIntentClientSecret: string;
+      ephemeralKey: string;
+      customerId: string;
+    };
 
 export class CheckoutError extends Error {
   constructor(
@@ -286,6 +330,9 @@ export async function startCheckout(params: {
   lines: CartLine[];
   addressId: string;
   promoCode: string | null;
+  zone: string;
+  method: ShippingOption['method'];
+  giftCard: string | null;
 }): Promise<CheckoutSession> {
   const { data, error } = await supabase.functions.invoke<CheckoutSession>('store-checkout', {
     body: {
@@ -293,6 +340,9 @@ export async function startCheckout(params: {
       items: toOrderItems(params.lines),
       addressId: params.addressId,
       promoCode: params.promoCode,
+      zone: params.zone,
+      method: params.method,
+      giftCard: params.giftCard,
     },
   });
   if (error) {
@@ -320,13 +370,18 @@ export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
 const normaliseOrder = (o: Order): Order => ({
   ...o,
   subtotal: Number(o.subtotal),
+  member_discount: Number(o.member_discount ?? 0),
   discount: Number(o.discount),
   shipping: Number(o.shipping),
   total: Number(o.total),
+  gift_card_amount: Number(o.gift_card_amount ?? 0),
+  amount_due: Number(o.amount_due ?? o.total),
   items: o.items
     ?.map((i) => ({
       ...i,
       unit_price: Number(i.unit_price),
+      print_price: Number(i.print_price ?? 0),
+      patch_price: Number(i.patch_price ?? 0),
       customisation_price: Number(i.customisation_price),
       line_total: Number(i.line_total),
     }))

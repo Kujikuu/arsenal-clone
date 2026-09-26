@@ -124,8 +124,8 @@ function RootLayout() {
                     <Stack.Screen name="store/players" options={CARD} />
                     <Stack.Screen name="store/tours" options={CARD} />
                     <Stack.Screen name="store/[id]" options={CARD} />
-                    <Stack.Screen name="store/cart" options={MODAL} />
-                    <Stack.Screen name="store/checkout" options={MODAL} />
+                    <Stack.Screen name="store/cart" options={CARD} />
+                    <Stack.Screen name="store/checkout" options={CARD} />
                     <Stack.Screen name="store/order/[id]" options={CARD} />
                     <Stack.Screen name="auth/login" options={MODAL} />
                     <Stack.Screen name="auth/signup" options={MODAL} />

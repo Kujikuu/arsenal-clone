@@ -33,6 +33,16 @@ The app needs the publishable key (and, for Apple Pay, the merchant ID) in
 `.env`: `EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_STRIPE_MERCHANT_ID`.
 The Stripe SDK is native, so build a new dev client after adding it.
 
+## Receipt emails
+
+Paid orders get a receipt through [Resend](https://resend.com) (sent once
+per order, including orders a gift card covers in full). Without the key
+receipts are skipped.
+
+```sh
+supabase secrets set RESEND_API_KEY=re_... RESEND_FROM="Arsenal Direct <orders@your-domain>"
+```
+
 ## Release abandoned checkouts
 
 Unpaid orders hold their stock for 30 minutes. Schedule the cleanup with

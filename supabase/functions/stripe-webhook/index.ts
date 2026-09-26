@@ -2,6 +2,7 @@
 // order becomes paid: the app never reports payment success itself.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import Stripe from 'npm:stripe@18';
+import { sendReceipt } from '../_shared/receipt.ts';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   httpClient: Stripe.createFetchHttpClient(),
@@ -32,6 +33,8 @@ async function paymentSucceeded(intent: Stripe.PaymentIntent) {
     console.error(`Payment ${intent.id} does not match its order total; not fulfilling.`);
   } else if (outcome === 'unknown') {
     console.warn(`Payment ${intent.id} has no store order.`);
+  } else if (outcome === 'paid' && intent.metadata?.order_id) {
+    await sendReceipt(admin, intent.metadata.order_id);
   }
   return outcome as string;
 }
