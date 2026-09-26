@@ -1,146 +1,114 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  Pressable,
-  RefreshControl,
-  useWindowDimensions,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/AppHeader';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
-import { DisplayText } from '@/components/ui/DisplayText';
-import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import { STORE_CATEGORIES, useStoreProducts, type StoreCategory } from '@/lib/api/store';
-import { formatPrice } from '@/lib/format';
-import { resolveImage } from '@/lib/media/resolveImage';
+import { View, ScrollView, RefreshControl } from 'react-native';
+import { Hero } from '@/components/store/home/Hero';
+import { ImageCarousel, type ImageCard } from '@/components/store/home/ImageCarousel';
+import { PlayerCarousel } from '@/components/store/home/PlayerCarousel';
+import { ProductRow, ProductTabs } from '@/components/store/home/ProductRow';
+import { QuickBuySheet } from '@/components/store/QuickBuySheet';
+import { Skeleton } from '@/components/store/ui/Misc';
+import { StoreFooter } from '@/components/store/ui/StoreFooter';
+import { StoreHeader } from '@/components/store/ui/StoreHeader';
+import { TrustBadges, TrustTicker } from '@/components/store/ui/Trust';
+import { StoreError } from '@/components/store/ui/StoreStates';
+import { useHomeModules } from '@/lib/api/storeCatalog';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { PALETTE } from '@/theme/palette';
+import type { HomeModule } from '@/types/database';
+import { STORE } from '@/theme/store';
 
-/** Club shop in the app's black & red style. */
+/** Shop home in the club store's layout, driven by store_home_modules. */
 export default function StoreScreen() {
-  const router = useRouter();
-  const { width } = useWindowDimensions();
-  const { settings, update } = useSettings();
-  const [category, setCategory] = useState<StoreCategory>('ALL');
-  const [refreshing, setRefreshing] = useState(false);
-  const products = useStoreProducts(category);
+  const { settings } = useSettings();
   const currency = settings.currency;
-  const cardWidth = (width - 16 * 2 - 12) / 2;
+  const home = useHomeModules();
+  const [quickBuy, setQuickBuy] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await products.refetch();
+    await home.refetch();
+    setRefreshKey((k) => k + 1);
     setRefreshing(false);
   };
 
-  const toggleCurrency = () =>
-    update({ currency: currency === 'GBP' ? 'USD' : 'GBP' }).catch(() => {});
+  const render = (m: HomeModule) => {
+    const p = m.payload ?? {};
+    switch (m.kind) {
+      case 'hero':
+        return (
+          <Hero key={m.id} title={m.title ?? ''} subtitle={p.subtitle} cta={p.cta} href={p.href} />
+        );
+      case 'ticker':
+        return <TrustTicker key={m.id} items={p.items ?? []} />;
+      case 'product_tabs':
+        return (
+          <ProductTabs
+            key={m.id}
+            currency={currency}
+            tabs={p.tabs ?? []}
+            onQuickBuy={setQuickBuy}
+          />
+        );
+      case 'collection_carousel':
+      case 'category_carousel':
+        return (
+          <ImageCarousel key={m.id} title={m.title ?? ''} items={(p.items ?? []) as ImageCard[]} />
+        );
+      case 'player_carousel':
+        return (
+          <PlayerCarousel
+            key={m.id}
+            title={m.title ?? 'Shop by Player'}
+            teams={p.teams ?? ['men']}
+            limit={p.limit}
+            menProduct={p.men_product}
+            womenProduct={p.women_product}
+          />
+        );
+      case 'product_carousel':
+        return (
+          <View
+            key={m.id}
+            style={{ paddingTop: 32, borderTopWidth: 1, borderTopColor: STORE.divider }}>
+            <ProductRow
+              currency={currency}
+              title={m.title ?? undefined}
+              params={{ category: p.category ?? null }}
+              onQuickBuy={setQuickBuy}
+            />
+          </View>
+        );
+      case 'trust':
+        return <TrustBadges key={m.id} />;
+      default:
+        return null;
+    }
+  };
 
-  const items = products.data ?? [];
+  const modules = home.data ?? [];
 
   return (
-    <View className="flex-1 bg-black">
-      <AppHeader
-        rightAction={
-          <Pressable
-            onPress={toggleCurrency}
-            hitSlop={8}
-            accessibilityLabel={`Prices in ${currency}. Switch currency`}
-            style={{
-              height: 30,
-              borderRadius: 15,
-              paddingHorizontal: 10,
-              backgroundColor: PALETTE.pill,
-            }}
-            className="items-center justify-center active:opacity-70">
-            <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
-              {currency === 'GBP' ? '£ GBP' : '$ USD'}
-            </Text>
-          </Pressable>
-        }
-      />
-
-      <UnderlineTabs
-        tabs={STORE_CATEGORIES}
-        value={category}
-        onChange={setCategory}
-        variant="inline"
-        scrollable
-        gap={27}
-        fontSize={15}
-        height={56}
-      />
-
+    <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
+      <StoreHeader />
       <ScrollView
+        key={refreshKey}
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={STORE.cta} />
         }>
-        {products.error ? (
-          <ErrorState error={products.error} onRetry={products.refetch} />
-        ) : products.loading && !items.length ? (
-          <LoadingState />
-        ) : !items.length ? (
-          <EmptyState icon="bag-outline" title="Nothing in this category yet" />
-        ) : (
-          <View className="flex-row flex-wrap" style={{ paddingLeft: 16, paddingTop: 18 }}>
-            {items.map((product) => (
-              <Pressable
-                key={product.id}
-                onPress={() => router.push(`/store/${product.id}`)}
-                accessibilityRole="button"
-                style={{
-                  width: cardWidth,
-                  marginRight: 12,
-                  marginBottom: 14,
-                  borderRadius: 6,
-                  backgroundColor: PALETTE.surfaceRaised,
-                }}
-                className="overflow-hidden active:opacity-85">
-                <Image
-                  source={resolveImage(product.main_image_url)}
-                  style={{ width: cardWidth, height: cardWidth * 1.1 }}
-                  resizeMode="cover"
-                />
-                {product.badge ? (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      left: 8,
-                      top: 8,
-                      backgroundColor: PALETTE.red,
-                      borderRadius: 3,
-                      paddingHorizontal: 6,
-                      paddingVertical: 2,
-                    }}>
-                    <Text className="font-body-semibold text-white" style={{ fontSize: 10.5 }}>
-                      {product.badge.toUpperCase()}
-                    </Text>
-                  </View>
-                ) : null}
-                <View style={{ padding: 10, minHeight: 96 }} className="justify-between">
-                  <Text
-                    className="font-body-semibold text-white"
-                    style={{ fontSize: 14.5, lineHeight: 17 }}
-                    numberOfLines={3}>
-                    {product.title}
-                  </Text>
-                  <DisplayText size={13} style={{ marginTop: 10 }}>
-                    {formatPrice(
-                      currency === 'GBP' ? product.price_gbp : product.price_usd,
-                      currency
-                    )}
-                  </DisplayText>
-                </View>
-              </Pressable>
-            ))}
+        {home.error ? (
+          <StoreError error={home.error} onRetry={home.refetch} />
+        ) : !modules.length && home.loading ? (
+          <View style={{ padding: 16 }}>
+            <Skeleton height={520} radius={0} />
+            <Skeleton height={40} style={{ marginTop: 16 }} />
           </View>
+        ) : (
+          <View style={{ gap: 28 }}>{modules.map(render)}</View>
         )}
+        <StoreFooter />
       </ScrollView>
+      <QuickBuySheet productId={quickBuy} currency={currency} onClose={() => setQuickBuy(null)} />
     </View>
   );
 }

@@ -33,6 +33,7 @@
     "@rn-primitives/slot": "^1.5.2",
     "@sentry/react-native": "~7.11.0",
     "@shopify/flash-list": "2.0.2",
+    "@stripe/stripe-react-native": "0.64.0",
     "@supabase/supabase-js": "^2.38.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

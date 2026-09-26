@@ -307,7 +307,149 @@ export interface StoreProduct {
   sizes: string[];
   is_customizable: boolean;
   badge?: string | null;
-  external_buy_url: string;
+  external_buy_url?: string | null;
+  customisation_price_gbp: number;
+  customisation_price_usd: number;
+  is_active: boolean;
+  created_at: string;
+  variants?: StoreProductVariant[];
+}
+
+export interface StoreProductVariant {
+  id: string;
+  product_id: string;
+  size: string;
+  sku?: string | null;
+  stock: number;
+  position: number;
+}
+
+export type Currency = 'GBP' | 'USD';
+
+export interface ShippingAddress {
+  id: string;
+  user_id: string;
+  full_name: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  region?: string | null;
+  postcode: string;
+  country: string;
+  phone?: string | null;
+  is_default: boolean;
+  created_at: string;
+}
+
+export type OrderStatus =
+  'pending_payment' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id?: string | null;
+  variant_id?: string | null;
+  title: string;
+  image_url?: string | null;
+  size: string;
+  custom_name?: string | null;
+  custom_number?: string | null;
+  unit_price: number;
+  compare_at?: number | null;
+  customisation_price: number;
+  print_type?: 'player' | 'custom' | null;
+  player_id?: string | null;
+  print_font?: KitFont | null;
+  patch_id?: string | null;
+  patch_name?: string | null;
+  print_price: number;
+  patch_price: number;
+  quantity: number;
+  line_total: number;
+  position: number;
+}
+
+export interface Order {
+  id: string;
+  order_number: string;
+  user_id: string;
+  status: OrderStatus;
+  currency: Currency;
+  subtotal: number;
+  member_discount: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  gift_card_code?: string | null;
+  gift_card_amount: number;
+  amount_due: number;
+  shipping_zone?: string | null;
+  shipping_method?: 'standard' | 'express' | 'nominated' | null;
+  promo_code?: string | null;
+  shipping_address: Omit<ShippingAddress, 'id' | 'user_id' | 'is_default' | 'created_at'>;
+  tracking_number?: string | null;
+  expires_at?: string | null;
+  paid_at?: string | null;
+  cancelled_at?: string | null;
+  created_at: string;
+  items?: OrderItem[];
+}
+
+/** Returned by the quote_store_cart() RPC. */
+export interface CartQuoteLine {
+  variant_id: string;
+  product_id: string;
+  title: string;
+  image_url: string;
+  size: string;
+  stock: number;
+  quantity: number;
+  custom_name: string | null;
+  custom_number: string | null;
+  returnable: boolean;
+  unit_price: number;
+  compare_at: number | null;
+  print: {
+    type: 'player' | 'custom';
+    player_id: string | null;
+    special_id: string | null;
+    name: string | null;
+    number: string | null;
+    font: KitFont;
+    patch_id: string | null;
+    patch_name: string | null;
+  } | null;
+  print_price: number;
+  patch_price: number;
+  customisation_price: number;
+  line_total: number;
+}
+
+export interface ShippingOption {
+  method: 'standard' | 'express' | 'nominated';
+  label: string;
+  eta: string;
+  price: number;
+}
+
+export interface CartQuote {
+  currency: Currency;
+  zone: string;
+  method: ShippingOption['method'];
+  lines: CartQuoteLine[];
+  subtotal: number;
+  member: boolean;
+  member_discount: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  gift_card: { code: string; amount: number; balance_after: number } | null;
+  gift_card_error: string | null;
+  amount_due: number;
+  free_shipping_threshold: number | null;
+  shipping_options: ShippingOption[];
+  promo: { code: string; description: string | null } | null;
+  promo_error: string | null;
 }
 
 export interface UserProfile {
@@ -393,4 +535,198 @@ export interface SearchResult {
   image_url: string;
   published_at: string;
   total: number;
+}
+
+// ---------------------------------------------------------------- store catalogue
+
+export type StoreProfile = 'mens' | 'womens' | 'kids' | 'baby' | 'unisex';
+export type KitRole = 'home' | 'away' | 'third' | 'goalkeeper';
+export type KitFont = 'premier_league' | 'arsenal' | 'pride';
+
+export interface StoreCategoryRow {
+  id: string;
+  parent_id: string | null;
+  slug: string;
+  title: string;
+  image_url?: string | null;
+  position: number;
+  show_in_menu: boolean;
+}
+
+/** A product as listings show it (browse_store()). */
+export interface StoreTile {
+  id: string;
+  title: string;
+  main_image_url: string;
+  badge?: string | null;
+  brand?: string | null;
+  profile: StoreProfile;
+  popularity: number;
+  price: number;
+  compare_at: number | null;
+  sold_out: boolean;
+}
+
+export interface BrowseFacets {
+  profiles: StoreProfile[];
+  brands: string[];
+  sizes: string[];
+  max_price: number | null;
+}
+
+export interface BrowseResult {
+  total: number;
+  products: StoreTile[];
+  facets: BrowseFacets;
+}
+
+export interface ProductDetails {
+  bullets?: string[];
+  fit?: string | null;
+  model?: string | null;
+  care?: string | null;
+  colour?: string | null;
+  code?: string | null;
+  material?: string | null;
+}
+
+export interface PrintPlayer {
+  id: string;
+  name: string;
+  number: number;
+}
+
+export interface PrintSpecial {
+  id: string;
+  label: string;
+  number: string;
+}
+
+export interface PrintOptions {
+  team_type: 'men' | 'women';
+  fonts: KitFont[];
+  player_price: number;
+  name_price: number;
+  number_price: number;
+  players: PrintPlayer[];
+  specials: PrintSpecial[];
+}
+
+export interface StorePatch {
+  id: string;
+  name: string;
+  price: number;
+}
+
+export interface SizeChart {
+  id: string;
+  title: string;
+  columns: string[];
+  rows: string[][];
+}
+
+export interface RatingSummary {
+  average: number;
+  total: number;
+  breakdown: Record<'1' | '2' | '3' | '4' | '5', number>;
+}
+
+/** get_store_product(): everything the product page needs. */
+export interface StoreProductPage {
+  product: StoreProduct & {
+    brand?: string | null;
+    family_id?: string | null;
+    kit_role?: KitRole | null;
+    profile: StoreProfile;
+    profile_group_id?: string | null;
+    details: ProductDetails;
+    returnable: boolean;
+    member_discount_eligible: boolean;
+    back_image_url?: string | null;
+  };
+  price: number;
+  compare_at: number | null;
+  variants: StoreProductVariant[];
+  family: { id: string; kit_role: KitRole; image_url: string; title: string }[];
+  profiles: { id: string; profile: StoreProfile }[];
+  size_chart: SizeChart | null;
+  print: PrintOptions | null;
+  patches: StorePatch[];
+  category: { slug: string; title: string } | null;
+  rating: RatingSummary | null;
+}
+
+export type HomeModuleKind =
+  | 'hero'
+  | 'ticker'
+  | 'product_tabs'
+  | 'collection_carousel'
+  | 'category_carousel'
+  | 'player_carousel'
+  | 'product_carousel'
+  | 'trust';
+
+export interface HomeModule {
+  id: string;
+  kind: HomeModuleKind;
+  title: string | null;
+  position: number;
+  payload: Record<string, any>;
+}
+
+export interface StoreReview {
+  id: string;
+  product_id: string;
+  user_id: string | null;
+  author_name: string;
+  country: string | null;
+  rating: number;
+  title: string;
+  body: string;
+  verified: boolean;
+  helpful_count: number;
+  unhelpful_count: number;
+  created_at: string;
+}
+
+export interface StoreQuestion {
+  id: string;
+  product_id: string;
+  author_name: string;
+  question: string;
+  answer: string | null;
+  answered_at: string | null;
+  created_at: string;
+}
+
+// ---------------------------------------------------------------- returns
+
+export type ReturnStatus = 'requested' | 'approved' | 'received' | 'refunded' | 'rejected';
+export type ReturnReason =
+  'too_small' | 'too_big' | 'not_as_described' | 'faulty' | 'changed_mind' | 'other';
+
+export interface StoreReturn {
+  id: string;
+  return_number: string;
+  order_id: string;
+  status: ReturnStatus;
+  reason: ReturnReason;
+  notes: string | null;
+  refund_amount: number | null;
+  created_at: string;
+  order?: Pick<Order, 'order_number' | 'currency'> | null;
+  items?: {
+    order_item_id: string;
+    quantity: number;
+    item?: Pick<OrderItem, 'title' | 'size' | 'image_url'> | null;
+  }[];
+}
+
+export interface ReturnableItem {
+  order_item_id: string;
+  title: string;
+  size: string;
+  image_url: string | null;
+  returnable_quantity: number;
+  reason: string | null;
 }

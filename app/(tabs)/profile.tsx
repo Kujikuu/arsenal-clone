@@ -32,6 +32,26 @@ const MENU = [
     ),
   },
   {
+    id: 'orders',
+    title: 'MY ORDERS',
+    icon: <Feather name="shopping-bag" size={ICON_SIZE} color="#FFF" />,
+  },
+  {
+    id: 'returns',
+    title: 'RETURNS',
+    icon: <Feather name="rotate-ccw" size={ICON_SIZE} color="#FFF" />,
+  },
+  {
+    id: 'wishlist',
+    title: 'WISHLIST',
+    icon: <Feather name="heart" size={ICON_SIZE} color="#FFF" />,
+  },
+  {
+    id: 'addresses',
+    title: 'ADDRESSES',
+    icon: <Feather name="map-pin" size={ICON_SIZE} color="#FFF" />,
+  },
+  {
     id: 'notifications',
     title: 'NOTIFICATIONS',
     icon: <Feather name="bell" size={ICON_SIZE} color="#FFF" />,
@@ -105,7 +125,7 @@ export default function ProfileScreen() {
             <Text
               className="text-center font-body text-white"
               style={{ fontSize: 16, lineHeight: 22 }}>
-              Sign in to manage your details, tickets and notifications.
+              Sign in to manage your details, tickets, orders and notifications.
             </Text>
             <View className="flex-row" style={{ marginTop: 16 }}>
               <PillButton label="SIGN IN" height={38} onPress={() => router.push('/auth/login')} />
