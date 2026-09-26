@@ -30,7 +30,12 @@ import {
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { BRAND } from '@/lib/brand';
 import { formatPrice } from '@/lib/format';
-import { paymentsSupported, useStripe } from '@/lib/payments';
+import {
+  UNAVAILABLE_MESSAGE,
+  paymentsSupported,
+  paymentsUnavailableReason,
+  useStripe,
+} from '@/lib/payments';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import { printLabel, useCartStore } from '@/store/cartStore';
 import { useRegionStore, zoneLabel } from '@/store/regionStore';
@@ -234,7 +239,10 @@ export default function CheckoutScreen() {
   const pay = async () => {
     if (!address || !q) return;
     if (q.amount_due > 0 && !paymentsSupported) {
-      Alert.alert('Payments unavailable', 'Checkout is available in the mobile app.');
+      Alert.alert(
+        'Card payment unavailable',
+        UNAVAILABLE_MESSAGE[paymentsUnavailableReason ?? 'no-key']
+      );
       return;
     }
     setPaying(true);
