@@ -2684,6 +2684,135 @@ const products = [
     badge: null,
     external_buy_url: 'https://arsenaldirect.arsenal.com',
   },
+  {
+    id: 'sp07',
+    category: 'Kits',
+    title: 'Arsenal 26/27 Home Kids Kit',
+    description:
+      'Shirt, shorts and socks in the new home colours, sized for young Gunners. Add their name and number.',
+    price_gbp: 60,
+    price_usd: 78,
+    main_image_url: IMG.ball,
+    gallery_urls: [IMG.ball, IMG.crowd],
+    sizes: ['3-4Y', '5-6Y', '7-8Y', '9-10Y', '11-12Y'],
+    is_customizable: true,
+    customisation_price_gbp: 10,
+    customisation_price_usd: 13,
+    badge: 'Kids',
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+  {
+    id: 'sp08',
+    category: 'Training',
+    title: 'Arsenal Training Shorts',
+    description: 'Lightweight shorts with an elasticated waist and zipped side pocket.',
+    price_gbp: 35,
+    price_usd: 45,
+    main_image_url: IMG.training,
+    gallery_urls: [IMG.training, IMG.keeper],
+    sizes: ['S', 'M', 'L', 'XL'],
+    is_customizable: false,
+    badge: null,
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+  {
+    id: 'sp09',
+    category: 'Retro',
+    title: 'Arsenal 1971 Double Winners Jacket',
+    description: 'A heritage track jacket celebrating the first league and cup double.',
+    price_gbp: 75,
+    price_usd: 95,
+    main_image_url: IMG.stadium,
+    gallery_urls: [IMG.stadium, IMG.crowd],
+    sizes: ['S', 'M', 'L', 'XL', '2XL'],
+    is_customizable: false,
+    badge: 'Limited',
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+  {
+    id: 'sp10',
+    category: 'Accessories',
+    title: 'Arsenal Home Bar Scarf',
+    description:
+      'Classic red and white bar scarf with woven crest, made for matchdays at the Emirates.',
+    price_gbp: 18,
+    price_usd: 24,
+    main_image_url: IMG.crowd,
+    gallery_urls: [IMG.crowd],
+    sizes: ['One Size'],
+    is_customizable: false,
+    badge: null,
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+  {
+    id: 'sp11',
+    category: 'Accessories',
+    title: 'Arsenal Crest Football',
+    description: 'Size 5 training ball with the Arsenal crest and machine-stitched panels.',
+    price_gbp: 20,
+    price_usd: 26,
+    main_image_url: IMG.action,
+    gallery_urls: [IMG.action],
+    sizes: ['Size 5'],
+    is_customizable: false,
+    badge: 'Bestseller',
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+  {
+    id: 'sp12',
+    category: 'Training',
+    title: 'Arsenal Goalkeeper Gloves',
+    description: 'Latex palm and negative cut for grip in all conditions.',
+    price_gbp: 45,
+    price_usd: 58,
+    main_image_url: IMG.keeper,
+    gallery_urls: [IMG.keeper],
+    sizes: ['7', '8', '9', '10'],
+    is_customizable: false,
+    badge: null,
+    external_buy_url: 'https://arsenaldirect.arsenal.com',
+  },
+];
+
+// Stock per size. Most sizes are well stocked; a few are low or sold out so
+// the shop shows "only N left" and disabled sizes.
+const LOW_STOCK = {
+  'sp01:2XL': 3,
+  'sp03:XL': 0,
+  'sp05:S': 2,
+  'sp09:S': 0,
+  'sp09:M': 4,
+  'sp12:10': 0,
+};
+const variants = products.flatMap((p) =>
+  p.sizes.map((size, i) => ({
+    product_id: p.id,
+    size,
+    sku: `${p.id}-${size.replace(/\s+/g, '')}`.toUpperCase(),
+    stock: LOW_STOCK[`${p.id}:${size}`] ?? 40,
+    position: i + 1,
+  }))
+);
+
+const PROMO_DEFAULTS = {
+  percent_off: null,
+  amount_off_gbp: null,
+  amount_off_usd: null,
+  free_shipping: false,
+  min_subtotal_gbp: 0,
+  min_subtotal_usd: 0,
+};
+const promoCodes = [
+  { code: 'GOONER10', description: '10% off your order', percent_off: 10 },
+  {
+    code: 'NORTHLONDON',
+    description: '£10 / $13 off orders over £60 / $80',
+    amount_off_gbp: 10,
+    amount_off_usd: 13,
+    min_subtotal_gbp: 60,
+    min_subtotal_usd: 80,
+  },
+  { code: 'FREESHIP', description: 'Free delivery', free_shipping: true },
 ];
 
 // ---------------------------------------------------------------- write
@@ -2751,7 +2880,21 @@ insert('fan_polls', polls);
 // Keep real vote counts on re-runs.
 insert('poll_options', pollOptions, { keep: ['votes_count'] });
 section('Store');
-insert('store_products', products);
+insert(
+  'store_products',
+  products.map((p) => ({
+    customisation_price_gbp: 15,
+    customisation_price_usd: 20,
+    ...p,
+  }))
+);
+// Keep live stock and redemption counts on re-runs.
+insert('store_product_variants', variants, { conflict: 'product_id, size', keep: ['stock'] });
+insert(
+  'promo_codes',
+  promoCodes.map((c) => ({ ...PROMO_DEFAULTS, ...c })),
+  { conflict: 'code', keep: ['redemptions'] }
+);
 section('Legal');
 insert('legal_documents', legal, { conflict: 'slug' });
 emit('commit;');

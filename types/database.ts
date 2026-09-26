@@ -307,7 +307,106 @@ export interface StoreProduct {
   sizes: string[];
   is_customizable: boolean;
   badge?: string | null;
-  external_buy_url: string;
+  external_buy_url?: string | null;
+  customisation_price_gbp: number;
+  customisation_price_usd: number;
+  is_active: boolean;
+  created_at: string;
+  variants?: StoreProductVariant[];
+}
+
+export interface StoreProductVariant {
+  id: string;
+  product_id: string;
+  size: string;
+  sku?: string | null;
+  stock: number;
+  position: number;
+}
+
+export type Currency = 'GBP' | 'USD';
+
+export interface ShippingAddress {
+  id: string;
+  user_id: string;
+  full_name: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  region?: string | null;
+  postcode: string;
+  country: string;
+  phone?: string | null;
+  is_default: boolean;
+  created_at: string;
+}
+
+export type OrderStatus =
+  'pending_payment' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id?: string | null;
+  variant_id?: string | null;
+  title: string;
+  image_url?: string | null;
+  size: string;
+  custom_name?: string | null;
+  custom_number?: string | null;
+  unit_price: number;
+  customisation_price: number;
+  quantity: number;
+  line_total: number;
+  position: number;
+}
+
+export interface Order {
+  id: string;
+  order_number: string;
+  user_id: string;
+  status: OrderStatus;
+  currency: Currency;
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  promo_code?: string | null;
+  shipping_address: Omit<ShippingAddress, 'id' | 'user_id' | 'is_default' | 'created_at'>;
+  tracking_number?: string | null;
+  expires_at?: string | null;
+  paid_at?: string | null;
+  cancelled_at?: string | null;
+  created_at: string;
+  items?: OrderItem[];
+}
+
+/** Returned by the quote_store_cart() RPC. */
+export interface CartQuoteLine {
+  variant_id: string;
+  product_id: string;
+  title: string;
+  image_url: string;
+  size: string;
+  stock: number;
+  quantity: number;
+  custom_name: string | null;
+  custom_number: string | null;
+  unit_price: number;
+  customisation_price: number;
+  line_total: number;
+}
+
+export interface CartQuote {
+  currency: Currency;
+  lines: CartQuoteLine[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  free_shipping_threshold: number;
+  promo: { code: string; description: string | null } | null;
+  promo_error: string | null;
 }
 
 export interface UserProfile {

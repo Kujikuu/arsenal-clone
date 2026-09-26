@@ -355,3 +355,7 @@ verify_jwt = false
 [functions.sync-football-data]
 # Called by pg_cron with SYNC_CRON_SECRET, not a user JWT.
 verify_jwt = false
+
+[functions.stripe-webhook]
+# Called by Stripe; authenticated by the Stripe-Signature header instead of a user JWT.
+verify_jwt = false

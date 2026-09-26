@@ -33,7 +33,14 @@
           "color": "#D32D2F"
         }
       ],
-      "@sentry/react-native"
+      "@sentry/react-native",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.afifistudio.arsenalclone",
+          "enableGooglePay": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

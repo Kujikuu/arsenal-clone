@@ -692,15 +692,23 @@ on conflict (id) do update set
 -- ----------------------------------------------------------------
 -- Store
 -- ----------------------------------------------------------------
-insert into public.store_products (id, category, title, description, price_gbp, price_usd, main_image_url, gallery_urls, sizes, is_customizable, badge, external_buy_url)
+insert into public.store_products (customisation_price_gbp, customisation_price_usd, id, category, title, description, price_gbp, price_usd, main_image_url, gallery_urls, sizes, is_customizable, badge, external_buy_url)
 values
-  ('sp01', 'Kits', 'Arsenal 26/27 Home Authentic Shirt', 'Engineered for peak performance at the Emirates: the iconic red body, crisp white sleeves and moisture-wicking HEAT.RDY technology.', 115, 145, 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL', '2XL']::text[], true, 'New Season', 'https://arsenaldirect.arsenal.com'),
-  ('sp02', 'Kits', 'Arsenal 26/27 Away Shirt', 'A modern away shirt with breathable AEROREADY fabric and a tonal cannon pattern.', 85, 110, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL', '2XL']::text[], true, 'Away Kit', 'https://arsenaldirect.arsenal.com'),
-  ('sp03', 'Kits', 'Arsenal 26/27 Third Shirt', 'A modern reimagining of 1990s flair with bold trims.', 85, 110, 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL']::text[], true, 'Third Kit', 'https://arsenaldirect.arsenal.com'),
-  ('sp04', 'Training', 'Arsenal Pro Training Top', 'As worn by the squad at Sobha Realty Training Centre. Quarter-zip collar with thumbholes.', 70, 90, 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop']::text[], array['XS', 'S', 'M', 'L', 'XL', '2XL']::text[], false, 'Training Wear', 'https://arsenaldirect.arsenal.com'),
-  ('sp05', 'Retro', 'Arsenal 1991/93 "Bruised Banana" Away Shirt', 'The cult classic retro jersey with its iconic zigzag pattern.', 65, 85, 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL']::text[], false, 'Heritage', 'https://arsenaldirect.arsenal.com'),
-  ('sp06', 'Accessories', 'Arsenal Cannon Cuff Beanie', 'Knitted beanie with the embroidered Arsenal cannon.', 22, 28, 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop']::text[], array['One Size']::text[], false, null, 'https://arsenaldirect.arsenal.com')
+  (15, 20, 'sp01', 'Kits', 'Arsenal 26/27 Home Authentic Shirt', 'Engineered for peak performance at the Emirates: the iconic red body, crisp white sleeves and moisture-wicking HEAT.RDY technology.', 115, 145, 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL', '2XL']::text[], true, 'New Season', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp02', 'Kits', 'Arsenal 26/27 Away Shirt', 'A modern away shirt with breathable AEROREADY fabric and a tonal cannon pattern.', 85, 110, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL', '2XL']::text[], true, 'Away Kit', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp03', 'Kits', 'Arsenal 26/27 Third Shirt', 'A modern reimagining of 1990s flair with bold trims.', 85, 110, 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL']::text[], true, 'Third Kit', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp04', 'Training', 'Arsenal Pro Training Top', 'As worn by the squad at Sobha Realty Training Centre. Quarter-zip collar with thumbholes.', 70, 90, 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop']::text[], array['XS', 'S', 'M', 'L', 'XL', '2XL']::text[], false, 'Training Wear', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp05', 'Retro', 'Arsenal 1991/93 "Bruised Banana" Away Shirt', 'The cult classic retro jersey with its iconic zigzag pattern.', 65, 85, 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL']::text[], false, 'Heritage', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp06', 'Accessories', 'Arsenal Cannon Cuff Beanie', 'Knitted beanie with the embroidered Arsenal cannon.', 22, 28, 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop']::text[], array['One Size']::text[], false, null, 'https://arsenaldirect.arsenal.com'),
+  (10, 13, 'sp07', 'Kits', 'Arsenal 26/27 Home Kids Kit', 'Shirt, shorts and socks in the new home colours, sized for young Gunners. Add their name and number.', 60, 78, 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop']::text[], array['3-4Y', '5-6Y', '7-8Y', '9-10Y', '11-12Y']::text[], true, 'Kids', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp08', 'Training', 'Arsenal Training Shorts', 'Lightweight shorts with an elasticated waist and zipped side pocket.', 35, 45, 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1517466787929-bc90951d0974?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL']::text[], false, null, 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp09', 'Retro', 'Arsenal 1971 Double Winners Jacket', 'A heritage track jacket celebrating the first league and cup double.', 75, 95, 'https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1577223625816-7546f13df25d?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop']::text[], array['S', 'M', 'L', 'XL', '2XL']::text[], false, 'Limited', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp10', 'Accessories', 'Arsenal Home Bar Scarf', 'Classic red and white bar scarf with woven crest, made for matchdays at the Emirates.', 18, 24, 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop']::text[], array['One Size']::text[], false, null, 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp11', 'Accessories', 'Arsenal Crest Football', 'Size 5 training ball with the Arsenal crest and machine-stitched panels.', 20, 26, 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200&auto=format&fit=crop']::text[], array['Size 5']::text[], false, 'Bestseller', 'https://arsenaldirect.arsenal.com'),
+  (15, 20, 'sp12', 'Training', 'Arsenal Goalkeeper Gloves', 'Latex palm and negative cut for grip in all conditions.', 45, 58, 'https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1200&auto=format&fit=crop', array['https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?q=80&w=1200&auto=format&fit=crop']::text[], array['7', '8', '9', '10']::text[], false, null, 'https://arsenaldirect.arsenal.com')
 on conflict (id) do update set
+  customisation_price_gbp = excluded.customisation_price_gbp,
+  customisation_price_usd = excluded.customisation_price_usd,
   category = excluded.category,
   title = excluded.title,
   description = excluded.description,
@@ -712,6 +720,71 @@ on conflict (id) do update set
   is_customizable = excluded.is_customizable,
   badge = excluded.badge,
   external_buy_url = excluded.external_buy_url;
+
+insert into public.store_product_variants (product_id, size, sku, stock, position)
+values
+  ('sp01', 'S', 'SP01-S', 40, 1),
+  ('sp01', 'M', 'SP01-M', 40, 2),
+  ('sp01', 'L', 'SP01-L', 40, 3),
+  ('sp01', 'XL', 'SP01-XL', 40, 4),
+  ('sp01', '2XL', 'SP01-2XL', 3, 5),
+  ('sp02', 'S', 'SP02-S', 40, 1),
+  ('sp02', 'M', 'SP02-M', 40, 2),
+  ('sp02', 'L', 'SP02-L', 40, 3),
+  ('sp02', 'XL', 'SP02-XL', 40, 4),
+  ('sp02', '2XL', 'SP02-2XL', 40, 5),
+  ('sp03', 'S', 'SP03-S', 40, 1),
+  ('sp03', 'M', 'SP03-M', 40, 2),
+  ('sp03', 'L', 'SP03-L', 40, 3),
+  ('sp03', 'XL', 'SP03-XL', 0, 4),
+  ('sp04', 'XS', 'SP04-XS', 40, 1),
+  ('sp04', 'S', 'SP04-S', 40, 2),
+  ('sp04', 'M', 'SP04-M', 40, 3),
+  ('sp04', 'L', 'SP04-L', 40, 4),
+  ('sp04', 'XL', 'SP04-XL', 40, 5),
+  ('sp04', '2XL', 'SP04-2XL', 40, 6),
+  ('sp05', 'S', 'SP05-S', 2, 1),
+  ('sp05', 'M', 'SP05-M', 40, 2),
+  ('sp05', 'L', 'SP05-L', 40, 3),
+  ('sp05', 'XL', 'SP05-XL', 40, 4),
+  ('sp06', 'One Size', 'SP06-ONESIZE', 40, 1),
+  ('sp07', '3-4Y', 'SP07-3-4Y', 40, 1),
+  ('sp07', '5-6Y', 'SP07-5-6Y', 40, 2),
+  ('sp07', '7-8Y', 'SP07-7-8Y', 40, 3),
+  ('sp07', '9-10Y', 'SP07-9-10Y', 40, 4),
+  ('sp07', '11-12Y', 'SP07-11-12Y', 40, 5),
+  ('sp08', 'S', 'SP08-S', 40, 1),
+  ('sp08', 'M', 'SP08-M', 40, 2),
+  ('sp08', 'L', 'SP08-L', 40, 3),
+  ('sp08', 'XL', 'SP08-XL', 40, 4),
+  ('sp09', 'S', 'SP09-S', 0, 1),
+  ('sp09', 'M', 'SP09-M', 4, 2),
+  ('sp09', 'L', 'SP09-L', 40, 3),
+  ('sp09', 'XL', 'SP09-XL', 40, 4),
+  ('sp09', '2XL', 'SP09-2XL', 40, 5),
+  ('sp10', 'One Size', 'SP10-ONESIZE', 40, 1),
+  ('sp11', 'Size 5', 'SP11-SIZE5', 40, 1),
+  ('sp12', '7', 'SP12-7', 40, 1),
+  ('sp12', '8', 'SP12-8', 40, 2),
+  ('sp12', '9', 'SP12-9', 40, 3),
+  ('sp12', '10', 'SP12-10', 0, 4)
+on conflict (product_id, size) do update set
+  sku = excluded.sku,
+  position = excluded.position;
+
+insert into public.promo_codes (percent_off, amount_off_gbp, amount_off_usd, free_shipping, min_subtotal_gbp, min_subtotal_usd, code, description)
+values
+  (10, null, null, false, 0, 0, 'GOONER10', '10% off your order'),
+  (null, 10, 13, false, 60, 80, 'NORTHLONDON', '£10 / $13 off orders over £60 / $80'),
+  (null, null, null, true, 0, 0, 'FREESHIP', 'Free delivery')
+on conflict (code) do update set
+  percent_off = excluded.percent_off,
+  amount_off_gbp = excluded.amount_off_gbp,
+  amount_off_usd = excluded.amount_off_usd,
+  free_shipping = excluded.free_shipping,
+  min_subtotal_gbp = excluded.min_subtotal_gbp,
+  min_subtotal_usd = excluded.min_subtotal_usd,
+  description = excluded.description;
 
 -- ----------------------------------------------------------------
 -- Legal

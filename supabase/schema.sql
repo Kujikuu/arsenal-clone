@@ -881,3 +881,1161 @@ grant execute on function public.search_content(text, text, text, integer, integ
 
 -- Some youth players have no official Premier League photo yet.
 alter table public.players alter column photo_url drop not null;
+
+-- ================================================================
+-- Push notifications
+--   push_tokens          Expo push tokens per signed-in device
+--   notification_events  outbox filled by triggers, drained by the
+--                        send-notifications Edge Function
+-- ================================================================
+
+-- ----------------------------------------------------------------
+-- 1. Club name used to decide which matches are "ours". Change it
+--    together with lib/brand.ts when rebranding.
+-- ----------------------------------------------------------------
+create or replace function public.club_name()
+returns text
+language sql
+immutable
+as $$ select 'Arsenal'::text $$;
+
+create or replace function public.is_club_match(p_home text, p_away text)
+returns boolean
+language sql
+immutable
+as $$ select p_home ilike public.club_name() || '%' or p_away ilike public.club_name() || '%' $$;
+
+-- ----------------------------------------------------------------
+-- 2. Device tokens
+-- ----------------------------------------------------------------
+create table if not exists public.push_tokens (
+  token text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  platform text not null check (platform in ('ios', 'android')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists push_tokens_user_idx on public.push_tokens (user_id);
+
+alter table public.push_tokens enable row level security;
+
+drop policy if exists "Users manage own push tokens" on public.push_tokens;
+create policy "Users manage own push tokens" on public.push_tokens
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- A device that changes account keeps its token: let the new owner claim it.
+create or replace function public.register_push_token(p_token text, p_platform text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in';
+  end if;
+  insert into public.push_tokens (token, user_id, platform)
+  values (p_token, auth.uid(), p_platform)
+  on conflict (token) do update
+    set user_id = excluded.user_id, platform = excluded.platform, updated_at = now();
+end;
+$$;
+
+revoke all on function public.register_push_token(text, text) from public, anon;
+grant execute on function public.register_push_token(text, text) to authenticated;
+
+-- ----------------------------------------------------------------
+-- 3. Outbox
+-- ----------------------------------------------------------------
+create table if not exists public.notification_events (
+  id bigint generated always as identity primary key,
+  category text not null check (category in ('kickoff', 'lineups', 'goals', 'full_time', 'news', 'tickets')),
+  -- null = not tied to a team (e.g. news); otherwise men / women / academy.
+  team_type text check (team_type in ('men', 'women', 'academy')),
+  title text not null,
+  body text not null,
+  -- In-app route opened when the notification is tapped, e.g. /match/abc.
+  url text,
+  dedupe_key text not null unique,
+  created_at timestamptz not null default now(),
+  sent_at timestamptz,
+  recipients integer,
+  error text
+);
+create index if not exists notification_events_pending_idx
+  on public.notification_events (created_at) where sent_at is null;
+
+-- Service role only: RLS on with no policies.
+alter table public.notification_events enable row level security;
+
+create or replace function public.enqueue_notification(
+  p_category text,
+  p_team_type text,
+  p_title text,
+  p_body text,
+  p_url text,
+  p_dedupe_key text
+)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  insert into public.notification_events (category, team_type, title, body, url, dedupe_key)
+  values (p_category, p_team_type, p_title, p_body, p_url, p_dedupe_key)
+  on conflict (dedupe_key) do nothing;
+$$;
+
+-- ----------------------------------------------------------------
+-- 4. Triggers that fill the outbox
+-- ----------------------------------------------------------------
+
+-- Goals, from the live match timeline.
+create or replace function public.notify_match_event()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  m public.matches%rowtype;
+begin
+  if new.type not in ('goal', 'own_goal', 'penalty_goal') then
+    return new;
+  end if;
+  select * into m from public.matches where id = new.match_id;
+  if not found or not public.is_club_match(m.home_team, m.away_team) then
+    return new;
+  end if;
+  perform public.enqueue_notification(
+    'goals',
+    m.team_type,
+    'GOAL ' || new.minute_label || ' · ' || m.home_team || ' v ' || m.away_team,
+    coalesce(nullif(new.player, ''), new.title) || ' — ' || new.body,
+    '/match/' || m.id,
+    'goal:' || new.id
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_match_event_notify on public.match_events;
+create trigger on_match_event_notify
+  after insert on public.match_events
+  for each row execute function public.notify_match_event();
+
+-- Team news, the first time a line-up is published for a match.
+create or replace function public.notify_lineups()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  m public.matches%rowtype;
+begin
+  select * into m from public.matches where id = new.match_id;
+  if not found or m.status = 'finished' or not public.is_club_match(m.home_team, m.away_team) then
+    return new;
+  end if;
+  perform public.enqueue_notification(
+    'lineups',
+    m.team_type,
+    'Team news: ' || m.home_team || ' v ' || m.away_team,
+    'The starting XI is in. See who''s playing.',
+    '/match/' || m.id,
+    'lineups:' || m.id
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_lineup_notify on public.match_lineups;
+create trigger on_lineup_notify
+  after insert on public.match_lineups
+  for each row execute function public.notify_lineups();
+
+-- Full time.
+create or replace function public.notify_full_time()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.status = 'finished' and old.status is distinct from 'finished'
+     and public.is_club_match(new.home_team, new.away_team) then
+    perform public.enqueue_notification(
+      'full_time',
+      new.team_type,
+      'Full time',
+      new.home_team || ' ' || coalesce(new.home_score, 0) || ' - '
+        || coalesce(new.away_score, 0) || ' ' || new.away_team,
+      '/match/' || new.id,
+      'full_time:' || new.id
+    );
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_match_full_time_notify on public.matches;
+create trigger on_match_full_time_notify
+  after update of status on public.matches
+  for each row execute function public.notify_full_time();
+
+-- Breaking news: articles flagged is_breaking.
+alter table public.articles add column if not exists is_breaking boolean not null default false;
+
+create or replace function public.notify_breaking_news()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.is_breaking and (tg_op = 'INSERT' or not old.is_breaking) then
+    perform public.enqueue_notification(
+      'news', null, 'Breaking news', new.title, '/article/' || new.id, 'news:' || new.id
+    );
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_article_breaking_notify on public.articles;
+create trigger on_article_breaking_notify
+  after insert or update of is_breaking on public.articles
+  for each row execute function public.notify_breaking_news();
+
+-- Ticket sales opening.
+create or replace function public.notify_ticket_sale()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  m public.matches%rowtype;
+begin
+  if new.status <> 'open' or (tg_op = 'UPDATE' and old.status = 'open') then
+    return new;
+  end if;
+  select * into m from public.matches where id = new.match_id;
+  if not found then
+    return new;
+  end if;
+  perform public.enqueue_notification(
+    'tickets',
+    m.team_type,
+    'Tickets on sale',
+    new.phase || ' is open for ' || m.home_team || ' v ' || m.away_team || '.',
+    '/account/tickets',
+    'tickets:' || new.id
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_ticket_sale_notify on public.ticket_sales;
+create trigger on_ticket_sale_notify
+  after insert or update of status on public.ticket_sales
+  for each row execute function public.notify_ticket_sale();
+
+-- Kick-off reminders are time based, so the sender calls this each run.
+create or replace function public.enqueue_kickoff_reminders()
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  added integer;
+begin
+  insert into public.notification_events (category, team_type, title, body, url, dedupe_key)
+  select 'kickoff',
+         m.team_type,
+         'Kick-off in one hour',
+         m.home_team || ' v ' || m.away_team || ' · ' || m.competition,
+         '/match/' || m.id,
+         'kickoff:' || m.id
+  from public.matches m
+  where m.status = 'scheduled'
+    and m.match_date between now() and now() + interval '65 minutes'
+    and public.is_club_match(m.home_team, m.away_team)
+  on conflict (dedupe_key) do nothing;
+  get diagnostics added = row_count;
+  return added;
+end;
+$$;
+
+-- ----------------------------------------------------------------
+-- 5. Who receives an event: users with the category switched on,
+--    and the women's / academy toggle when the event is for that team.
+-- ----------------------------------------------------------------
+create or replace function public.notification_tokens(p_event_id bigint)
+returns table (token text)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select t.token
+  from public.notification_events e
+  join public.user_settings s on true
+  join public.push_tokens t on t.user_id = s.user_id
+  where e.id = p_event_id
+    and case e.category
+          when 'kickoff' then s.notify_kickoff
+          when 'lineups' then s.notify_lineups
+          when 'goals' then s.notify_goals
+          when 'full_time' then s.notify_full_time
+          when 'news' then s.notify_news
+          when 'tickets' then s.notify_tickets
+        end
+    and case e.team_type
+          when 'women' then s.notify_women
+          when 'academy' then s.notify_academy
+          else true
+        end;
+$$;
+
+-- Only the service role (the Edge Function) may run the outbox helpers.
+revoke all on function public.enqueue_notification(text, text, text, text, text, text) from public, anon, authenticated;
+revoke all on function public.enqueue_kickoff_reminders() from public, anon, authenticated;
+revoke all on function public.notification_tokens(bigint) from public, anon, authenticated;
+grant execute on function public.enqueue_kickoff_reminders() to service_role;
+grant execute on function public.notification_tokens(bigint) to service_role;
+
+-- ================================================================
+-- Staff role, content management, media storage and hardening
+-- ================================================================
+
+-- ----------------------------------------------------------------
+-- 1. Profiles are private. The init migration let anyone (including
+--    the anon key shipped in the app) read every profile, which now
+--    holds phone, date of birth and postcode.
+-- ----------------------------------------------------------------
+drop policy if exists "Allow public read of profiles" on public.user_profiles;
+
+-- Members may edit their details, not their Gunner ID or membership tier.
+create or replace function public.protect_profile_fields()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  -- auth.uid() is null for the service role, Studio and migrations.
+  if auth.uid() is not null then
+    new.id := old.id;
+    new.gunner_id_number := old.gunner_id_number;
+    new.membership_tier := old.membership_tier;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists protect_profile_fields on public.user_profiles;
+create trigger protect_profile_fields
+  before update on public.user_profiles
+  for each row execute function public.protect_profile_fields();
+
+-- ----------------------------------------------------------------
+-- 2. Staff (editors / admins) can manage club content from a signed-in
+--    client, e.g. a CMS or future in-app tools. Grant access with:
+--      insert into public.staff_members (user_id, role) values ('<uuid>', 'editor');
+-- ----------------------------------------------------------------
+create table if not exists public.staff_members (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  role text not null check (role in ('editor', 'admin')),
+  created_at timestamptz not null default now()
+);
+
+alter table public.staff_members enable row level security;
+
+drop policy if exists "Staff read own membership" on public.staff_members;
+create policy "Staff read own membership" on public.staff_members
+  for select using (auth.uid() = user_id);
+
+create or replace function public.is_staff()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$ select exists (select 1 from public.staff_members where user_id = auth.uid()) $$;
+
+revoke all on function public.is_staff() from public;
+grant execute on function public.is_staff() to anon, authenticated, service_role;
+
+do $$
+declare t text;
+begin
+  foreach t in array array[
+    'articles', 'matches', 'standings', 'players', 'videos', 'video_collections',
+    'fan_polls', 'poll_options', 'store_products', 'match_events', 'match_lineups',
+    'match_stats', 'photo_galleries', 'photo_gallery_images', 'quizzes', 'quiz_questions',
+    'experiences', 'reels', 'ticket_sales', 'legal_documents'
+  ] loop
+    execute format('drop policy if exists "Staff manage %1$s" on public.%1$I', t);
+    execute format(
+      'create policy "Staff manage %1$s" on public.%1$I for all to authenticated '
+      'using (public.is_staff()) with check (public.is_staff())', t);
+  end loop;
+end $$;
+
+-- Staff work the support inbox.
+drop policy if exists "Staff read support messages" on public.support_messages;
+create policy "Staff read support messages" on public.support_messages
+  for select to authenticated using (public.is_staff());
+
+drop policy if exists "Staff update support messages" on public.support_messages;
+create policy "Staff update support messages" on public.support_messages
+  for update to authenticated using (public.is_staff()) with check (public.is_staff());
+
+-- ----------------------------------------------------------------
+-- 3. Media bucket for article, video, player and product images.
+--    Public read; only staff upload or change files.
+-- ----------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Staff upload media" on storage.objects;
+create policy "Staff upload media" on storage.objects
+  for insert to authenticated with check (bucket_id = 'media' and public.is_staff());
+
+drop policy if exists "Staff update media" on storage.objects;
+create policy "Staff update media" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'media' and public.is_staff())
+  with check (bucket_id = 'media' and public.is_staff());
+
+drop policy if exists "Staff delete media" on storage.objects;
+create policy "Staff delete media" on storage.objects
+  for delete to authenticated using (bucket_id = 'media' and public.is_staff());
+
+-- ----------------------------------------------------------------
+-- 4. Support form rate limit: the form is open to guests, so cap
+--    messages per email address and per account.
+-- ----------------------------------------------------------------
+create index if not exists support_messages_email_created_idx
+  on public.support_messages (lower(email), created_at);
+
+create or replace function public.limit_support_messages()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  recent integer;
+begin
+  select count(*) into recent
+  from public.support_messages
+  where created_at > now() - interval '1 hour'
+    and (lower(email) = lower(new.email) or (new.user_id is not null and user_id = new.user_id));
+  if recent >= 3 then
+    raise exception 'Too many messages. Please try again later.' using errcode = 'P0001';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists limit_support_messages on public.support_messages;
+create trigger limit_support_messages
+  before insert on public.support_messages
+  for each row execute function public.limit_support_messages();
+
+-- ================================================================
+-- Live data from football-data.org (sync-football-data Edge Function)
+-- ================================================================
+
+-- Rows imported from the API carry its id, e.g. 'fd:537785'. Seeded and
+-- staff-entered rows leave it null.
+alter table public.matches add column if not exists external_id text;
+create unique index if not exists matches_external_id_key on public.matches (external_id);
+
+-- The free plan has no goal-by-goal timeline, so for imported matches a goal
+-- alert is raised when the live score goes up. Hand-entered goals still come
+-- from match_events (see 20260926090000_push_notifications.sql).
+create or replace function public.notify_score_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.external_id is null
+     or new.status <> 'live'
+     or not public.is_club_match(new.home_team, new.away_team)
+     or coalesce(new.home_score, 0) + coalesce(new.away_score, 0)
+        <= coalesce(old.home_score, 0) + coalesce(old.away_score, 0) then
+    return new;
+  end if;
+  perform public.enqueue_notification(
+    'goals',
+    new.team_type,
+    'GOAL · ' || new.home_team || ' v ' || new.away_team,
+    new.home_team || ' ' || coalesce(new.home_score, 0) || ' - '
+      || coalesce(new.away_score, 0) || ' ' || new.away_team,
+    '/match/' || new.id,
+    'score:' || new.id || ':' || coalesce(new.home_score, 0) || '-' || coalesce(new.away_score, 0)
+  );
+  return new;
+end;
+$$;
+
+drop trigger if exists on_match_score_notify on public.matches;
+create trigger on_match_score_notify
+  after update of home_score, away_score on public.matches
+  for each row execute function public.notify_score_change();
+
+-- Let the app subscribe to live scores and the match timeline.
+do $$
+declare t text;
+begin
+  if not exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    return;
+  end if;
+  foreach t in array array['matches', 'match_events'] loop
+    if not exists (
+      select 1 from pg_publication_tables
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    end if;
+  end loop;
+end $$;
+
+-- ================================================================
+-- Store: in-app shop with bag, checkout and orders
+--   store_product_variants  stock per product and size
+--   user_wishlist           saved products per user
+--   shipping_addresses      delivery addresses per user
+--   promo_codes             discount codes (never readable by clients)
+--   orders / order_items    placed orders; written only by the
+--                           create_store_order() RPC and Stripe webhook
+--   stripe_customers        Stripe customer per user (service role only)
+--
+-- Prices, stock and discounts are always computed here, never taken
+-- from the client. quote_store_cart() prices a bag for display and
+-- create_store_order() uses the same pricing to place the order and
+-- reserve stock in one transaction. Payment is confirmed only by the
+-- stripe-webhook Edge Function.
+-- ================================================================
+
+-- ----------------------------------------------------------------
+-- 1. Products and variants
+-- ----------------------------------------------------------------
+alter table public.store_products add column if not exists customisation_price_gbp numeric(8,2) not null default 15;
+alter table public.store_products add column if not exists customisation_price_usd numeric(8,2) not null default 20;
+alter table public.store_products add column if not exists is_active boolean not null default true;
+-- Kept for reference; the app now sells in-app.
+alter table public.store_products alter column external_buy_url drop not null;
+
+create table if not exists public.store_product_variants (
+  id text primary key default gen_random_uuid()::text,
+  product_id text not null references public.store_products(id) on delete cascade,
+  size text not null,
+  sku text unique,
+  stock integer not null default 0 check (stock >= 0),
+  position integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (product_id, size)
+);
+create index if not exists store_product_variants_product_idx
+  on public.store_product_variants (product_id, position);
+
+-- Existing products get one variant per listed size.
+insert into public.store_product_variants (product_id, size, sku, stock, position)
+select p.id, s.size, upper(p.id || '-' || regexp_replace(s.size, '\s+', '', 'g')), 25, s.ord::int
+from public.store_products p, unnest(p.sizes) with ordinality as s(size, ord)
+on conflict (product_id, size) do nothing;
+
+alter table public.store_product_variants enable row level security;
+
+drop policy if exists "Public read store variants" on public.store_product_variants;
+create policy "Public read store variants" on public.store_product_variants for select using (true);
+
+-- ----------------------------------------------------------------
+-- 2. Wishlist and addresses
+-- ----------------------------------------------------------------
+create table if not exists public.user_wishlist (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  product_id text not null references public.store_products(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, product_id)
+);
+
+alter table public.user_wishlist enable row level security;
+
+drop policy if exists "Users manage own wishlist" on public.user_wishlist;
+create policy "Users manage own wishlist" on public.user_wishlist
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create table if not exists public.shipping_addresses (
+  id text primary key default gen_random_uuid()::text,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  full_name text not null check (length(btrim(full_name)) between 1 and 100),
+  line1 text not null check (length(btrim(line1)) between 1 and 120),
+  line2 text check (length(line2) <= 120),
+  city text not null check (length(btrim(city)) between 1 and 80),
+  region text check (length(region) <= 80),
+  postcode text not null check (length(btrim(postcode)) between 1 and 20),
+  country text not null check (length(btrim(country)) between 1 and 60),
+  phone text check (length(phone) <= 30),
+  is_default boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists shipping_addresses_user_idx on public.shipping_addresses (user_id);
+create unique index if not exists shipping_addresses_one_default
+  on public.shipping_addresses (user_id) where is_default;
+
+alter table public.shipping_addresses enable row level security;
+
+drop policy if exists "Users manage own addresses" on public.shipping_addresses;
+create policy "Users manage own addresses" on public.shipping_addresses
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- Making an address the default clears the previous one.
+create or replace function public.shipping_address_single_default()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if new.is_default then
+    update public.shipping_addresses
+      set is_default = false
+      where user_id = new.user_id and id <> new.id and is_default;
+  end if;
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists shipping_address_single_default on public.shipping_addresses;
+create trigger shipping_address_single_default
+  before insert or update on public.shipping_addresses
+  for each row execute function public.shipping_address_single_default();
+
+-- ----------------------------------------------------------------
+-- 3. Promo codes
+-- ----------------------------------------------------------------
+create table if not exists public.promo_codes (
+  code text primary key check (code = upper(code) and code ~ '^[A-Z0-9]{3,20}$'),
+  description text,
+  percent_off integer check (percent_off between 1 and 100),
+  amount_off_gbp numeric(8,2) check (amount_off_gbp > 0),
+  amount_off_usd numeric(8,2) check (amount_off_usd > 0),
+  free_shipping boolean not null default false,
+  min_subtotal_gbp numeric(8,2) not null default 0,
+  min_subtotal_usd numeric(8,2) not null default 0,
+  starts_at timestamptz,
+  ends_at timestamptz,
+  max_redemptions integer check (max_redemptions > 0),
+  redemptions integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  check (percent_off is not null or amount_off_gbp is not null or free_shipping),
+  check ((amount_off_gbp is null) = (amount_off_usd is null))
+);
+
+-- Clients never read codes directly; they are checked by quote_store_cart().
+alter table public.promo_codes enable row level security;
+
+-- ----------------------------------------------------------------
+-- 4. Orders
+-- ----------------------------------------------------------------
+create sequence if not exists public.order_number_seq start 100001;
+
+create table if not exists public.orders (
+  id text primary key default gen_random_uuid()::text,
+  order_number text not null unique default ('AFC' || nextval('public.order_number_seq')),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending_payment' check (status in (
+    'pending_payment', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
+  )),
+  currency text not null check (currency in ('GBP', 'USD')),
+  subtotal numeric(10,2) not null check (subtotal >= 0),
+  discount numeric(10,2) not null default 0 check (discount >= 0),
+  shipping numeric(10,2) not null default 0 check (shipping >= 0),
+  total numeric(10,2) not null check (total >= 0),
+  promo_code text references public.promo_codes(code) on delete set null,
+  shipping_address jsonb not null,
+  stripe_payment_intent_id text unique,
+  tracking_number text,
+  expires_at timestamptz,
+  paid_at timestamptz,
+  cancelled_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists orders_user_idx on public.orders (user_id, created_at desc);
+create index if not exists orders_pending_idx on public.orders (expires_at) where status = 'pending_payment';
+
+create table if not exists public.order_items (
+  id text primary key default gen_random_uuid()::text,
+  order_id text not null references public.orders(id) on delete cascade,
+  product_id text references public.store_products(id) on delete set null,
+  variant_id text references public.store_product_variants(id) on delete set null,
+  title text not null,
+  image_url text,
+  size text not null,
+  custom_name text,
+  custom_number text,
+  unit_price numeric(10,2) not null,
+  customisation_price numeric(10,2) not null default 0,
+  quantity integer not null check (quantity between 1 and 10),
+  line_total numeric(10,2) not null,
+  position integer not null default 0
+);
+create index if not exists order_items_order_idx on public.order_items (order_id, position);
+
+alter table public.orders enable row level security;
+alter table public.order_items enable row level security;
+
+-- Read-only for customers; writes go through the functions below.
+drop policy if exists "Users read own orders" on public.orders;
+create policy "Users read own orders" on public.orders
+  for select using (auth.uid() = user_id);
+
+drop policy if exists "Users read own order items" on public.order_items;
+create policy "Users read own order items" on public.order_items
+  for select using (exists (
+    select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid()
+  ));
+
+create table if not exists public.stripe_customers (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  customer_id text not null unique,
+  created_at timestamptz not null default now()
+);
+alter table public.stripe_customers enable row level security;
+
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists orders_touch on public.orders;
+create trigger orders_touch before update on public.orders
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists store_product_variants_touch on public.store_product_variants;
+create trigger store_product_variants_touch before update on public.store_product_variants
+  for each row execute function public.touch_updated_at();
+
+-- ----------------------------------------------------------------
+-- 5. Staff manage the shop
+-- ----------------------------------------------------------------
+do $$
+declare t text;
+begin
+  foreach t in array array['store_product_variants', 'promo_codes', 'orders', 'order_items'] loop
+    execute format('drop policy if exists "Staff manage %1$s" on public.%1$I', t);
+    execute format(
+      'create policy "Staff manage %1$s" on public.%1$I for all to authenticated '
+      'using (public.is_staff()) with check (public.is_staff())', t);
+  end loop;
+end $$;
+
+-- ----------------------------------------------------------------
+-- 6. Pricing
+-- ----------------------------------------------------------------
+
+-- Prices a bag. p_items is [{variant_id, quantity, custom_name?, custom_number?}].
+-- Raises on invalid input; stock is reported per line (`stock`) rather than
+-- enforced, so the bag can show "only 2 left" before checkout.
+create or replace function public.quote_store_cart(
+  p_currency text,
+  p_items jsonb,
+  p_promo_code text default null
+)
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  gbp boolean := p_currency = 'GBP';
+  item jsonb;
+  v record;
+  qty integer;
+  custom_name text;
+  custom_number text;
+  unit numeric;
+  custom numeric;
+  lines jsonb := '[]'::jsonb;
+  subtotal numeric := 0;
+  discount numeric := 0;
+  shipping numeric;
+  free_shipping boolean := false;
+  promo public.promo_codes%rowtype;
+  promo_code text := nullif(upper(btrim(coalesce(p_promo_code, ''))), '');
+  promo_error text;
+  min_subtotal numeric;
+  -- Flat delivery, free above the threshold (the app reads it from the quote).
+  shipping_flat numeric := case when gbp then 4.95 else 6.95 end;
+  free_threshold numeric := case when gbp then 75 else 100 end;
+begin
+  if p_currency is null or p_currency not in ('GBP', 'USD') then
+    raise exception 'Unsupported currency' using errcode = '22023';
+  end if;
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'Your bag is empty' using errcode = '22023';
+  end if;
+  if jsonb_array_length(p_items) > 30 then
+    raise exception 'Too many items in your bag' using errcode = '22023';
+  end if;
+
+  for item in select value from jsonb_array_elements(p_items) loop
+    qty := case when item->>'quantity' ~ '^\d{1,3}$' then (item->>'quantity')::integer end;
+    if qty is null or qty < 1 or qty > 10 then
+      raise exception 'Quantity must be between 1 and 10' using errcode = '22023';
+    end if;
+
+    select vr.id as variant_id, vr.size, vr.stock, p.id as product_id, p.title,
+           p.main_image_url, p.is_customizable,
+           case when gbp then p.price_gbp else p.price_usd end as price,
+           case when gbp then p.customisation_price_gbp else p.customisation_price_usd end as custom_price
+      into v
+      from public.store_product_variants vr
+      join public.store_products p on p.id = vr.product_id
+      where vr.id = item->>'variant_id' and p.is_active;
+    if not found then
+      raise exception 'An item in your bag is no longer available' using errcode = 'P0002';
+    end if;
+
+    custom_name := nullif(upper(btrim(coalesce(item->>'custom_name', ''))), '');
+    custom_number := nullif(btrim(coalesce(item->>'custom_number', '')), '');
+    if custom_name is not null or custom_number is not null then
+      if not v.is_customizable then
+        raise exception '% cannot be personalised', v.title using errcode = '22023';
+      end if;
+      if custom_name is not null and custom_name !~ '^[A-Z][A-Z .''-]{0,11}$' then
+        raise exception 'Shirt names can use up to 12 letters' using errcode = '22023';
+      end if;
+      if custom_number is not null and custom_number !~ '^[0-9]{1,2}$' then
+        raise exception 'Shirt numbers must be between 0 and 99' using errcode = '22023';
+      end if;
+      custom := v.custom_price;
+    else
+      custom := 0;
+    end if;
+
+    unit := v.price;
+    subtotal := subtotal + (unit + custom) * qty;
+    lines := lines || jsonb_build_object(
+      'variant_id', v.variant_id,
+      'product_id', v.product_id,
+      'title', v.title,
+      'image_url', v.main_image_url,
+      'size', v.size,
+      'stock', v.stock,
+      'quantity', qty,
+      'custom_name', custom_name,
+      'custom_number', custom_number,
+      'unit_price', unit,
+      'customisation_price', custom,
+      'line_total', (unit + custom) * qty
+    );
+  end loop;
+
+  if promo_code is not null then
+    select * into promo from public.promo_codes pc where pc.code = promo_code;
+    min_subtotal := case when gbp then promo.min_subtotal_gbp else promo.min_subtotal_usd end;
+    if not found or not promo.is_active
+       or (promo.starts_at is not null and promo.starts_at > now())
+       or (promo.ends_at is not null and promo.ends_at < now()) then
+      promo_error := 'This code isn''t valid';
+    elsif promo.max_redemptions is not null and promo.redemptions >= promo.max_redemptions then
+      promo_error := 'This code has been fully redeemed';
+    elsif subtotal < min_subtotal then
+      promo_error := format('Spend %s%s to use this code',
+        case when gbp then '£' else '$' end, to_char(min_subtotal, 'FM999990.00'));
+    else
+      discount := round(subtotal * coalesce(promo.percent_off, 0) / 100.0, 2)
+        + coalesce(case when gbp then promo.amount_off_gbp else promo.amount_off_usd end, 0);
+      discount := least(discount, subtotal);
+      free_shipping := promo.free_shipping;
+    end if;
+  end if;
+
+  shipping := case when free_shipping or subtotal - discount >= free_threshold then 0 else shipping_flat end;
+
+  return jsonb_build_object(
+    'currency', p_currency,
+    'lines', lines,
+    'subtotal', subtotal,
+    'discount', discount,
+    'shipping', shipping,
+    'total', subtotal - discount + shipping,
+    'free_shipping_threshold', free_threshold,
+    'promo', case when promo_code is not null and promo_error is null
+      then jsonb_build_object('code', promo.code, 'description', promo.description) end,
+    'promo_error', promo_error
+  );
+end;
+$$;
+
+revoke all on function public.quote_store_cart(text, jsonb, text) from public;
+grant execute on function public.quote_store_cart(text, jsonb, text) to anon, authenticated, service_role;
+
+-- ----------------------------------------------------------------
+-- 7. Order lifecycle
+-- ----------------------------------------------------------------
+
+-- Returns an order's stock to the shelves. Internal: callers guard the status.
+create or replace function public.release_order_stock(p_order_id text)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.store_product_variants v
+    set stock = v.stock + i.qty
+    from (
+      select variant_id, sum(quantity)::integer as qty
+      from public.order_items
+      where order_id = p_order_id and variant_id is not null
+      group by variant_id
+    ) i
+    where v.id = i.variant_id;
+$$;
+
+-- Takes an order's items off the shelves, or raises if any size ran out.
+create or replace function public.reserve_order_stock(p_order_id text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  line record;
+begin
+  -- Fixed lock order so concurrent checkouts cannot deadlock.
+  for line in
+    select i.variant_id, sum(i.quantity)::integer as qty, min(i.title) as title, min(i.size) as size
+    from public.order_items i
+    where i.order_id = p_order_id and i.variant_id is not null
+    group by i.variant_id
+    order by i.variant_id
+  loop
+    update public.store_product_variants
+      set stock = stock - line.qty
+      where id = line.variant_id and stock >= line.qty;
+    if not found then
+      raise exception 'Not enough stock: % (size %)', line.title, line.size
+        using errcode = 'P0001', hint = 'out_of_stock';
+    end if;
+  end loop;
+end;
+$$;
+
+-- Cancels an unpaid order and releases its stock. Idempotent.
+create or replace function public.cancel_pending_order(p_order_id text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.orders
+    set status = 'cancelled', cancelled_at = now()
+    where id = p_order_id and status = 'pending_payment';
+  if not found then
+    return false;
+  end if;
+  perform public.release_order_stock(p_order_id);
+  return true;
+end;
+$$;
+
+-- Places an order for the signed-in user: prices the bag, snapshots the
+-- address, reserves stock and returns the pending order. Any earlier
+-- unpaid order is cancelled first so an abandoned checkout never holds stock.
+create or replace function public.create_store_order(
+  p_currency text,
+  p_items jsonb,
+  p_address_id text,
+  p_promo_code text default null
+)
+returns public.orders
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  address public.shipping_addresses%rowtype;
+  quote jsonb;
+  new_order public.orders%rowtype;
+  previous text;
+begin
+  if uid is null then
+    raise exception 'Sign in to check out' using errcode = '28000';
+  end if;
+
+  select * into address from public.shipping_addresses where id = p_address_id and user_id = uid;
+  if not found then
+    raise exception 'Choose a delivery address' using errcode = 'P0002';
+  end if;
+
+  for previous in
+    select id from public.orders where user_id = uid and status = 'pending_payment'
+  loop
+    perform public.cancel_pending_order(previous);
+  end loop;
+
+  quote := public.quote_store_cart(p_currency, p_items, p_promo_code);
+  if quote->>'promo_error' is not null then
+    raise exception '%', quote->>'promo_error' using errcode = '22023', hint = 'promo';
+  end if;
+
+  insert into public.orders (
+    user_id, currency, subtotal, discount, shipping, total, promo_code, shipping_address, expires_at
+  ) values (
+    uid,
+    p_currency,
+    (quote->>'subtotal')::numeric,
+    (quote->>'discount')::numeric,
+    (quote->>'shipping')::numeric,
+    (quote->>'total')::numeric,
+    quote->'promo'->>'code',
+    jsonb_build_object(
+      'full_name', address.full_name, 'line1', address.line1, 'line2', address.line2,
+      'city', address.city, 'region', address.region, 'postcode', address.postcode,
+      'country', address.country, 'phone', address.phone
+    ),
+    now() + interval '30 minutes'
+  )
+  returning * into new_order;
+
+  insert into public.order_items (
+    order_id, product_id, variant_id, title, image_url, size, custom_name, custom_number,
+    unit_price, customisation_price, quantity, line_total, position
+  )
+  select new_order.id, l->>'product_id', l->>'variant_id', l->>'title', l->>'image_url', l->>'size',
+         l->>'custom_name', l->>'custom_number', (l->>'unit_price')::numeric,
+         (l->>'customisation_price')::numeric, (l->>'quantity')::integer,
+         (l->>'line_total')::numeric, ord::integer
+  from jsonb_array_elements(quote->'lines') with ordinality as t(l, ord);
+
+  perform public.reserve_order_stock(new_order.id);
+  return new_order;
+end;
+$$;
+
+revoke all on function public.create_store_order(text, jsonb, text, text) from public, anon;
+grant execute on function public.create_store_order(text, jsonb, text, text) to authenticated;
+
+-- Called by the Stripe webhook once a payment succeeds. Returns
+--   'paid'      order is (now) paid
+--   'refund'    order had been cancelled and its stock is gone: refund it
+--   'mismatch'  amount or currency differs from the order: do not fulfil
+--   'unknown'   no order for this payment intent
+create or replace function public.mark_order_paid(
+  p_payment_intent_id text,
+  p_amount_minor bigint,
+  p_currency text
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  o public.orders%rowtype;
+begin
+  select * into o from public.orders where stripe_payment_intent_id = p_payment_intent_id for update;
+  if not found then
+    return 'unknown';
+  end if;
+  if o.status not in ('pending_payment', 'cancelled') then
+    return 'paid';
+  end if;
+  if round(o.total * 100) <> p_amount_minor or lower(o.currency) <> lower(p_currency) then
+    return 'mismatch';
+  end if;
+
+  if o.status = 'cancelled' then
+    -- Paid after the order expired: take the stock again if it is still there.
+    begin
+      perform public.reserve_order_stock(o.id);
+    exception when sqlstate 'P0001' then
+      update public.orders set status = 'refunded' where id = o.id;
+      return 'refund';
+    end;
+  end if;
+
+  update public.orders
+    set status = 'paid', paid_at = now(), cancelled_at = null, expires_at = null
+    where id = o.id;
+  if o.promo_code is not null then
+    update public.promo_codes set redemptions = redemptions + 1 where code = o.promo_code;
+  end if;
+  return 'paid';
+end;
+$$;
+
+-- Called by the Stripe webhook when a payment fails for good or is cancelled.
+create or replace function public.cancel_order_payment(p_payment_intent_id text)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select public.cancel_pending_order(id) from public.orders
+      where stripe_payment_intent_id = p_payment_intent_id),
+    false
+  );
+$$;
+
+-- Releases stock held by checkouts that were never paid. Run every few
+-- minutes from pg_cron (see supabase/functions/stripe-webhook/README.md).
+create or replace function public.expire_pending_orders()
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  expired integer := 0;
+  o text;
+begin
+  for o in
+    select id from public.orders
+    where status = 'pending_payment' and expires_at < now()
+    for update skip locked
+  loop
+    if public.cancel_pending_order(o) then
+      expired := expired + 1;
+    end if;
+  end loop;
+  return expired;
+end;
+$$;
+
+do $$
+declare f text;
+begin
+  foreach f in array array[
+    'public.release_order_stock(text)', 'public.reserve_order_stock(text)',
+    'public.cancel_pending_order(text)', 'public.mark_order_paid(text, bigint, text)',
+    'public.cancel_order_payment(text)', 'public.expire_pending_orders()'
+  ] loop
+    execute format('revoke all on function %s from public, anon, authenticated', f);
+    execute format('grant execute on function %s to service_role', f);
+  end loop;
+end $$;
