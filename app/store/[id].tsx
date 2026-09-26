@@ -111,12 +111,11 @@ export default function ProductDetailModal() {
         title: product.title,
         imageUrl: product.main_image_url,
         size: variant.size,
-        priceGbp: product.price_gbp,
-        priceUsd: product.price_usd,
-        customPriceGbp: product.customisation_price_gbp,
-        customPriceUsd: product.customisation_price_usd,
-        customName: personalised && customName.trim() ? customName.trim() : null,
-        customNumber: personalised && customNumber ? customNumber : null,
+        print: personalised
+          ? { type: 'custom', name: customName.trim() || null, number: customNumber || null }
+          : null,
+        snapshotCurrency: currency,
+        snapshotUnit: price + (personalised ? customPrice : 0),
       },
       quantity
     );

@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, Image, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { PriceTag } from '@/components/store/ui/PriceTag';
-import { resolveImage } from '@/lib/media/resolveImage';
+import { ProductImage } from '@/components/store/ui/ProductImage';
 import type { Currency } from '@/types/database';
 import { STORE } from '@/theme/store';
 
@@ -45,20 +45,13 @@ export function ProductTile({
         accessibilityRole="button"
         accessibilityLabel={product.title}
         className="active:opacity-85">
-        <View
-          style={{
-            width,
-            height: width * 1.05,
-            borderRadius: STORE_TILE,
-            backgroundColor: STORE.muted,
-          }}
-          className="overflow-hidden">
-          <Image
-            source={resolveImage(product.main_image_url)}
-            style={{ width: '100%', height: '100%', opacity: product.sold_out ? 0.5 : 1 }}
-            resizeMode="cover"
-          />
-        </View>
+        <ProductImage
+          uri={product.main_image_url}
+          width={width}
+          height={width * 1.05}
+          radius={STORE_TILE}
+          dimmed={product.sold_out}
+        />
         {label ? (
           <Text
             className="font-body-bold"

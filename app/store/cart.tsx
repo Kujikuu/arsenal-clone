@@ -14,7 +14,13 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { MAX_LINE_QUANTITY, linePrice, useCartStore, type CartLine } from '@/store/cartStore';
+import {
+  MAX_LINE_QUANTITY,
+  linePrice,
+  printLabel,
+  useCartStore,
+  type CartLine,
+} from '@/store/cartStore';
 import type { CartQuoteLine, Currency } from '@/types/database';
 import { PALETTE } from '@/theme/palette';
 
@@ -44,7 +50,7 @@ function BagLine({
   const setQuantity = useCartStore((s) => s.setQuantity);
   const remove = useCartStore((s) => s.remove);
   const total = quoted ? Number(quoted.line_total) : linePrice(line, currency);
-  const personalisation = [line.customName, line.customNumber].filter(Boolean).join(' ');
+  const personalisation = printLabel(line.print);
 
   return (
     <View
@@ -99,7 +105,7 @@ function BagLine({
             onChange={(q) => setQuantity(line.key, q)}
           />
           <Text className="font-body-semibold text-white" style={{ fontSize: 15 }}>
-            {formatPrice(total, currency)}
+            {total == null ? '…' : formatPrice(total, currency)}
           </Text>
         </View>
       </View>
@@ -213,13 +219,8 @@ export default function CartScreen() {
   const quote = useCartQuote(currency, lines, promoCode);
   const q = lines.length ? quote.data : undefined;
 
-  const quoted = (line: CartLine) =>
-    q?.lines.find(
-      (l) =>
-        l.variant_id === line.variantId &&
-        (l.custom_name ?? null) === (line.customName ?? null) &&
-        (l.custom_number ?? null) === (line.customNumber ?? null)
-    );
+  // Quote lines come back in bag order.
+  const quoted = (line: CartLine) => q?.lines[lines.indexOf(line)];
   const problems = lines.map((l) => stockProblem(l, quoted(l), lines));
   const hasProblem = problems.some(Boolean) || Boolean(q?.promo_error);
   const count = lines.reduce((n, l) => n + l.quantity, 0);

@@ -29,8 +29,8 @@ export function PaymentBadges({ dark = true }: { dark?: boolean }) {
             backgroundColor: b.bg,
             marginRight: 8,
             marginBottom: 8,
-            borderWidth: dark ? 0 : 1,
-            borderColor: STORE.divider,
+            borderWidth: 1,
+            borderColor: dark ? '#555' : STORE.divider,
           }}
           className="items-center justify-center">
           <Text className="font-body-bold" style={{ fontSize: 11, color: b.fg }} numberOfLines={1}>

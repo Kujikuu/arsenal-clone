@@ -21,7 +21,7 @@ import { BRAND } from '@/lib/brand';
 import { formatPrice } from '@/lib/format';
 import { paymentsSupported, useStripe } from '@/lib/payments';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { useCartStore } from '@/store/cartStore';
+import { printLabel, useCartStore } from '@/store/cartStore';
 import type { ShippingAddress } from '@/types/database';
 import { PALETTE } from '@/theme/palette';
 
@@ -249,9 +249,7 @@ export default function CheckoutScreen() {
                   style={{ fontSize: 14.5, marginRight: 12 }}
                   numberOfLines={2}>
                   {l.quantity} × {l.title} · {l.size}
-                  {l.customName || l.customNumber
-                    ? ` · ${[l.customName, l.customNumber].filter(Boolean).join(' ')}`
-                    : ''}
+                  {l.print ? ` · ${printLabel(l.print)}` : ''}
                 </Text>
               </View>
             ))}

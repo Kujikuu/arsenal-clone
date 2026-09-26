@@ -35,7 +35,7 @@ export function TrustTicker({ items }: { items: string[] }) {
   const row = (key: string) => (
     <View
       key={key}
-      className="flex-row items-center"
+      style={{ flexDirection: 'row', alignItems: 'center' }}
       onLayout={key === 'a' ? (e) => (width.current = e.nativeEvent.layout.width) : undefined}>
       {items.map((t, i) => (
         <View key={i} className="flex-row items-center" style={{ paddingHorizontal: 18 }}>
@@ -57,7 +57,7 @@ export function TrustTicker({ items }: { items: string[] }) {
       accessibilityLabel={items.join('. ')}
       style={{ height: 44, backgroundColor: '#E6E6E6', overflow: 'hidden' }}
       className="justify-center">
-      <Animated.View className="flex-row" style={{ transform: [{ translateX: x }] }}>
+      <Animated.View style={{ flexDirection: 'row', transform: [{ translateX: x }] }}>
         {row('a')}
         {row('b')}
       </Animated.View>

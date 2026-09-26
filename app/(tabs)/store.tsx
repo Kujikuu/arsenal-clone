@@ -1,192 +1,114 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  RefreshControl,
-  TextInput,
-  useWindowDimensions,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { AppHeader } from '@/components/AppHeader';
-import { BagButton } from '@/components/store/BagButton';
-import { ProductCard } from '@/components/store/ProductCard';
-import { StoreFilterSheet } from '@/components/store/StoreFilterSheet';
-import { UnderlineTabs } from '@/components/ui/UnderlineTabs';
-import { EmptyState, ErrorState, LoadingState } from '@/components/ui/States';
-import {
-  DEFAULT_STORE_FILTERS,
-  STORE_CATEGORIES,
-  isStoreFiltered,
-  useStoreProducts,
-  useWishlistIds,
-  type StoreCategory,
-  type StoreFilters,
-} from '@/lib/api/store';
+import React, { useState } from 'react';
+import { View, ScrollView, RefreshControl } from 'react-native';
+import { Hero } from '@/components/store/home/Hero';
+import { ImageCarousel, type ImageCard } from '@/components/store/home/ImageCarousel';
+import { PlayerCarousel } from '@/components/store/home/PlayerCarousel';
+import { ProductRow, ProductTabs } from '@/components/store/home/ProductRow';
+import { QuickBuySheet } from '@/components/store/QuickBuySheet';
+import { Skeleton } from '@/components/store/ui/Misc';
+import { StoreFooter } from '@/components/store/ui/StoreFooter';
+import { StoreHeader } from '@/components/store/ui/StoreHeader';
+import { TrustBadges, TrustTicker } from '@/components/store/ui/Trust';
+import { StoreError } from '@/components/store/ui/StoreStates';
+import { useHomeModules } from '@/lib/api/storeCatalog';
 import { useSettings } from '@/lib/settings/SettingsProvider';
-import { PALETTE } from '@/theme/palette';
+import type { HomeModule } from '@/types/database';
+import { STORE } from '@/theme/store';
 
-/** Club shop in the app's black & red style. */
+/** Shop home in the club store's layout, driven by store_home_modules. */
 export default function StoreScreen() {
-  const router = useRouter();
-  const { width } = useWindowDimensions();
-  const { settings, update } = useSettings();
-  const [category, setCategory] = useState<StoreCategory>('ALL');
-  const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState<StoreFilters>(DEFAULT_STORE_FILTERS);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const { settings } = useSettings();
   const currency = settings.currency;
-  const products = useStoreProducts(category, filters, currency);
-  const wishlist = useWishlistIds();
-  const cardWidth = (width - 16 * 2 - 12) / 2;
-
-  // Search as the fan types, without a request per keystroke.
-  useEffect(() => {
-    const t = setTimeout(() => setFilters((f) => ({ ...f, search: searchText })), 300);
-    return () => clearTimeout(t);
-  }, [searchText]);
+  const home = useHomeModules();
+  const [quickBuy, setQuickBuy] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await products.refetch();
+    await home.refetch();
+    setRefreshKey((k) => k + 1);
     setRefreshing(false);
   };
 
-  const toggleCurrency = () =>
-    update({ currency: currency === 'GBP' ? 'USD' : 'GBP' }).catch(() => {});
+  const render = (m: HomeModule) => {
+    const p = m.payload ?? {};
+    switch (m.kind) {
+      case 'hero':
+        return (
+          <Hero key={m.id} title={m.title ?? ''} subtitle={p.subtitle} cta={p.cta} href={p.href} />
+        );
+      case 'ticker':
+        return <TrustTicker key={m.id} items={p.items ?? []} />;
+      case 'product_tabs':
+        return (
+          <ProductTabs
+            key={m.id}
+            currency={currency}
+            tabs={p.tabs ?? []}
+            onQuickBuy={setQuickBuy}
+          />
+        );
+      case 'collection_carousel':
+      case 'category_carousel':
+        return (
+          <ImageCarousel key={m.id} title={m.title ?? ''} items={(p.items ?? []) as ImageCard[]} />
+        );
+      case 'player_carousel':
+        return (
+          <PlayerCarousel
+            key={m.id}
+            title={m.title ?? 'Shop by Player'}
+            teams={p.teams ?? ['men']}
+            limit={p.limit}
+            menProduct={p.men_product}
+            womenProduct={p.women_product}
+          />
+        );
+      case 'product_carousel':
+        return (
+          <View
+            key={m.id}
+            style={{ paddingTop: 32, borderTopWidth: 1, borderTopColor: STORE.divider }}>
+            <ProductRow
+              currency={currency}
+              title={m.title ?? undefined}
+              params={{ category: p.category ?? null }}
+              onQuickBuy={setQuickBuy}
+            />
+          </View>
+        );
+      case 'trust':
+        return <TrustBadges key={m.id} />;
+      default:
+        return null;
+    }
+  };
 
-  const items = products.data ?? [];
-  const filtered = isStoreFiltered(filters);
-  const searching = Boolean(filters.search.trim());
+  const modules = home.data ?? [];
 
   return (
-    <View className="flex-1 bg-black">
-      <AppHeader rightAction={<BagButton />} />
-
-      <UnderlineTabs
-        tabs={STORE_CATEGORIES}
-        value={category}
-        onChange={setCategory}
-        variant="inline"
-        scrollable
-        gap={27}
-        fontSize={15}
-        height={56}
-      />
-
-      <View className="flex-row items-center px-4" style={{ paddingTop: 12 }}>
-        <View
-          style={{ height: 40, borderRadius: 20, backgroundColor: PALETTE.pill, paddingLeft: 12 }}
-          className="flex-1 flex-row items-center">
-          <Ionicons name="search-outline" size={18} color={PALETTE.textMuted} />
-          <TextInput
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholder="Search the shop"
-            placeholderTextColor={PALETTE.textDim}
-            returnKeyType="search"
-            autoCorrect={false}
-            accessibilityLabel="Search the shop"
-            className="flex-1 font-body text-white"
-            style={{ fontSize: 15, paddingHorizontal: 8, height: 40 }}
-          />
-          {searchText ? (
-            <Pressable
-              onPress={() => setSearchText('')}
-              hitSlop={8}
-              accessibilityLabel="Clear search"
-              style={{ paddingHorizontal: 10 }}>
-              <Ionicons name="close-circle" size={18} color={PALETTE.textMuted} />
-            </Pressable>
-          ) : null}
-        </View>
-        <Pressable
-          onPress={() => setFiltersOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel={filtered ? 'Sort and filter, filters applied' : 'Sort and filter'}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            marginLeft: 8,
-            backgroundColor: filtered ? PALETTE.red : PALETTE.pill,
-          }}
-          className="items-center justify-center active:opacity-70">
-          <Ionicons name="options-outline" size={20} color="#FFF" />
-        </Pressable>
-        <Pressable
-          onPress={toggleCurrency}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel={`Prices in ${currency}. Switch currency`}
-          style={{
-            height: 40,
-            borderRadius: 20,
-            paddingHorizontal: 12,
-            marginLeft: 8,
-            backgroundColor: PALETTE.pill,
-          }}
-          className="items-center justify-center active:opacity-70">
-          <Text className="font-body-semibold text-white" style={{ fontSize: 13 }}>
-            {currency === 'GBP' ? '£ GBP' : '$ USD'}
-          </Text>
-        </Pressable>
-      </View>
-
+    <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
+      <StoreHeader />
       <ScrollView
+        key={refreshKey}
         className="flex-1"
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PALETTE.red} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={STORE.cta} />
         }>
-        {products.error ? (
-          <ErrorState error={products.error} onRetry={products.refetch} />
-        ) : products.loading && !items.length ? (
-          <LoadingState />
-        ) : !items.length ? (
-          searching || filtered ? (
-            <EmptyState
-              icon="search-outline"
-              title="No products match"
-              message="Try a different search or clear your filters."
-              actionLabel="CLEAR ALL"
-              onAction={() => {
-                setSearchText('');
-                setFilters(DEFAULT_STORE_FILTERS);
-              }}
-            />
-          ) : (
-            <EmptyState icon="bag-outline" title="Nothing in this category yet" />
-          )
-        ) : (
-          <View className="flex-row flex-wrap" style={{ paddingLeft: 16, paddingTop: 16 }}>
-            {items.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                width={cardWidth}
-                currency={currency}
-                saved={wishlist.ids.includes(product.id)}
-                onPress={() => router.push(`/store/${product.id}`)}
-                onToggleSaved={() => wishlist.toggle(product.id)}
-              />
-            ))}
+        {home.error ? (
+          <StoreError error={home.error} onRetry={home.refetch} />
+        ) : !modules.length && home.loading ? (
+          <View style={{ padding: 16 }}>
+            <Skeleton height={520} radius={0} />
+            <Skeleton height={40} style={{ marginTop: 16 }} />
           </View>
+        ) : (
+          <View style={{ gap: 28 }}>{modules.map(render)}</View>
         )}
+        <StoreFooter />
       </ScrollView>
-
-      <StoreFilterSheet
-        visible={filtersOpen}
-        value={filters}
-        currency={currency}
-        onChange={setFilters}
-        onClose={() => setFiltersOpen(false)}
-      />
+      <QuickBuySheet productId={quickBuy} currency={currency} onClose={() => setQuickBuy(null)} />
     </View>
   );
 }

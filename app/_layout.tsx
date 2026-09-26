@@ -108,6 +108,21 @@ function RootLayout() {
                     <Stack.Screen name="quiz/[id]" options={CARD} />
                     <Stack.Screen name="experience/[id]" options={CARD} />
                     <Stack.Screen name="video/[id]" options={MODAL} />
+                    <Stack.Screen
+                      name="store/menu"
+                      options={{ ...MODAL, presentation: 'fullScreenModal' }}
+                    />
+                    <Stack.Screen
+                      name="store/search"
+                      options={{ ...MODAL, presentation: 'fullScreenModal' }}
+                    />
+                    <Stack.Screen
+                      name="store/region"
+                      options={{ ...MODAL, presentation: 'transparentModal', animation: 'fade' }}
+                    />
+                    <Stack.Screen name="store/c/[slug]" options={CARD} />
+                    <Stack.Screen name="store/players" options={CARD} />
+                    <Stack.Screen name="store/tours" options={CARD} />
                     <Stack.Screen name="store/[id]" options={MODAL} />
                     <Stack.Screen name="store/cart" options={MODAL} />
                     <Stack.Screen name="store/checkout" options={MODAL} />

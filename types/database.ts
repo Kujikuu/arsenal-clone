@@ -493,3 +493,164 @@ export interface SearchResult {
   published_at: string;
   total: number;
 }
+
+// ---------------------------------------------------------------- store catalogue
+
+export type StoreProfile = 'mens' | 'womens' | 'kids' | 'baby' | 'unisex';
+export type KitRole = 'home' | 'away' | 'third' | 'goalkeeper';
+export type KitFont = 'premier_league' | 'arsenal' | 'pride';
+
+export interface StoreCategoryRow {
+  id: string;
+  parent_id: string | null;
+  slug: string;
+  title: string;
+  image_url?: string | null;
+  position: number;
+  show_in_menu: boolean;
+}
+
+/** A product as listings show it (browse_store()). */
+export interface StoreTile {
+  id: string;
+  title: string;
+  main_image_url: string;
+  badge?: string | null;
+  brand?: string | null;
+  profile: StoreProfile;
+  popularity: number;
+  price: number;
+  compare_at: number | null;
+  sold_out: boolean;
+}
+
+export interface BrowseFacets {
+  profiles: StoreProfile[];
+  brands: string[];
+  sizes: string[];
+  max_price: number | null;
+}
+
+export interface BrowseResult {
+  total: number;
+  products: StoreTile[];
+  facets: BrowseFacets;
+}
+
+export interface ProductDetails {
+  bullets?: string[];
+  fit?: string | null;
+  model?: string | null;
+  care?: string | null;
+  colour?: string | null;
+  code?: string | null;
+  material?: string | null;
+}
+
+export interface PrintPlayer {
+  id: string;
+  name: string;
+  number: number;
+}
+
+export interface PrintSpecial {
+  id: string;
+  label: string;
+  number: string;
+}
+
+export interface PrintOptions {
+  team_type: 'men' | 'women';
+  fonts: KitFont[];
+  player_price: number;
+  name_price: number;
+  number_price: number;
+  players: PrintPlayer[];
+  specials: PrintSpecial[];
+}
+
+export interface StorePatch {
+  id: string;
+  name: string;
+  price: number;
+}
+
+export interface SizeChart {
+  id: string;
+  title: string;
+  columns: string[];
+  rows: string[][];
+}
+
+export interface RatingSummary {
+  average: number;
+  total: number;
+  breakdown: Record<'1' | '2' | '3' | '4' | '5', number>;
+}
+
+/** get_store_product(): everything the product page needs. */
+export interface StoreProductPage {
+  product: StoreProduct & {
+    brand?: string | null;
+    family_id?: string | null;
+    kit_role?: KitRole | null;
+    profile: StoreProfile;
+    profile_group_id?: string | null;
+    details: ProductDetails;
+    returnable: boolean;
+    back_image_url?: string | null;
+  };
+  price: number;
+  compare_at: number | null;
+  variants: StoreProductVariant[];
+  family: { id: string; kit_role: KitRole; image_url: string; title: string }[];
+  profiles: { id: string; profile: StoreProfile }[];
+  size_chart: SizeChart | null;
+  print: PrintOptions | null;
+  patches: StorePatch[];
+  category: { slug: string; title: string } | null;
+  rating: RatingSummary | null;
+}
+
+export type HomeModuleKind =
+  | 'hero'
+  | 'ticker'
+  | 'product_tabs'
+  | 'collection_carousel'
+  | 'category_carousel'
+  | 'player_carousel'
+  | 'product_carousel'
+  | 'trust';
+
+export interface HomeModule {
+  id: string;
+  kind: HomeModuleKind;
+  title: string | null;
+  position: number;
+  payload: Record<string, any>;
+}
+
+export interface StoreReview {
+  id: string;
+  product_id: string;
+  user_id: string | null;
+  author_name: string;
+  country: string | null;
+  rating: number;
+  title: string;
+  body: string;
+  verified: boolean;
+  helpful_count: number;
+  unhelpful_count: number;
+  created_at: string;
+}
+
+export interface StoreQuestion {
+  id: string;
+  product_id: string;
+  author_name: string;
+  question: string;
+  answer: string | null;
+  answered_at: string | null;
+  created_at: string;
+}
