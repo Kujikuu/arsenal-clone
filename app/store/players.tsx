@@ -3,14 +3,14 @@ import { View, Text, FlatList, Image, Pressable, useWindowDimensions } from 'rea
 import { useRouter } from 'expo-router';
 import { SegmentedButtons, StoreButton } from '@/components/store/ui/Buttons';
 import { ShirtArt } from '@/components/store/ui/ShirtArt';
-import { StoreFooter } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { TileGridSkeleton } from '@/components/store/ui/Misc';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { useShopPlayers } from '@/lib/api/storeCatalog';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 type Team = 'mens' | 'womens' | 'legends';
 
@@ -158,7 +158,7 @@ export default function ShopByPlayerScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" />
+      <AppHeader left="back" rightAction={<StoreHeaderActions />} />
       <FlatList
         data={list}
         keyExtractor={(p) => p.id}
@@ -189,7 +189,7 @@ export default function ShopByPlayerScreen() {
           )
         }
         renderItem={({ item }) => <Hero p={item} width={width} />}
-        ListFooterComponent={<StoreFooter />}
+        ListFooterComponent={<View style={{ height: 48 }} />}
       />
     </View>
   );

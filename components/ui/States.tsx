@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PALETTE } from '@/theme/palette';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -56,6 +57,14 @@ export function EmptyState({ icon, title, message, actionLabel, onAction }: Mess
 
 /** Shown when a Supabase request fails. */
 export function ErrorState({ error, onRetry }: { error?: Error | null; onRetry?: () => void }) {
+  if (!isSupabaseConfigured)
+    return (
+      <EmptyState
+        icon="construct-outline"
+        title="Supabase isn't connected"
+        message='Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_KEY to .env, then restart Metro with "npx expo start -c".'
+      />
+    );
   return (
     <EmptyState
       icon="cloud-offline-outline"

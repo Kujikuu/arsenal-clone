@@ -4,12 +4,13 @@ import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ProductImage } from '@/components/store/ui/ProductImage';
 import { StoreButton } from '@/components/store/ui/Buttons';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { useBrowse } from '@/lib/api/storeCatalog';
 import { useSettings } from '@/lib/settings/SettingsProvider';
 import type { StoreTile } from '@/types/database';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 function ResultRow({ product, onPress }: { product: StoreTile; onPress: () => void }) {
   return (
@@ -53,7 +54,7 @@ export default function StoreSearchScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: '#E6E6E6' }}>
-      <StoreHeader left="close" />
+      <AppHeader left="close" rightAction={<StoreHeaderActions />} />
       <View
         className="flex-row items-center"
         style={{ backgroundColor: STORE.surface, padding: 16 }}>

@@ -3,14 +3,14 @@ import { View, Text, ScrollView, Image, Pressable, useWindowDimensions } from 'r
 import { useRouter } from 'expo-router';
 import { StoreButton } from '@/components/store/ui/Buttons';
 import { Skeleton } from '@/components/store/ui/Misc';
-import { StoreFooter } from '@/components/store/ui/StoreFooter';
-import { StoreHeader } from '@/components/store/ui/StoreHeader';
 import { StoreHeading } from '@/components/store/ui/StoreText';
 import { DisplayText } from '@/components/ui/DisplayText';
 import { useExperiences } from '@/lib/api/experiences';
 import { formatPrice } from '@/lib/format';
 import { resolveImage } from '@/lib/media/resolveImage';
 import { STORE } from '@/theme/store';
+import { AppHeader } from '@/components/AppHeader';
+import { StoreHeaderActions } from '@/components/store/StoreHeaderActions';
 
 /** EMIRATES STADIUM TOURS landing, booking through the app's experiences. */
 export default function StadiumToursScreen() {
@@ -22,7 +22,7 @@ export default function StadiumToursScreen() {
 
   return (
     <View className="flex-1" style={{ backgroundColor: STORE.surface }}>
-      <StoreHeader left="back" promo="CLICK HERE FOR OPENING TIMES" />
+      <AppHeader left="back" rightAction={<StoreHeaderActions />} />
       <ScrollView>
         <View style={{ width, height: width * 1.25, backgroundColor: '#1B1B1B' }}>
           {hero?.image_url ? (
@@ -94,7 +94,7 @@ export default function StadiumToursScreen() {
             </Pressable>
           ))}
         </View>
-        <StoreFooter />
+        <View style={{ height: 48 }} />
       </ScrollView>
     </View>
   );

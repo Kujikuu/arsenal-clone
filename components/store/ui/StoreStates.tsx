@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { StoreButton } from '@/components/store/ui/Buttons';
 import { STORE } from '@/theme/store';
 
@@ -41,7 +42,42 @@ export function StoreEmpty({
   );
 }
 
+const MISSING_SCHEMA_CODES = new Set(['PGRST202', 'PGRST205', '42P01', '42883']);
+
+/** Why the shop can't load when the backend itself isn't ready, or null. */
+export function storeSetupProblem(error?: Error | null): { title: string; message: string } | null {
+  if (!isSupabaseConfigured)
+    return {
+      title: "Supabase isn't connected",
+      message:
+        'Add EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_KEY to .env, then restart Metro with "npx expo start -c".',
+    };
+  const code = (error as { code?: string } | null | undefined)?.code;
+  if (
+    error &&
+    ((code && MISSING_SCHEMA_CODES.has(code)) ||
+      /does not exist|could not find the (function|table)|schema cache/i.test(error.message))
+  )
+    return {
+      title: "The shop database isn't set up",
+      message:
+        'Apply the latest migrations ("supabase db push") and load supabase/seed.sql into your project, then pull to refresh.',
+    };
+  return null;
+}
+
 export function StoreError({ error, onRetry }: { error?: Error | null; onRetry?: () => void }) {
+  const setup = storeSetupProblem(error);
+  if (setup)
+    return (
+      <StoreEmpty
+        icon="construct-outline"
+        title={setup.title}
+        message={setup.message}
+        actionLabel={onRetry ? 'Try again' : undefined}
+        onAction={onRetry}
+      />
+    );
   return (
     <StoreEmpty
       icon="cloud-offline-outline"

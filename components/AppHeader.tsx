@@ -37,7 +37,8 @@ export function AppHeader({
   const handleLeft = () => {
     if (onLeftPress) return onLeftPress();
     if (leftAction === 'search') return router.push('/search');
-    router.back();
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
   };
 
   return (
